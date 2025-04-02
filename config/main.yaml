@@ -1,0 +1,20 @@
+http:
+  port: 8080
+  maxHeaderBytes: 1
+  readTimeout: 10s
+  writeTimeout: 10s
+
+# cache:
+#   ttl: 3600s
+
+postgres:
+  dbName: gmtool
+  host: localhost
+  port: 5431
+  user: alinasad
+  password: ""
+  maxConn: 10
+
+auth:
+  accessTokenTTL: 120m
+  refreshTokenTTL: 43200m #30 days
