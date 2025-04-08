@@ -1,0 +1,266 @@
+package tests
+
+import (
+	"sso/internal/lib/jwt"
+	"sso/tests/suite"
+	"testing"
+	"time"
+
+	ssov1 "github.com/alsadx/protos/gen/go/sso"
+	"github.com/brianvoe/gofakeit"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+const (
+	emptyAppId = 0
+	appId      = 1
+	appSecret  = "secret"
+
+	passDefaultLen = 10
+)
+
+func TestRegisterLogin_Login_HappyPath(t *testing.T) {
+	ctx, suite := suite.New(t)
+	tokenManager := jwt.NewTokenManager()
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := suite.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := suite.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: password,
+		AppId:    appId,
+	})
+	require.NoError(t, err)
+
+	loginTime := time.Now()
+
+	token := respLog.GetToken()
+	require.NotEmpty(t, token)
+
+	parsedJWT, err := tokenManager.ParseJWT(respLog.Token, appSecret)
+	require.NoError(t, err)
+
+	assert.Equal(t, respReg.GetUserId(), parsedJWT.UserId)
+	assert.Equal(t, email, parsedJWT.Email)
+	assert.Equal(t, appId, parsedJWT.AppId)
+
+	const deltaSeconds = 1
+
+	assert.InDelta(t, loginTime.Add(suite.Cfg.Auth.AccessTokenTTL).Unix(), parsedJWT.ExpiresAt.Unix(), deltaSeconds)
+}
+
+func TestReqister_UserExists(t *testing.T) {
+	ctx, suite := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	resp, err := suite.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp.GetUserId())
+
+	resp, err = suite.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+	require.Error(t, err)
+	assert.Empty(t, resp.GetUserId())
+	assert.ErrorContains(t, err, "user already exists")
+}
+
+func TestRegister_FailCases(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	tests := []struct {
+		name        string
+		email       string
+		password    string
+		username    string
+		expectedErr string
+	}{
+		{
+			name:        "Register with Empty Password",
+			email:       gofakeit.Email(),
+			password:    "",
+			username:    gofakeit.Name(),
+			expectedErr: "password is required",
+		},
+		{
+			name:        "Register with Empty Email",
+			email:       "",
+			password:    randomFakePassword(),
+			username:    gofakeit.Name(),
+			expectedErr: "email is required",
+		},
+		{
+			name:        "Register with Empty Username",
+			email:       gofakeit.Email(),
+			password:    randomFakePassword(),
+			username:    "",
+			expectedErr: "name is required",
+		},
+		{
+			name:        "Register with All Empty",
+			email:       "",
+			password:    "",
+			username:    "",
+			expectedErr: "email is required",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+				Email:    tt.email,
+				Password: tt.password,
+				Name:     tt.username,
+			})
+			require.Error(t, err)
+			require.Contains(t, err.Error(), tt.expectedErr)
+
+		})
+	}
+}
+
+func TestLogin_FailCases(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	tests := []struct {
+		name        string
+		email       string
+		password    string
+		appId       int32
+		expectedErr string
+	}{
+		{
+			name:        "Login with Empty Password",
+			email:       gofakeit.Email(),
+			password:    "",
+			appId:       appId,
+			expectedErr: "password is required",
+		},
+		{
+			name:        "Login with Empty Email",
+			email:       "",
+			password:    randomFakePassword(),
+			appId:       appId,
+			expectedErr: "email is required",
+		},
+		{
+			name:        "Login with Both Empty Email and Password",
+			email:       "",
+			password:    "",
+			appId:       appId,
+			expectedErr: "email is required",
+		},
+		{
+			name:        "Login with Non-Matching Password",
+			email:       gofakeit.Email(),
+			password:    randomFakePassword(),
+			appId:       appId,
+			expectedErr: "invalid email or password",
+		},
+		{
+			name:        "Login without AppID",
+			email:       gofakeit.Email(),
+			password:    randomFakePassword(),
+			appId:       emptyAppId,
+			expectedErr: "app_id is required",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+				Email:    gofakeit.Email(),
+				Password: randomFakePassword(),
+				Name:     gofakeit.Name(),
+			})
+			require.NoError(t, err)
+
+			_, err = st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+				Email:    tt.email,
+				Password: tt.password,
+				AppId:    tt.appId,
+			})
+			require.Error(t, err)
+			require.Contains(t, err.Error(), tt.expectedErr)
+		})
+	}
+}
+
+func TestLogin_InvalidPassword(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: "invalid",
+		AppId:    appId,
+	})
+
+	require.Error(t, err)
+	assert.Empty(t, respLog.GetToken())
+	assert.ErrorContains(t, err, "invalid email or password")
+}
+
+func TestLogin_InvalidAppId(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: password,
+		AppId:    4,
+	})
+
+	require.Error(t, err)
+	assert.Empty(t, respLog.GetToken())
+	assert.ErrorContains(t, err, "internal error")
+}
+
+func randomFakePassword() string {
+	return gofakeit.Password(true, true, true, true, false, passDefaultLen)
+}

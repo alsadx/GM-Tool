@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5431,
+            "driver": "PostgreSQL",
+            "name": "sso_db",
+            "database": "sso",
+            "username": "postgres",
+            "password": ""
+        }
+    ]
+}
