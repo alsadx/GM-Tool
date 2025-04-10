@@ -17,8 +17,11 @@ import (
 
 type Auth interface {
 	Register(ctx context.Context, email, password, name string) (userId int64, err error)
-	Login(ctx context.Context, email, password string, appId int) (token string, err error)
+	Login(ctx context.Context, email, password string, appId int) (token models.Tokens, err error)
 	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
+	RefreshToken(ctx context.Context, refreshToken string, appId int) (token models.Tokens, err error)
+	Logout(ctx context.Context, token string, appId int) (err error)
+	GetCurrentUser(ctx context.Context, token string, appId int) (user models.User, err error)
 }
 
 type serverAPI struct {
@@ -41,7 +44,7 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	token, err := s.auth.Login(ctx, input.Email, input.Password, int(input.AppId))
+	tokens, err := s.auth.Login(ctx, input.Email, input.Password, int(input.AppId))
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid email or password")
@@ -50,7 +53,7 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 		return nil, status.Errorf(codes.Internal, "internal error")
 	}
 
-	return &ssov1.LoginResponse{Token: token}, nil
+	return &ssov1.LoginResponse{Token: tokens.AccessToken, RefreshToken: tokens.RefreshToken}, nil
 }
 
 func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*ssov1.RegisterResponse, error) {
@@ -101,6 +104,43 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 
 	return &ssov1.IsAdminResponse{IsAdmin: isAdmin}, nil
 }
+
+func (s *serverAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenRequest) (*ssov1.RefreshTokenResponse, error) {
+	tokens, err := s.auth.RefreshToken(ctx, req.GetRefreshToken(), int(req.GetAppId()))
+	if err != nil {
+		if errors.Is(err, auth.ErrInvalidRefreshToken) {
+			return nil, status.Errorf(codes.Unauthenticated, "invalid or expired refresh token")
+		}
+		return nil, status.Errorf(codes.Internal, "internal error")
+	}
+
+	return &ssov1.RefreshTokenResponse{Token: tokens.AccessToken, RefreshToken: tokens.RefreshToken}, nil
+}
+
+func (s *serverAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov1.LogoutResponse, error) {
+	err := s.auth.Logout(ctx, req.GetToken(), int(req.GetAppId()))
+	if err != nil {
+		if errors.Is(err, auth.ErrUserNotFound) {
+			return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.NotFound, "user not found")
+		}
+		return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.Internal, "internal error")
+	}
+
+	return &ssov1.LogoutResponse{Success: true}, nil
+}
+
+func (s *serverAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUserRequest) (*ssov1.GetCurrentUserResponse, error) {
+	user, err := s.auth.GetCurrentUser(ctx, req.GetToken(), int(req.GetAppId()))
+	if err != nil {
+		if errors.Is(err, auth.ErrUserNotFound) {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "internal error")
+	}
+
+	return &ssov1.GetCurrentUserResponse{UserId: user.Id, Name: user.Name, Email: user.Email}, nil
+}
+
 
 func ValidateInput(input any) error {
 	validate := validator.New(validator.WithRequiredStructEnabled())

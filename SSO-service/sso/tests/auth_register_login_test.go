@@ -261,6 +261,151 @@ func TestLogin_InvalidAppId(t *testing.T) {
 	assert.ErrorContains(t, err, "internal error")
 }
 
+func TestRefreshToken_HappyPath(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: password,
+		AppId:    appId,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respLog.GetToken())
+	assert.NotEmpty(t, respLog.GetRefreshToken())
+
+	refreshTime := time.Now()
+
+	respRefresh, err := st.AuthClient.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
+		RefreshToken: respLog.GetRefreshToken(),
+		AppId:        appId,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respRefresh.GetToken())
+	assert.NotEmpty(t, respRefresh.GetRefreshToken())
+
+	assert.NotEqual(t, respLog.GetRefreshToken(), respRefresh.GetRefreshToken())
+
+	tokenManager := jwt.NewTokenManager()
+
+	parsedJWT, err := tokenManager.ParseJWT(respRefresh.Token, appSecret)
+
+	require.NoError(t, err)
+	assert.Equal(t, respReg.GetUserId(), parsedJWT.UserId)
+	assert.Equal(t, email, parsedJWT.Email)
+	assert.Equal(t, appId, parsedJWT.AppId)
+
+	const deltaSeconds = 1
+
+	assert.InDelta(t, refreshTime.Add(st.Cfg.Auth.AccessTokenTTL).Unix(), parsedJWT.ExpiresAt.Unix(), deltaSeconds)
+}
+
+func TestLogout_HappyPath(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: password,
+		AppId:    appId,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respLog.GetToken())
+	assert.NotEmpty(t, respLog.GetRefreshToken())
+
+	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
+		Token: respLog.GetToken(),
+		AppId: appId,
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, true, respLogout.GetSuccess())
+
+	_, err = st.AuthClient.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
+		RefreshToken: respLog.GetRefreshToken(),
+		AppId:        appId,
+	})
+
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "invalid or expired refresh token")
+}
+
+func TestLogout_InvalidToken(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
+		Token: "invalid",
+		AppId: appId,
+	})
+
+	require.Error(t, err)
+	assert.Equal(t, false, respLogout.GetSuccess())
+}
+
+func TestGetCurrentUser_HappyPath(t *testing.T) {
+	ctx, st := suite.New(t)
+
+	email := gofakeit.Email()
+	password := randomFakePassword()
+	name := gofakeit.Name()
+
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+		Email:    email,
+		Password: password,
+		Name:     name,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respReg.GetUserId())
+
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
+		Email:    email,
+		Password: password,
+		AppId:    appId,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, respLog.GetToken())
+	assert.NotEmpty(t, respLog.GetRefreshToken())
+
+	respGetCurrentUser, err := st.AuthClient.GetCurrentUser(ctx, &ssov1.GetCurrentUserRequest{
+		Token: respLog.GetToken(),
+		AppId: appId,
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, respReg.GetUserId(), respGetCurrentUser.GetUserId())
+	assert.Equal(t, email, respGetCurrentUser.GetEmail())
+	assert.Equal(t, name, respGetCurrentUser.GetName())
+}
+
 func randomFakePassword() string {
 	return gofakeit.Password(true, true, true, true, false, passDefaultLen)
 }

@@ -1,15 +1,20 @@
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    pass_hash VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    pass_hash BYTEA NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS email_idx ON users (email);
-
 CREATE TABLE IF NOT EXISTS apps (
-    id INTEGER PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     secret TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) UNIQUE,
+    refresh_token TEXT NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL
 );

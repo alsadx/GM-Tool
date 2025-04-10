@@ -62,7 +62,7 @@ func (m *TokenManager) NewRefreshToken() (string, error) {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate refresh token: %s", err)
+		return "", err
 	}
 
 	return hex.EncodeToString(b), nil

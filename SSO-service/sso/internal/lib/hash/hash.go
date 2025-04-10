@@ -12,17 +12,17 @@ func NewHasher() *Hasher {
 	return &Hasher{}
 }
 
-func (h *Hasher) Hash(password string) (string, error) {
+func (h *Hasher) Hash(password string) ([]byte, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return string(bytes), nil
+	return bytes, nil
 }
 
-func (h *Hasher) CheckPassword(password, hash string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+func (h *Hasher) CheckPassword(password string, hash []byte) error {
+	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			return fmt.Errorf("invalid password")

@@ -38,7 +38,7 @@ func New(dbConfig *config.DBConfig) (*Storage, error) {
 }
 
 // SaveUser saves user to storage
-func (s *Storage) SaveUser(ctx context.Context, email, name string, passHash string) (int64, error) {
+func (s *Storage) SaveUser(ctx context.Context, email, name string, passHash []byte) (int64, error) {
 	op := "storage.postgres.SaveUser"
 	var userId int64
 
@@ -72,6 +72,28 @@ func (s *Storage) User(ctx context.Context, email string) (models.User, error) {
 	`
 
 	err := s.dbPool.QueryRow(ctx, query, email).Scan(&user.Id, &user.Email, &user.PassHash, &user.Name)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
+			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		}
+		return models.User{}, fmt.Errorf("%s: %w", op, err)
+	}
+	return user, nil
+}
+
+func (s *Storage) UserByRefreshToken(ctx context.Context, refreshToken string) (models.User, error) {
+	op := "storage.postgres.UserByRefreshToken"
+
+	var user models.User
+
+	query := `
+		SELECT u.id, u.email, u.pass_hash, u.name
+		FROM users u
+		JOIN sessions s ON u.id = s.user_id
+		WHERE s.refresh_token = $1 AND s.expires_at > NOW()
+	`
+
+	err := s.dbPool.QueryRow(ctx, query, refreshToken).Scan(&user.Id, &user.Email, &user.PassHash, &user.Name)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
 			return models.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
@@ -123,6 +145,37 @@ func (s *Storage) App(ctx context.Context, appId int) (models.App, error) {
 	}
 
 	return app, nil
+}
+
+func (s *Storage) SetSession(ctx context.Context, userId int64, session models.Session) error {
+	query := `
+		INSERT INTO sessions (user_id, refresh_token, expires_at)
+		VALUES ($3, $1, $2)
+		ON CONFLICT (user_id) DO UPDATE
+		SET refresh_token = EXCLUDED.refresh_token,
+		expires_at = EXCLUDED.expires_at;
+	`
+
+	_, err := s.dbPool.Exec(ctx, query, session.RefreshToken, session.ExpiresAt, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Storage) DeleteSession(ctx context.Context, userId int64) error {
+	query := `
+		DELETE FROM sessions
+		WHERE user_id = $1;
+	`
+
+	_, err := s.dbPool.Exec(ctx, query, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Storage) Close() {

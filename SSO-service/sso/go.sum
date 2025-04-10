@@ -2,6 +2,16 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/alsadx/protos v0.0.1 h1:6xp/UOBFXE8VGzzMfpvnIdZ8s45zMDmhLCB5Hsh/1o4=
 github.com/alsadx/protos v0.0.1/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
+github.com/alsadx/protos v0.0.3 h1:VNYJRj+nyQDNX2fdJTIk0txtsTIsZSimBcdwsbq5mVE=
+github.com/alsadx/protos v0.0.3/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
+github.com/alsadx/protos v0.0.4 h1:NJogNJFtITlgSEwK+R4hm5zMrAUKVnw42UerVD0qQ0A=
+github.com/alsadx/protos v0.0.4/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
+github.com/alsadx/protos v0.0.5 h1:OTcMIEbbSaiyEeIOSiVr/iKyJTLwP12499OrUjeYmlA=
+github.com/alsadx/protos v0.0.5/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
+github.com/alsadx/protos v0.0.6 h1:LCl3bqyPGHkzjwPYdtOzgEv/L8V9qO1BgM8NEuq45R4=
+github.com/alsadx/protos v0.0.6/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
+github.com/alsadx/protos v0.0.7 h1:srq63TJQtfPIPG9IHqNrpRFM3kiwjSaJbYMfTEhPxG8=
+github.com/alsadx/protos v0.0.7/go.mod h1:E5RHkX8r8KsqexmWhzReSxrqVAvOX63u/rgl3XfzoL0=
 github.com/brianvoe/gofakeit v3.18.0+incompatible h1:wDOmHc9DLG4nRjUVVaxA+CEglKOW72Y5+4WNxUIkjM8=
 github.com/brianvoe/gofakeit v3.18.0+incompatible/go.mod h1:kfwdRA90vvNhPutZWfH7WPaDzUjz+CZFqG+rPkOjGOc=
 github.com/brianvoe/gofakeit/v6 v6.28.0 h1:Xib46XXuQfmlLS2EXRuJpqcw8St6qSZz75OUo0tgAW4=
