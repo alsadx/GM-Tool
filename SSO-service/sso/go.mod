@@ -3,7 +3,7 @@ module sso
 go 1.23.3
 
 require (
-	github.com/alsadx/protos v0.0.7
+	github.com/alsadx/protos v0.0.9
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/rs/zerolog v1.34.0
 )
