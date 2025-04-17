@@ -13,9 +13,7 @@ import (
 )
 
 const (
-	emptyAppId = 0
-	appId      = 1
-	appSecret  = "secret"
+	signKey  = "secret"
 
 	passDefaultLen = 10
 )
@@ -40,7 +38,6 @@ func TestRegisterLogin_Login_HappyPath(t *testing.T) {
 	respLog, err := suite.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
-		AppId:    appId,
 	})
 	require.NoError(t, err)
 
@@ -49,12 +46,11 @@ func TestRegisterLogin_Login_HappyPath(t *testing.T) {
 	token := respLog.GetToken()
 	require.NotEmpty(t, token)
 
-	parsedJWT, err := tokenManager.ParseJWT(respLog.Token, appSecret)
+	parsedJWT, err := tokenManager.ParseJWT(respLog.Token, signKey)
 	require.NoError(t, err)
 
 	assert.Equal(t, respReg.GetUserId(), parsedJWT.UserId)
 	assert.Equal(t, email, parsedJWT.Email)
-	assert.Equal(t, appId, parsedJWT.AppId)
 
 	const deltaSeconds = 1
 
@@ -148,43 +144,31 @@ func TestLogin_FailCases(t *testing.T) {
 		name        string
 		email       string
 		password    string
-		appId       int32
 		expectedErr string
 	}{
 		{
 			name:        "Login with Empty Password",
 			email:       gofakeit.Email(),
 			password:    "",
-			appId:       appId,
 			expectedErr: "password is required",
 		},
 		{
 			name:        "Login with Empty Email",
 			email:       "",
 			password:    randomFakePassword(),
-			appId:       appId,
 			expectedErr: "email is required",
 		},
 		{
 			name:        "Login with Both Empty Email and Password",
 			email:       "",
 			password:    "",
-			appId:       appId,
 			expectedErr: "email is required",
 		},
 		{
 			name:        "Login with Non-Matching Password",
 			email:       gofakeit.Email(),
 			password:    randomFakePassword(),
-			appId:       appId,
 			expectedErr: "invalid email or password",
-		},
-		{
-			name:        "Login without AppID",
-			email:       gofakeit.Email(),
-			password:    randomFakePassword(),
-			appId:       emptyAppId,
-			expectedErr: "app_id is required",
 		},
 	}
 	for _, tt := range tests {
@@ -199,7 +183,6 @@ func TestLogin_FailCases(t *testing.T) {
 			_, err = st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 				Email:    tt.email,
 				Password: tt.password,
-				AppId:    tt.appId,
 			})
 			require.Error(t, err)
 			require.Contains(t, err.Error(), tt.expectedErr)
@@ -226,39 +209,11 @@ func TestLogin_InvalidPassword(t *testing.T) {
 	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: "invalid",
-		AppId:    appId,
 	})
 
 	require.Error(t, err)
 	assert.Empty(t, respLog.GetToken())
 	assert.ErrorContains(t, err, "invalid email or password")
-}
-
-func TestLogin_InvalidAppId(t *testing.T) {
-	ctx, st := suite.New(t)
-
-	email := gofakeit.Email()
-	password := randomFakePassword()
-	name := gofakeit.Name()
-
-	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
-		Email:    email,
-		Password: password,
-		Name:     name,
-	})
-
-	require.NoError(t, err)
-	assert.NotEmpty(t, respReg.GetUserId())
-
-	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
-		Email:    email,
-		Password: password,
-		AppId:    4,
-	})
-
-	require.Error(t, err)
-	assert.Empty(t, respLog.GetToken())
-	assert.ErrorContains(t, err, "internal error")
 }
 
 func TestRefreshToken_HappyPath(t *testing.T) {
@@ -280,7 +235,6 @@ func TestRefreshToken_HappyPath(t *testing.T) {
 	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
-		AppId:    appId,
 	})
 
 	require.NoError(t, err)
@@ -291,7 +245,6 @@ func TestRefreshToken_HappyPath(t *testing.T) {
 
 	respRefresh, err := st.AuthClient.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
 		RefreshToken: respLog.GetRefreshToken(),
-		AppId:        appId,
 	})
 
 	require.NoError(t, err)
@@ -302,12 +255,11 @@ func TestRefreshToken_HappyPath(t *testing.T) {
 
 	tokenManager := jwt.NewTokenManager()
 
-	parsedJWT, err := tokenManager.ParseJWT(respRefresh.Token, appSecret)
+	parsedJWT, err := tokenManager.ParseJWT(respRefresh.Token, signKey)
 
 	require.NoError(t, err)
 	assert.Equal(t, respReg.GetUserId(), parsedJWT.UserId)
 	assert.Equal(t, email, parsedJWT.Email)
-	assert.Equal(t, appId, parsedJWT.AppId)
 
 	const deltaSeconds = 1
 
@@ -333,7 +285,6 @@ func TestLogout_HappyPath(t *testing.T) {
 	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
-		AppId:    appId,
 	})
 
 	require.NoError(t, err)
@@ -342,7 +293,6 @@ func TestLogout_HappyPath(t *testing.T) {
 
 	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
 		Token: respLog.GetToken(),
-		AppId: appId,
 	})
 
 	require.NoError(t, err)
@@ -350,7 +300,6 @@ func TestLogout_HappyPath(t *testing.T) {
 
 	_, err = st.AuthClient.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
 		RefreshToken: respLog.GetRefreshToken(),
-		AppId:        appId,
 	})
 
 	require.Error(t, err)
@@ -362,7 +311,6 @@ func TestLogout_InvalidToken(t *testing.T) {
 
 	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
 		Token: "invalid",
-		AppId: appId,
 	})
 
 	require.Error(t, err)
@@ -388,7 +336,6 @@ func TestGetCurrentUser_HappyPath(t *testing.T) {
 	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
-		AppId:    appId,
 	})
 
 	require.NoError(t, err)
@@ -397,7 +344,6 @@ func TestGetCurrentUser_HappyPath(t *testing.T) {
 
 	respGetCurrentUser, err := st.AuthClient.GetCurrentUser(ctx, &ssov1.GetCurrentUserRequest{
 		Token: respLog.GetToken(),
-		AppId: appId,
 	})
 
 	require.NoError(t, err)

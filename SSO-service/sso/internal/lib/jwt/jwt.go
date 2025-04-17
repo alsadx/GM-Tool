@@ -42,7 +42,7 @@ func NewTokenManager() *TokenManager {
 	return &TokenManager{}
 }
 
-func (m *TokenManager) NewJWT(user models.User, app models.App, ttl time.Duration) (string, error) {
+func (m *TokenManager) NewJWT(user models.User, signKey string, ttl time.Duration) (string, error) {
 	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, ClaimsJWT{
 	// 	UserId:   userId,
 	// 	ExpiresAt: time.Now().Add(ttl).Unix(),
@@ -53,9 +53,8 @@ func (m *TokenManager) NewJWT(user models.User, app models.App, ttl time.Duratio
 	claims["uid"] = user.Id
 	claims["email"] = user.Email
 	claims["exp"] = time.Now().Add(ttl).Unix()
-	claims["app_id"] = app.Id
 
-	return token.SignedString([]byte(app.SigningKey))
+	return token.SignedString([]byte(signKey))
 }
 
 func (m *TokenManager) NewRefreshToken() (string, error) {
@@ -88,7 +87,6 @@ func (m *TokenManager) ParseJWT(token string, signKey string) (*ParsedJWT, error
 	parsedJWT.UserId = int64(claims["uid"].(float64))
 	parsedJWT.Email = claims["email"].(string)
 	parsedJWT.ExpiresAt = time.Unix(int64(claims["exp"].(float64)), 0)
-	parsedJWT.AppId = int(claims["app_id"].(float64))
 
 	// userId, ok := claims["sub"].(string)
 	// if !ok {

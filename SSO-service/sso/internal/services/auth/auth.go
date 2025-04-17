@@ -13,6 +13,10 @@ import (
 	"sso/internal/storage"
 )
 
+const (
+	signKey = "secret"
+)
+
 type UserSaver interface {
 	SaveUser(ctx context.Context, email, name string, passHash []byte) (userId int64, err error)
 }
@@ -25,15 +29,10 @@ type UserProvider interface {
 	DeleteSession(ctx context.Context, userId int64) error
 }
 
-type AppProvider interface {
-	App(ctx context.Context, appId int) (models.App, error)
-}
-
 type Auth struct {
 	log          *slog.Logger
 	userSaver    UserSaver
 	userProvider UserProvider
-	appProvider  AppProvider
 	tokenTTL     time.Duration
 	hasher       *hash.Hasher
 	tokenManager *jwt.TokenManager
@@ -41,18 +40,16 @@ type Auth struct {
 
 var (
 	ErrInvalidCredentials  = errors.New("invalid credentials")
-	ErrAppNotFound         = errors.New("app not found")
 	ErrUserExists          = errors.New("user already exists")
 	ErrUserNotFound        = errors.New("user not found")
 	ErrInvalidRefreshToken = errors.New("invalid refresh token")
 )
 
-func New(log *slog.Logger, userSaver UserSaver, userProvider UserProvider, appProvider AppProvider, tokenTTL time.Duration, hasher *hash.Hasher, tokenManager *jwt.TokenManager) *Auth {
+func New(log *slog.Logger, userSaver UserSaver, userProvider UserProvider, tokenTTL time.Duration, hasher *hash.Hasher, tokenManager *jwt.TokenManager) *Auth {
 	return &Auth{
 		log:          log,
 		userSaver:    userSaver,
 		userProvider: userProvider,
-		appProvider:  appProvider,
 		tokenTTL:     tokenTTL,
 		hasher:       hasher,
 		tokenManager: tokenManager,
@@ -62,7 +59,7 @@ func New(log *slog.Logger, userSaver UserSaver, userProvider UserProvider, appPr
 // Login checks if user with given credentials exists
 // if user exists returns token
 // if user doesn't exist returns error
-func (a *Auth) Login(ctx context.Context, email, password string, appId int) (models.Tokens, error) {
+func (a *Auth) Login(ctx context.Context, email, password string) (models.Tokens, error) {
 	const op = "auth.Login"
 
 	log := a.log.With(slog.String("op", op), slog.String("email", email))
@@ -88,25 +85,13 @@ func (a *Auth) Login(ctx context.Context, email, password string, appId int) (mo
 		return models.Tokens{}, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	app, err := a.appProvider.App(ctx, appId)
-	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			a.log.Warn("app not found", slog.String("error", err.Error()))
-
-			return models.Tokens{}, fmt.Errorf("%s: %w", op, ErrAppNotFound)
-		}
-		a.log.Error("error getting app", slog.String("error", err.Error()))
-
-		return models.Tokens{}, fmt.Errorf("%s: %w", op, err)
-	}
-
 	// token, err := a.tokenManager.NewJWT(user, app, a.tokenTTL)
 	// if err != nil {
 	// 	a.log.Error("failed to generate token", slog.String("error", err.Error()))
 
 	// 	return "", fmt.Errorf("%s: %w", op, err)
 	// }
-	tokens, err := a.CreateSession(ctx, user, app)
+	tokens, err := a.CreateSession(ctx, user)
 	if err != nil {
 		a.log.Error("failed to create session", slog.String("error", err.Error()))
 
@@ -161,11 +146,6 @@ func (a *Auth) IsAdmin(ctx context.Context, userId int64) (bool, error) {
 
 	isAdmin, err := a.userProvider.IsAdmin(ctx, userId)
 	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			a.log.Warn("app not found", slog.String("error", err.Error()))
-
-			return false, fmt.Errorf("%s: %w", op, ErrAppNotFound)
-		}
 		a.log.Error("failed to check if user is admin", slog.String("error", err.Error()))
 
 		return false, fmt.Errorf("%s: %w", op, err)
@@ -176,7 +156,7 @@ func (a *Auth) IsAdmin(ctx context.Context, userId int64) (bool, error) {
 	return isAdmin, nil
 }
 
-func (a *Auth) RefreshToken(ctx context.Context, refreshToken string, appId int) (models.Tokens, error) {
+func (a *Auth) RefreshToken(ctx context.Context, refreshToken string) (models.Tokens, error) {
 	const op = "auth.RefreshToken"
 
 	log := a.log.With(slog.String("op", op))
@@ -195,19 +175,7 @@ func (a *Auth) RefreshToken(ctx context.Context, refreshToken string, appId int)
 		return models.Tokens{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	app, err := a.appProvider.App(ctx, appId)
-	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			a.log.Warn("app not found", slog.String("error", err.Error()))
-
-			return models.Tokens{}, fmt.Errorf("%s: %w", op, ErrAppNotFound)
-		}
-		a.log.Error("failed to get app", slog.String("error", err.Error()))
-
-		return models.Tokens{}, fmt.Errorf("%s: %w", op, err)
-	}
-
-	tokens, err := a.CreateSession(ctx, user, app)
+	tokens, err := a.CreateSession(ctx, user)
 	if err != nil {
 		a.log.Error("failed to create session", slog.String("error", err.Error()))
 
@@ -219,26 +187,14 @@ func (a *Auth) RefreshToken(ctx context.Context, refreshToken string, appId int)
 	return tokens, nil
 }
 
-func (a *Auth) Logout(ctx context.Context, token string, appId int) error {
+func (a *Auth) Logout(ctx context.Context, token string) error {
 	const op = "auth.Logout"
 
 	log := a.log.With(slog.String("op", op))
 
 	log.Info("logging out")
 
-	app, err := a.appProvider.App(ctx, appId)
-	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			a.log.Warn("app not found", slog.String("error", err.Error()))
-
-			return fmt.Errorf("%s: %w", op, ErrAppNotFound)
-		}
-		a.log.Error("failed to get app", slog.String("error", err.Error()))
-
-		return fmt.Errorf("%s: %w", op, err)
-	}
-
-	parsedJWT, err := a.tokenManager.ParseJWT(token, app.SigningKey)
+	parsedJWT, err := a.tokenManager.ParseJWT(token, signKey)
 	if err != nil {
 		a.log.Warn("invalid token", slog.String("error", err.Error()))
 
@@ -257,26 +213,14 @@ func (a *Auth) Logout(ctx context.Context, token string, appId int) error {
 	return nil
 }
 
-func (a *Auth) GetCurrentUser(ctx context.Context, token string, appId int) (models.User, error) {
+func (a *Auth) GetCurrentUser(ctx context.Context, token string) (models.User, error) {
 	const op = "auth.GetCurrentUser"
 
 	log := a.log.With(slog.String("op", op))
 
 	log.Info("getting current user")
 
-	app, err := a.appProvider.App(ctx, appId)
-	if err != nil {
-		if errors.Is(err, storage.ErrAppNotFound) {
-			a.log.Warn("app not found", slog.String("error", err.Error()))
-
-			return models.User{}, fmt.Errorf("%s: %w", op, ErrAppNotFound)
-		}
-		a.log.Error("failed to get app", slog.String("error", err.Error()))
-
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
-	}
-
-	parsedToken, err := a.tokenManager.ParseJWT(token, app.SigningKey)
+	parsedToken, err := a.tokenManager.ParseJWT(token, signKey)
 	if err != nil {
 		a.log.Warn("invalid token", slog.String("error", err.Error()))
 
@@ -300,7 +244,7 @@ func (a *Auth) GetCurrentUser(ctx context.Context, token string, appId int) (mod
 	return user, nil
 }
 
-func (a *Auth) CreateSession(ctx context.Context, user models.User, app models.App) (models.Tokens, error) {
+func (a *Auth) CreateSession(ctx context.Context, user models.User) (models.Tokens, error) {
 	const op = "auth.CreateSession"
 
 	log := a.log.With(slog.String("op", op), slog.String("email", user.Email))
@@ -310,7 +254,7 @@ func (a *Auth) CreateSession(ctx context.Context, user models.User, app models.A
 	var res models.Tokens
 	var err error
 
-	res.AccessToken, err = a.tokenManager.NewJWT(user, app, a.tokenTTL)
+	res.AccessToken, err = a.tokenManager.NewJWT(user, signKey, a.tokenTTL)
 	if err != nil {
 		a.log.Error("failed to generate access token", slog.String("error", err.Error()))
 

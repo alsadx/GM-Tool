@@ -17,11 +17,11 @@ import (
 
 type Auth interface {
 	Register(ctx context.Context, email, password, name string) (userId int64, err error)
-	Login(ctx context.Context, email, password string, appId int) (token models.Tokens, err error)
+	Login(ctx context.Context, email, password string) (token models.Tokens, err error)
 	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
-	RefreshToken(ctx context.Context, refreshToken string, appId int) (token models.Tokens, err error)
-	Logout(ctx context.Context, token string, appId int) (err error)
-	GetCurrentUser(ctx context.Context, token string, appId int) (user models.User, err error)
+	RefreshToken(ctx context.Context, refreshToken string) (token models.Tokens, err error)
+	Logout(ctx context.Context, token string) (err error)
+	GetCurrentUser(ctx context.Context, token string) (user models.User, err error)
 }
 
 type serverAPI struct {
@@ -37,14 +37,13 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 	input := models.LoginInput{
 		Email:    req.Email,
 		Password: req.Password,
-		AppId:    req.AppId,
 	}
 
 	if err := ValidateInput(input); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	tokens, err := s.auth.Login(ctx, input.Email, input.Password, int(input.AppId))
+	tokens, err := s.auth.Login(ctx, input.Email, input.Password)
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid email or password")
@@ -106,7 +105,7 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 }
 
 func (s *serverAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenRequest) (*ssov1.RefreshTokenResponse, error) {
-	tokens, err := s.auth.RefreshToken(ctx, req.GetRefreshToken(), int(req.GetAppId()))
+	tokens, err := s.auth.RefreshToken(ctx, req.GetRefreshToken())
 	if err != nil {
 		if errors.Is(err, auth.ErrInvalidRefreshToken) {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid or expired refresh token")
@@ -118,7 +117,7 @@ func (s *serverAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenReq
 }
 
 func (s *serverAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov1.LogoutResponse, error) {
-	err := s.auth.Logout(ctx, req.GetToken(), int(req.GetAppId()))
+	err := s.auth.Logout(ctx, req.GetToken())
 	if err != nil {
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.NotFound, "user not found")
@@ -130,7 +129,7 @@ func (s *serverAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov
 }
 
 func (s *serverAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUserRequest) (*ssov1.GetCurrentUserResponse, error) {
-	user, err := s.auth.GetCurrentUser(ctx, req.GetToken(), int(req.GetAppId()))
+	user, err := s.auth.GetCurrentUser(ctx, req.GetToken())
 	if err != nil {
 		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
@@ -158,8 +157,6 @@ func ValidateInput(input any) error {
 				return fmt.Errorf("name is required")
 			case "password":
 				return fmt.Errorf("password is required")
-			case "appid":
-				return fmt.Errorf("app_id is required")
 			case "userid":
 				return fmt.Errorf("user_id is required")
 			}

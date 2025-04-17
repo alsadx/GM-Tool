@@ -3,7 +3,6 @@ package postgres
 import (
 	"campaigntool/internal/config"
 	"campaigntool/internal/domain/models"
-	"campaigntool/internal/storage"
 	"context"
 	"errors"
 	"fmt"
@@ -50,7 +49,7 @@ func (s *Storage) SaveCampaign(ctx context.Context, name, desc string, userId in
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrCampaignExists)
+			return 0, fmt.Errorf("%s: %w", op, models.ErrCampaignExists)
 		}
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
@@ -68,7 +67,7 @@ func (s *Storage) DeleteCampaign(ctx context.Context, campaignId int32, userId i
 	_, err := s.dbPool.Exec(ctx, query, campaignId, userId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return fmt.Errorf("%s: %w", op, storage.ErrCampaignNotFound)
+			return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
 		}
 
 		return fmt.Errorf("%s: %w", op, err)
@@ -88,7 +87,7 @@ func (s *Storage) SetInviteCode(ctx context.Context, campaignId int32, inviteCod
 	_, err := s.dbPool.Exec(ctx, query, inviteCode, campaignId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return fmt.Errorf("%s: %w", op, storage.ErrCampaignNotFound)
+			return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
 		}
 
 		return fmt.Errorf("%s: %w", op, err)
@@ -108,7 +107,7 @@ func (s *Storage) CheckInviteCode(ctx context.Context, inviteCode string) (int32
 	err := s.dbPool.QueryRow(ctx, query, inviteCode).Scan(&campaignId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrCampaignNotFound)
+			return 0, fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
 		}
 
 		return 0, fmt.Errorf("%s: %w", op, err)
@@ -121,16 +120,35 @@ func (s *Storage) AddPlayer(ctx context.Context, campaignId int32, userId int) e
 	op := "storage.postgres.AddPlayer"
 
 	query := `
-		INSERT INTO players (campaign_id, user_id)
+		INSERT INTO players (campaign_id, player_id)
 		VALUES ($1, $2)
 	`
 	_, err := s.dbPool.Exec(ctx, query, campaignId, userId)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return fmt.Errorf("%s: %w", op, storage.ErrPlayerInCampaign)
+			return fmt.Errorf("%s: %w", op, models.ErrPlayerInCampaign)
 		} else if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return fmt.Errorf("%s: %w", op, storage.ErrCampaignNotFound)
+			return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
+		}
+
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) RemovePlayer(ctx context.Context, campaignId int32, userId int) error {
+	op := "storage.postgres.RemovePlayer"
+
+	query := `
+		DELETE FROM players
+		WHERE campaign_id = $1 AND player_id = $2
+	`
+	_, err := s.dbPool.Exec(ctx, query, campaignId, userId)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
+			return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
 		}
 
 		return fmt.Errorf("%s: %w", op, err)

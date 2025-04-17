@@ -1,8 +1,8 @@
 package jwt
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -16,14 +16,27 @@ func ValidateToken(token, secret string) (int, error) {
 	})
 
 	if err != nil || !parsedToken.Valid {
-		return 0, errors.New("invalid token")
+		return 0, fmt.Errorf("invalid token")
 	}
 
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok {
-		return 0, errors.New("invalid claims")
+		return 0, fmt.Errorf("invalid claims")
 	}
 
 	userId := int(claims["uid"].(float64))
 	return userId, nil
+}
+
+func ExtractTokenFromHeader(authHeader string) (string, error) {
+	if authHeader == "" {
+		return "", fmt.Errorf("empty authorization header")
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		return "", fmt.Errorf("invalid authorization header format")
+	}
+
+	return token, nil
 }

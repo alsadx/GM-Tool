@@ -1,0 +1,212 @@
+package tests
+
+import (
+	"campaigntool/internal/domain/models"
+	grpccampaign "campaigntool/internal/grpc/campaign"
+	"context"
+	"net"
+	"os"
+	"testing"
+	"time"
+
+	campaignv1 "github.com/alsadx/protos/gen/go/campaign"
+	"github.com/golang/mock/gomock"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
+)
+
+func TestGRPC_CreateCampaign_Success(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, mockGameSaver, _ := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	name := "Test Campaign"
+	description := "This is a test campaign"
+	expectedCampaignId := int32(123)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
+
+	mockGameSaver.EXPECT().
+		SaveCampaign(gomock.Any(), name, description, 1).
+		Return(expectedCampaignId, nil)
+
+	resp, err := client.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
+		Name:        name,
+		Description: &description,
+	})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp.GetCampaignId())
+}
+
+func TestGRPC_CreateCampaign_EmptyName(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, _, _ := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	name := ""
+	description := "This is a test campaign"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
+
+	resp, err := client.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
+		Name:        name,
+		Description: &description,
+	})
+
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "name is required")
+	assert.Empty(t, resp.GetCampaignId())
+}
+
+func TestGRPC_CreateCampaign_InvalidToken(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, _, _ := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	name := "Test Campaign"
+	description := "This is a test campaign"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer invalid-token"))
+
+	resp, err := client.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
+		Name:        name,
+		Description: &description,
+	})
+
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "invalid token")
+	assert.Empty(t, resp.GetCampaignId())
+}
+
+func TestGRPC_CreateCampaign_CampaignAlreadyExists(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, mockGameSaver, _ := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	name := "Test Campaign"
+	description := "This is a test campaign"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
+
+	mockGameSaver.EXPECT().
+		SaveCampaign(gomock.Any(), name, description, 1).
+		Return(int32(0), models.ErrCampaignExists)
+
+	resp, err := client.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
+		Name:        name,
+		Description: &description,
+	})
+
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "campaign with this name already exists")
+	assert.Empty(t, resp.GetCampaignId())
+}

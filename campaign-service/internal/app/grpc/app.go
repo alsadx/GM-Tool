@@ -17,7 +17,7 @@ type App struct {
 }
 
 func New(log *slog.Logger, campaignToolService grpccampaign.CampaignTool, port int) *App {
-	gRPCServer := grpc.NewServer()
+	gRPCServer := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
 	grpccampaign.RegisterServerAPI(gRPCServer, campaignToolService)
 
 	return &App{

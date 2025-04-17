@@ -4,7 +4,7 @@ tasks:
   migrate:
     desc: "Apply database migrations"
     cmds:
-      - go run ./cmd/migrator/main.go --db-url="postgres:@localhost:5431/sso?sslmode=disable" --migrations-path="./migrations"
+      - go run ./cmd/migrator/main.go --db-url="postgres:@localhost:5431/sso?sslmode=disable" --migrations-path="./migrations" --migrations-table="sso_migrations"
 
   run:
     desc: "Run the server"

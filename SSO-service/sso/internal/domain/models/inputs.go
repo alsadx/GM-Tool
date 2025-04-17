@@ -3,7 +3,6 @@ package models
 type LoginInput struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"` // TODO: add min length
-	AppId    int32    `json:"app_id" validate:"required,min=1"`
 }
 
 type RegisterInput struct {

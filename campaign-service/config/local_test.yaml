@@ -1,0 +1,12 @@
+env: "local"
+postgres:
+  host: "localhost"
+  port: 5431
+  user: "postgres"
+  password: ""
+  database: "sso"
+  maxConn: 10
+
+grpc:
+  port: 50052
+  timeout: 10h

@@ -126,26 +126,26 @@ func (s *Storage) IsAdmin(ctx context.Context, userId int64) (bool, error) {
 	return isAdmin, nil
 }
 
-func (s *Storage) App(ctx context.Context, appId int) (models.App, error) {
-	op := "storage.postgres.App"
+// func (s *Storage) App(ctx context.Context, appId int) (models.App, error) {
+// 	op := "storage.postgres.App"
 
-	var app models.App
-	query := `
-		SELECT id, name, secret
-		FROM apps
-		WHERE id = $1
-	`
+// 	var app models.App
+// 	query := `
+// 		SELECT id, name, secret
+// 		FROM apps
+// 		WHERE id = $1
+// 	`
 
-	err := s.dbPool.QueryRow(ctx, query, appId).Scan(&app.Id, &app.Name, &app.SigningKey)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrAppNotFound)
-		}
-		return models.App{}, fmt.Errorf("%s: %w", op, err)
-	}
+// 	err := s.dbPool.QueryRow(ctx, query, appId).Scan(&app.Id, &app.Name, &app.SigningKey)
+// 	if err != nil {
+// 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
+// 			return models.App{}, fmt.Errorf("%s: %w", op, storage.ErrAppNotFound)
+// 		}
+// 		return models.App{}, fmt.Errorf("%s: %w", op, err)
+// 	}
 
-	return app, nil
-}
+// 	return app, nil
+// }
 
 func (s *Storage) SetSession(ctx context.Context, userId int64, session models.Session) error {
 	query := `

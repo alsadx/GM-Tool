@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"sso/internal/app"
@@ -13,6 +14,7 @@ import (
 )
 
 func main() {
+
 	cfg := config.MustLoad()
 
 	log := logger.SetupLogger(cfg.Env)
