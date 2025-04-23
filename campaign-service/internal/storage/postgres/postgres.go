@@ -64,14 +64,14 @@ func (s *Storage) DeleteCampaign(ctx context.Context, campaignId int32, userId i
 		DELETE FROM campaigns
 		WHERE id = $1 AND master_id = $2
 	`
-	_, err := s.dbPool.Exec(ctx, query, campaignId, userId)
+	commandTag, err := s.dbPool.Exec(ctx, query, campaignId, userId)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
-		}
-
 		return fmt.Errorf("%s: %w", op, err)
 	}
+	
+	if commandTag.RowsAffected() == 0 {
+        return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
+    }
 
 	return nil
 }
@@ -157,7 +157,7 @@ func (s *Storage) RemovePlayer(ctx context.Context, campaignId int32, userId int
 	return nil
 }
 
-func (s *Storage) CreatedCampaigns(ctx context.Context, userId int) ([]models.Campaign, error) {
+func (s *Storage) CreatedCampaigns(ctx context.Context, userId int) ([]*models.Campaign, error) {
 	op := "storage.postgres.CreatedCampaigns"
 
 	query := `
@@ -184,23 +184,27 @@ func (s *Storage) CreatedCampaigns(ctx context.Context, userId int) ([]models.Ca
 	}
     defer rows.Close()
 
-	var campaigns []models.Campaign
+	var campaigns []*models.Campaign
 	for rows.Next() {
 		var campaign models.Campaign
 		if err := rows.Scan(&campaign.Id, &campaign.Name, &campaign.Description, &campaign.PlayerCount, &campaign.CreatedAt); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
-		campaigns = append(campaigns, campaign)
+		campaigns = append(campaigns, &campaign)
 	}
 	if err := rows.Err(); err != nil {
         return nil, fmt.Errorf("%s: %w", op, err)
     }
 
+	if len(campaigns) == 0 {
+        return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+    }
+
 	return campaigns, nil
 }
 
-func (s *Storage) CurrentCampaigns(ctx context.Context, userId int) ([]models.CampaignForPlayer, error) {
+func (s *Storage) CurrentCampaigns(ctx context.Context, userId int) ([]*models.CampaignForPlayer, error) {
 	op := "storage.postgres.CurrentCampaigns"
 
 	query := `
@@ -215,20 +219,57 @@ func (s *Storage) CurrentCampaigns(ctx context.Context, userId int) ([]models.Ca
 	}
     defer rows.Close()
 
-	var campaigns []models.CampaignForPlayer
+	var campaigns []*models.CampaignForPlayer
 	for rows.Next() {
 		var campaign models.CampaignForPlayer
 		if err := rows.Scan(&campaign.Id, &campaign.Name); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
-		campaigns = append(campaigns, campaign)
+		campaigns = append(campaigns, &campaign)
 	}
 	if err := rows.Err(); err != nil {
         return nil, fmt.Errorf("%s: %w", op, err)
     }
 
+	if len(campaigns) == 0 {
+        return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+    }
+
 	return campaigns, nil
+}
+
+func (s *Storage) GetCampaignPlayers(ctx context.Context, campaignId int) ([]int, error) {
+	op := "storage.postgres.GetCampaignPlayers"
+
+	query := `
+		SELECT
+            player_id
+        FROM
+            players
+        WHERE
+            campaign_id = $1
+	`
+	rows, err := s.dbPool.Query(ctx, query, campaignId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+    defer rows.Close()
+
+	var players []int
+	for rows.Next() {
+		var player int
+		if err := rows.Scan(&player); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		players = append(players, player)
+	}
+	if err := rows.Err(); err != nil {
+        return nil, fmt.Errorf("%s: %w", op, err)
+    }
+
+	return players, nil
 }
 
 func (s *Storage) Close() {

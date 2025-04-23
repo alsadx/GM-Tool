@@ -6,6 +6,7 @@ import (
 	"context"
 	"net"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 
@@ -19,59 +20,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func TestGRPC_JoinCampaign_Success(t *testing.T) {
-	os.Setenv("TEST_ENV", "true")
-	defer os.Setenv("TEST_ENV", "")
-
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
-	service, mockGameSaver, mockGameProvider := setupTest(t)
-	srv := grpccampaign.ServerAPI{
-		CampaignTool: service,
-	}
-
-	campaignv1.RegisterCampaignToolServer(server, &srv)
-
-	listener, err := net.Listen("tcp", ":0")
-	require.NoError(t, err)
-	go server.Serve(listener)
-	defer server.Stop()
-
-	serverAddress := listener.Addr().String()
-
-	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		t.Fatal("grpc server connection failed: %w", err)
-	}
-	require.NoError(t, err)
-	defer clientConn.Close()
-
-	client := campaignv1.NewCampaignToolClient(clientConn)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
-
-	campaignId := int32(123)
-	inviteCode := "ABCDEF"
-
-	mockGameProvider.EXPECT().
-		CheckInviteCode(gomock.Any(), inviteCode).
-		Return(campaignId, nil)
-
-	mockGameSaver.EXPECT().
-		AddPlayer(gomock.Any(), campaignId, 1).
-		Return(nil)
-
-	resp, err := client.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
-		InviteCode: inviteCode,
-	})
-
-	require.NoError(t, err)
-	assert.True(t, resp.Success)
-}
-
-func TestGRPC_JoinCampaign_InvalidInviteCode(t *testing.T) {
+func TestGRPC_GetCreatedCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
@@ -104,27 +53,42 @@ func TestGRPC_JoinCampaign_InvalidInviteCode(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
 
-	inviteCode := "ABCDEF"
+	expectedCampaigns := make([]*models.Campaign, 2)
+	for i := 0; i < 2; i++ {
+		expectedCampaigns[i] =&models.Campaign{
+			Id:          int32(i),
+			Name:        "valid-campaign-name" + strconv.Itoa(i),
+			Description: "valid-campaign-description",
+			PlayerCount: 4,
+			CreatedAt:   time.Now(),
+		}
+	}
 
 	mockGameProvider.EXPECT().
-		CheckInviteCode(gomock.Any(), inviteCode).
-		Return(int32(0), models.ErrCampaignNotFound)
+		CreatedCampaigns(gomock.Any(), 1).
+		Return(expectedCampaigns, nil)
 
-	resp, err := client.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
-		InviteCode: inviteCode,
-	})
+	resp, err := client.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{})
 
-	require.Error(t, err)
-	assert.ErrorContains(t, err, "invalid invite code")
-	assert.False(t, resp.GetSuccess())
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.IsType(t, []*campaignv1.Campaign{}, resp.Campaigns)
+	assert.Equal(t, expectedCampaigns[0].Name, resp.Campaigns[0].Name)
+	assert.Equal(t, expectedCampaigns[1].Name, resp.Campaigns[1].Name)
+	assert.Equal(t, expectedCampaigns[0].Id, resp.Campaigns[0].CampaignId)
+	assert.Equal(t, expectedCampaigns[1].Id, resp.Campaigns[1].CampaignId)
+	assert.Equal(t, expectedCampaigns[0].PlayerCount, resp.Campaigns[0].PlayerCount)
+	assert.Equal(t, expectedCampaigns[1].PlayerCount, resp.Campaigns[1].PlayerCount)
+	assert.Equal(t, expectedCampaigns[0].Description, *resp.Campaigns[0].Description)
+	assert.Equal(t, expectedCampaigns[1].Description, *resp.Campaigns[1].Description)
 }
 
-func TestGRPC_JoinCampaign_NotFound(t *testing.T) {
+func TestGRPC_GetCreatedCampaign_NoCampaigns(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
 	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
-	service, mockGameSaver, mockGameProvider := setupTest(t)
+	service, _, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
 	}
@@ -152,80 +116,18 @@ func TestGRPC_JoinCampaign_NotFound(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
 
-	campaignId := int32(123)
-	inviteCode := "ABCDEF"
-
 	mockGameProvider.EXPECT().
-		CheckInviteCode(gomock.Any(), inviteCode).
-		Return(campaignId, nil)
+		CreatedCampaigns(gomock.Any(), 1).
+		Return(nil, models.ErrNoCampaigns)
 
-	mockGameSaver.EXPECT().
-		AddPlayer(gomock.Any(), campaignId, 1).
-		Return(models.ErrCampaignNotFound)
+	resp, err := client.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{})
 
-	resp, err := client.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
-		InviteCode: inviteCode,
-	})
-
-	require.Error(t, err)
-	assert.ErrorContains(t, err, "campaign not found")
-	assert.False(t, resp.GetSuccess())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "campaigns not found")
+	assert.Nil(t, resp)
 }
 
-func TestGRPC_JoinCampaign_AlreadyJoined(t *testing.T) {
-	os.Setenv("TEST_ENV", "true")
-	defer os.Setenv("TEST_ENV", "")
-
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
-	service, mockGameSaver, mockGameProvider := setupTest(t)
-	srv := grpccampaign.ServerAPI{
-		CampaignTool: service,
-	}
-
-	campaignv1.RegisterCampaignToolServer(server, &srv)
-
-	listener, err := net.Listen("tcp", ":0")
-	require.NoError(t, err)
-	go server.Serve(listener)
-	defer server.Stop()
-
-	serverAddress := listener.Addr().String()
-
-	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		t.Fatal("grpc server connection failed: %w", err)
-	}
-	require.NoError(t, err)
-	defer clientConn.Close()
-
-	client := campaignv1.NewCampaignToolClient(clientConn)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
-
-	campaignId := int32(123)
-	inviteCode := "ABCDEF"
-
-	mockGameProvider.EXPECT().
-		CheckInviteCode(gomock.Any(), inviteCode).
-		Return(campaignId, nil)
-
-	mockGameSaver.EXPECT().
-		AddPlayer(gomock.Any(), campaignId, 1).
-		Return(models.ErrPlayerInCampaign)
-
-	resp, err := client.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
-		InviteCode: inviteCode,
-	})
-
-	require.Error(t, err)
-	assert.ErrorContains(t, err, "player is already in campaign")
-	assert.False(t, resp.GetSuccess())
-}
-
-func TestGRPC_JoinCampaign_InvalidToken(t *testing.T) {
+func TestGRPC_GetCreatedCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
@@ -258,13 +160,149 @@ func TestGRPC_JoinCampaign_InvalidToken(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer invalid-token"))
 
-	inviteCode := "ABCDEF"
+	resp, err := client.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{})
 
-	resp, err := client.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
-		InviteCode: inviteCode,
-	})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid token")
+	assert.Nil(t, resp)
+}
 
-	require.Error(t, err)
-	assert.ErrorContains(t, err, "invalid token")
+func TestGRPC_GetCurrentCampaign_Success(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, _, mockGameProvider := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
+
+	expectedCampaigns := make([]*models.CampaignForPlayer, 2)
+	for i := 0; i < 2; i++ {
+		expectedCampaigns[i] =&models.CampaignForPlayer{
+			Id:          int32(i),
+			Name:        "valid-campaign-name" + strconv.Itoa(i),
+		}
+	}
+
+	mockGameProvider.EXPECT().
+		CurrentCampaigns(gomock.Any(), 1).
+		Return(expectedCampaigns, nil)
+
+	resp, err := client.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{})
+
+	require.NoError(t, err)
+	assert.NotEmpty(t, resp)
+	assert.IsType(t, []*campaignv1.CampaignForPlayer{}, resp.Campaigns)
+	assert.Equal(t, expectedCampaigns[0].Name, resp.Campaigns[0].Name)
+	assert.Equal(t, expectedCampaigns[1].Name, resp.Campaigns[1].Name)
+	assert.Equal(t, expectedCampaigns[0].Id, resp.Campaigns[0].CampaignId)
+	assert.Equal(t, expectedCampaigns[1].Id, resp.Campaigns[1].CampaignId)
+}
+
+func TestGRPC_GetCurrentCampaign_NoCampaigns(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, _, mockGameProvider := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
+
+	mockGameProvider.EXPECT().
+		CurrentCampaigns(gomock.Any(), 1).
+		Return(nil, models.ErrNoCampaigns)
+
+	resp, err := client.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{})
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "campaigns not found")
+	assert.Nil(t, resp)
+}
+
+func TestGRPC_GetCurrentCampaign_InvalidToken(t *testing.T) {
+	os.Setenv("TEST_ENV", "true")
+	defer os.Setenv("TEST_ENV", "")
+
+	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	service, _, _ := setupTest(t)
+	srv := grpccampaign.ServerAPI{
+		CampaignTool: service,
+	}
+
+	campaignv1.RegisterCampaignToolServer(server, &srv)
+
+	listener, err := net.Listen("tcp", ":0")
+	require.NoError(t, err)
+	go server.Serve(listener)
+	defer server.Stop()
+
+	serverAddress := listener.Addr().String()
+
+	clientConn, err := grpc.NewClient(serverAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		t.Fatal("grpc server connection failed: %w", err)
+	}
+	require.NoError(t, err)
+	defer clientConn.Close()
+
+	client := campaignv1.NewCampaignToolClient(clientConn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer invalid-token"))
+
+	resp, err := client.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{})
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid token")
 	assert.Nil(t, resp)
 }

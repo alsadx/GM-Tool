@@ -178,6 +178,10 @@ func (s *Storage) DeleteSession(ctx context.Context, userId int64) error {
 	return nil
 }
 
+func (s *Storage) HealthCheck(ctx context.Context) error {
+	return s.dbPool.Ping(ctx)
+}
+
 func (s *Storage) Close() {
 	s.dbPool.Close()
 }

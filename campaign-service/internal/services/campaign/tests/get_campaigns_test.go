@@ -3,6 +3,7 @@ package tests
 import (
 	"campaigntool/internal/domain/models"
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestGetCreatedCampaign_Success(t *testing.T) {
 
 	mockGameProvider.EXPECT().
 		CreatedCampaigns(ctx, 1).
-		Return([]models.Campaign{
+		Return([]*models.Campaign{
 			{
 				Id: campaignId,
 			},
@@ -29,6 +30,21 @@ func TestGetCreatedCampaign_Success(t *testing.T) {
 	assert.Equal(t, campaignId, campaigns[0].Id)
 }
 
+func TestGetCreatedCampaign_NoCampaigns(t *testing.T) {
+	service, _, mockGameProvider := setupTest(t)
+
+	ctx := context.WithValue(context.Background(), "user_id", 1)
+
+	mockGameProvider.EXPECT().
+		CreatedCampaigns(ctx, 1).
+		Return(nil, models.ErrNoCampaigns)
+
+	campaigns, err := service.GetCreatedCampaigns(ctx, 1)
+	require.Error(t, err)
+	assert.Equal(t, models.ErrNoCampaigns, errors.Unwrap(err))
+	assert.Nil(t, campaigns)
+}
+
 func TestGetCurrentCampaign_Success(t *testing.T) {
 	service, _, mockGameProvider := setupTest(t)
 
@@ -37,7 +53,7 @@ func TestGetCurrentCampaign_Success(t *testing.T) {
 
 	mockGameProvider.EXPECT().
 		CurrentCampaigns(ctx, 1).
-		Return([]models.CampaignForPlayer{
+		Return([]*models.CampaignForPlayer{
 			{
 				Id: campaignId,
 			},
@@ -47,4 +63,19 @@ func TestGetCurrentCampaign_Success(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(campaigns))
 	assert.Equal(t, campaignId, campaigns[0].Id)
+}
+
+func TestGetCurrentCampaign_NoCampaigns(t *testing.T) {
+	service, _, mockGameProvider := setupTest(t)
+
+	ctx := context.WithValue(context.Background(), "user_id", 1)
+
+	mockGameProvider.EXPECT().
+		CurrentCampaigns(ctx, 1).
+		Return(nil, models.ErrNoCampaigns)
+
+	campaigns, err := service.GetCurrentCampaigns(ctx, 1)
+	require.Error(t, err)
+	assert.Equal(t, models.ErrNoCampaigns, errors.Unwrap(err))
+	assert.Nil(t, campaigns)
 }

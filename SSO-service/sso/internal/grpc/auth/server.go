@@ -22,6 +22,7 @@ type Auth interface {
 	RefreshToken(ctx context.Context, refreshToken string) (token models.Tokens, err error)
 	Logout(ctx context.Context, token string) (err error)
 	GetCurrentUser(ctx context.Context, token string) (user models.User, err error)
+	HealthCheck(ctx context.Context) (err error)
 }
 
 type serverAPI struct {
@@ -140,6 +141,14 @@ func (s *serverAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUse
 	return &ssov1.GetCurrentUserResponse{UserId: user.Id, Name: user.Name, Email: user.Email}, nil
 }
 
+func (s *serverAPI) HealthCheck(ctx context.Context, req *ssov1.HealthCheckRequest) (*ssov1.HealthCheckResponse, error) {
+    // Проверяем подключение к базе данных
+	err := s.auth.HealthCheck(ctx)
+	if err != nil {
+		return &ssov1.HealthCheckResponse{Status: ssov1.HealthCheckResponse_NOT_SERVING}, nil
+	}
+    return &ssov1.HealthCheckResponse{Status: ssov1.HealthCheckResponse_SERVING}, nil
+}
 
 func ValidateInput(input any) error {
 	validate := validator.New(validator.WithRequiredStructEnabled())

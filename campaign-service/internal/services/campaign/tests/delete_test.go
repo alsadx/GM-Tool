@@ -11,8 +11,7 @@ import (
 )
 
 func TestDeleteCampaign_Success(t *testing.T) {
-	service, mockGameSaver, _ := setupTest(t)
-
+	service, mockGameSaver, mockGameProvider := setupTest(t)
 	ctx := context.WithValue(context.Background(), "user_id", 1)
 	name := "Test Campaign"
 	description := "This is a test campaign"
@@ -27,6 +26,10 @@ func TestDeleteCampaign_Success(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expectedCampaignId, campaignId)
 
+	mockGameProvider.EXPECT().
+		GetCampaignPlayers(ctx, int(campaignId)).
+		Return([]int{}, nil)
+
 	mockGameSaver.EXPECT().
 		DeleteCampaign(ctx, campaignId, 1).
 		Return(nil)
@@ -37,10 +40,14 @@ func TestDeleteCampaign_Success(t *testing.T) {
 }
 
 func TestDeleteCampaign_CampaignNotFound(t *testing.T) {
-	service, mockGameSaver, _ := setupTest(t)
+	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
 	campaignId := int32(123)
+
+	mockGameProvider.EXPECT().
+	GetCampaignPlayers(ctx, int(campaignId)).
+	Return([]int{}, nil)
 
 	mockGameSaver.EXPECT().
 		DeleteCampaign(ctx, campaignId, 1).
@@ -53,7 +60,7 @@ func TestDeleteCampaign_CampaignNotFound(t *testing.T) {
 }
 
 func TestDeleteCampaign_CampaignNotFound2(t *testing.T) {
-	service, mockGameSaver, _ := setupTest(t)
+	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
 	name := "Test Campaign"
@@ -69,6 +76,10 @@ func TestDeleteCampaign_CampaignNotFound2(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expectedCampaignId, campaignId)
 
+	mockGameProvider.EXPECT().
+		GetCampaignPlayers(ctx, int(campaignId)).
+		Return([]int{}, nil)
+
 	mockGameSaver.EXPECT().
 		DeleteCampaign(ctx, campaignId, 2).
 		Return(models.ErrCampaignNotFound)
@@ -77,4 +88,27 @@ func TestDeleteCampaign_CampaignNotFound2(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Equal(t, models.ErrCampaignNotFound, errors.Unwrap(err))
+}
+
+func TestDeleteCampaign_CampaignWithPlayers(t *testing.T) {
+	service, mockGameSaver, mockGameProvider := setupTest(t)
+
+	ctx := context.WithValue(context.Background(), "user_id", 1)
+	campaignId := int32(123)
+
+	mockGameProvider.EXPECT().
+		GetCampaignPlayers(ctx, int(campaignId)).
+		Return([]int{10}, nil)
+
+	mockGameSaver.EXPECT().
+		RemovePlayer(ctx, campaignId, 10).
+		Return(nil)
+
+	mockGameSaver.EXPECT().
+		DeleteCampaign(ctx, campaignId, 1).
+		Return(nil)
+
+	err := service.DeleteCampaign(ctx, campaignId, 1)
+
+	require.NoError(t, err)
 }

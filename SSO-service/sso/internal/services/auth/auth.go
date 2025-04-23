@@ -27,6 +27,7 @@ type UserProvider interface {
 	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
 	SetSession(ctx context.Context, userId int64, session models.Session) error
 	DeleteSession(ctx context.Context, userId int64) error
+	HealthCheck(ctx context.Context) (err error)
 }
 
 type Auth struct {
@@ -282,4 +283,23 @@ func (a *Auth) CreateSession(ctx context.Context, user models.User) (models.Toke
 	log.Info("session created")
 
 	return res, nil
+}
+
+func (a *Auth) HealthCheck(ctx context.Context) error {
+	const op = "auth.HealthCheck"
+
+	log := a.log.With(slog.String("op", op))
+
+	log.Info("health checking")
+
+	err := a.userProvider.HealthCheck(ctx)
+	if err != nil {
+		a.log.Error("failed to health check", slog.String("error", err.Error()))
+
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("health checked")
+
+	return nil
 }

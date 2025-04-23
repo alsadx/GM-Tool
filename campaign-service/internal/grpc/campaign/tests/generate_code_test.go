@@ -114,7 +114,8 @@ func TestGRPC_GenerateInviteCode_NotFound(t *testing.T) {
 
 	inviteCode := resp.GetInviteCode()
 
-	require.NoError(t, err)
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "campaign not found")
 	assert.Empty(t, inviteCode)
 }
 

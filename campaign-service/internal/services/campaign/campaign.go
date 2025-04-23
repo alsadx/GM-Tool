@@ -19,8 +19,9 @@ type GameSaver interface {
 
 type GameProvider interface {
 	CheckInviteCode(ctx context.Context, inviteCode string) (int32, error)
-	CreatedCampaigns(ctx context.Context, userId int) ([]models.Campaign, error)
-	CurrentCampaigns(ctx context.Context, userId int) ([]models.CampaignForPlayer, error)
+	CreatedCampaigns(ctx context.Context, userId int) ([]*models.Campaign, error)
+	CurrentCampaigns(ctx context.Context, userId int) ([]*models.CampaignForPlayer, error)
+	GetCampaignPlayers(ctx context.Context, campaignId int) ([]int, error)
 }
 
 type CampaignTool struct {
@@ -28,14 +29,6 @@ type CampaignTool struct {
 	GameSaver    GameSaver
 	GameProvider GameProvider
 }
-
-// var (
-// 	ErrInvalidCredentials = errors.New("invalid credentials")
-// 	ErrCampaignNotFound   = errors.New("campaign not found")
-// 	ErrCampaignExists     = errors.New("campaign with this name already exists")
-// 	ErrInvalidCode        = errors.New("invalid invite code")
-// 	ErrPlayerInCampaign   = errors.New("player already in campaign")
-// )
 
 func New(log *slog.Logger, gameSaver GameSaver, gameProvider GameProvider) *CampaignTool {
 	return &CampaignTool{
@@ -75,6 +68,26 @@ func (s *CampaignTool) DeleteCampaign(ctx context.Context, campaignId int32, use
 	log := s.Log.With(slog.String("op", op), slog.Int("campaignId", int(campaignId)))
 
 	log.Info("deleting campaign")
+
+	players, err := s.GameProvider.GetCampaignPlayers(ctx, int(campaignId))
+	if err != nil{
+		s.Log.Error("failed to get campaign players", slog.String("error", err.Error()))
+
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if len(players) > 0 {
+		log.Info("removing players from campaign")
+		for _, player := range players {
+			err = s.GameSaver.RemovePlayer(ctx, campaignId, player)
+			if err != nil {
+				s.Log.Error("failed to remove player", slog.String("error", err.Error()))
+
+				return fmt.Errorf("%s: %w", op, err)
+			}
+		}
+		log.Info("removed players from campaign")
+	}
 
 	err = s.GameSaver.DeleteCampaign(ctx, campaignId, userId)
 	if err != nil {
@@ -184,15 +197,20 @@ func (s *CampaignTool) LeaveCampaign(ctx context.Context, campaignId int32, user
 	return nil
 }
 
-func (s *CampaignTool) GetCreatedCampaigns(ctx context.Context, userId int) (campaigns []models.Campaign, err error) {
+func (s *CampaignTool) GetCreatedCampaigns(ctx context.Context, userId int) (campaigns []*models.Campaign, err error) {
 	op := "campaign.GetCreatedCampaigns"
 
-	log := s.Log.With(slog.String("op", op), slog.Int("id", int(userId)))
+	log := s.Log.With(slog.String("op", op), slog.Int("user_id", int(userId)))
 
 	log.Info("getting created campaigns")
 
 	campaigns, err = s.GameProvider.CreatedCampaigns(ctx, userId)
 	if err != nil {
+		// if errors.Is(err, models.ErrNoCampaigns) {
+		// 	s.Log.Error("created campaigns not found", slog.String("error", err.Error()))
+
+		// 	return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+		// }
 		log.Error("failed to get created campaigns", slog.String("error", err.Error()))
 
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -203,15 +221,20 @@ func (s *CampaignTool) GetCreatedCampaigns(ctx context.Context, userId int) (cam
 	return campaigns, nil
 }
 
-func (s *CampaignTool) GetCurrentCampaigns(ctx context.Context, userId int) (campaigns []models.CampaignForPlayer, err error) {
+func (s *CampaignTool) GetCurrentCampaigns(ctx context.Context, userId int) (campaigns []*models.CampaignForPlayer, err error) {
 	op := "campaign.GetCreatedCampaigns"
 
-	log := s.Log.With(slog.String("op", op), slog.Int("id", int(userId)))
+	log := s.Log.With(slog.String("op", op), slog.Int("user_id", int(userId)))
 
 	log.Info("getting current campaigns")
 
 	campaigns, err = s.GameProvider.CurrentCampaigns(ctx, userId)
 	if err != nil {
+		// if errors.Is(err, models.ErrNoCampaigns) {
+		// 	s.Log.Error("current campaigns not found", slog.String("error", err.Error()))
+
+		// 	return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+		// }
 		log.Error("failed to get current campaigns", slog.String("error", err.Error()))
 
 		return nil, fmt.Errorf("%s: %w", op, err)
