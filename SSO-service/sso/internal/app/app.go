@@ -7,6 +7,7 @@ import (
 	"sso/internal/lib/hash"
 	"sso/internal/lib/jwt"
 	"sso/internal/services/auth"
+	"sso/internal/services/user_info"
 	"sso/internal/storage/postgres"
 	"time"
 )
@@ -24,7 +25,9 @@ func New(log *slog.Logger, grpcPort int, dbConfig *config.DBConfig, tokenTTL tim
 
 	authService := auth.New(log, storage, storage, tokenTTL, hasher, tokenManager)
 
-	grpcApp := grpcapp.New(log, authService, grpcPort)
+	userInfoService := userinfo.New(log, storage, storage)
+
+	grpcApp := grpcapp.New(log, authService, userInfoService, grpcPort)
 
 	return &App{
 		GRPCServer: grpcApp,

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"sso/internal/domain/models"
-	"sso/internal/services/auth"
 	"strings"
 
 	ssov1 "github.com/alsadx/protos/gen/go/sso"
@@ -46,7 +45,7 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 
 	tokens, err := s.auth.Login(ctx, input.Email, input.Password)
 	if err != nil {
-		if errors.Is(err, auth.ErrInvalidCredentials) {
+		if errors.Is(err, models.ErrInvalidCredentials) {
 			return nil, status.Errorf(codes.InvalidArgument, "invalid email or password")
 		}
 
@@ -69,7 +68,7 @@ func (s *serverAPI) Register(ctx context.Context, req *ssov1.RegisterRequest) (*
 
 	userId, err := s.auth.Register(ctx, input.Email, input.Password, input.Name)
 	if err != nil {
-		if errors.Is(err, auth.ErrUserExists) {
+		if errors.Is(err, models.ErrUserExists) {
 			return nil, status.Errorf(codes.AlreadyExists, "user already exists")
 		}
 
@@ -95,7 +94,7 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 
 	isAdmin, err := s.auth.IsAdmin(ctx, input.UserId)
 	if err != nil {
-		if errors.Is(err, auth.ErrUserNotFound) {
+		if errors.Is(err, models.ErrUserNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
 
@@ -108,7 +107,7 @@ func (s *serverAPI) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (*ss
 func (s *serverAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenRequest) (*ssov1.RefreshTokenResponse, error) {
 	tokens, err := s.auth.RefreshToken(ctx, req.GetRefreshToken())
 	if err != nil {
-		if errors.Is(err, auth.ErrInvalidRefreshToken) {
+		if errors.Is(err, models.ErrInvalidRefreshToken) {
 			return nil, status.Errorf(codes.Unauthenticated, "invalid or expired refresh token")
 		}
 		return nil, status.Errorf(codes.Internal, "internal error")
@@ -120,7 +119,7 @@ func (s *serverAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenReq
 func (s *serverAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov1.LogoutResponse, error) {
 	err := s.auth.Logout(ctx, req.GetToken())
 	if err != nil {
-		if errors.Is(err, auth.ErrUserNotFound) {
+		if errors.Is(err, models.ErrUserNotFound) {
 			return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.NotFound, "user not found")
 		}
 		return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.Internal, "internal error")
@@ -132,7 +131,7 @@ func (s *serverAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov
 func (s *serverAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUserRequest) (*ssov1.GetCurrentUserResponse, error) {
 	user, err := s.auth.GetCurrentUser(ctx, req.GetToken())
 	if err != nil {
-		if errors.Is(err, auth.ErrUserNotFound) {
+		if errors.Is(err, models.ErrUserNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
 		return nil, status.Errorf(codes.Internal, "internal error")

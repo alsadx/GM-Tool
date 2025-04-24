@@ -3,7 +3,7 @@ module sso
 go 1.23.3
 
 require (
-	github.com/alsadx/protos v0.0.16
+	github.com/alsadx/protos v0.0.18
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.18.0
@@ -25,6 +25,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
