@@ -1,0 +1,16 @@
+env: "local"
+postgres:
+  host: "localhost"
+  port: 5431
+  user: "alinasad"
+  password: ""
+  database: "sso"
+  maxConn: 10
+
+grpc:
+  port: 50051
+  timeout: 10h
+
+auth:
+  accessTokenTTL: 1h
+  refreshTokenTTL: 720h #30 days

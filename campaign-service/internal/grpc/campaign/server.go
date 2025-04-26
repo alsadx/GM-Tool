@@ -2,15 +2,12 @@ package campaign
 
 import (
 	"campaigntool/internal/domain/models"
-	"campaigntool/internal/lib/jwt"
 	"context"
 	"errors"
-	"os"
 
 	campaignv1 "github.com/alsadx/protos/gen/go/campaign"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,41 +28,6 @@ type ServerAPI struct {
 
 func RegisterServerAPI(gRPC *grpc.Server, campaignTool CampaignTool) {
 	campaignv1.RegisterCampaignToolServer(gRPC, &ServerAPI{CampaignTool: campaignTool})
-}
-
-func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "missing metadata")
-	}
-	
-	authHeader, ok := md["authorization"]
-	if !ok || len(authHeader) == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "missing authorization header")
-	}
-	
-	token, err := jwt.ExtractTokenFromHeader(authHeader[0])
-	if err != nil {
-		return nil, err
-	}
-	
-	if os.Getenv("TEST_ENV") == "true" {
-		if token == "valid-token" {
-			ctx = context.WithValue(ctx, "user_id", 1)
-			return handler(ctx, req)
-		} else {
-			return nil, status.Errorf(codes.Unauthenticated, "invalid token")
-		} 
-	}
-
-	userId, err := jwt.ValidateToken(token, "secret")
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
-	}
-
-	ctx = context.WithValue(ctx, "user_id", userId)
-
-	return handler(ctx, req)
 }
 
 func (s *ServerAPI) CreateCampaign(ctx context.Context, req *campaignv1.CreateCampaignRequest) (*campaignv1.CreateCampaignResponse, error) {

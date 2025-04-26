@@ -3,8 +3,8 @@ package app
 import (
 	grpcapp "campaigntool/internal/app/grpc"
 	"campaigntool/internal/config"
-	"campaigntool/internal/storage/postgres"
 	"campaigntool/internal/services/campaign"
+	"campaigntool/internal/storage/postgres"
 	"log/slog"
 )
 

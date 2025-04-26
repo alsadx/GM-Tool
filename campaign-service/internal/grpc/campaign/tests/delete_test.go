@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -23,7 +24,7 @@ func TestGRPC_DeleteCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -74,7 +75,7 @@ func TestGRPC_DeleteCampaign_NotFound(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -126,7 +127,7 @@ func TestGRPC_DeleteCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -170,7 +171,7 @@ func TestGRPC_DeleteCampaign_CampaignWithPlayers(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,

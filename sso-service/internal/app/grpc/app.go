@@ -1,14 +1,15 @@
 package grpcapp
 
 import (
-	"auth"
-	grpccampaign "campaigntool/internal/grpc/campaign"
 	"fmt"
-
 	"log/slog"
 	"net"
 
 	"google.golang.org/grpc"
+
+	authgrpc "sso/internal/grpc/auth"
+	userinfogrpc "sso/internal/grpc/user_info"
+	"auth"
 )
 
 type App struct {
@@ -17,9 +18,10 @@ type App struct {
 	port       int
 }
 
-func New(log *slog.Logger, campaignToolService grpccampaign.CampaignTool, port int) *App {
+func New(log *slog.Logger, authService authgrpc.Auth, userInfoService userinfogrpc.UserInfo, port int) *App {
 	gRPCServer := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
-	grpccampaign.RegisterServerAPI(gRPCServer, campaignToolService)
+	authgrpc.RegisterServerAPI(gRPCServer, authService)
+	userinfogrpc.RegisterUserInfoAPI(gRPCServer, userInfoService)
 
 	return &App{
 		log:        log,

@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -24,7 +25,7 @@ func TestGRPC_GetCreatedCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -55,7 +56,7 @@ func TestGRPC_GetCreatedCampaign_Success(t *testing.T) {
 
 	expectedCampaigns := make([]*models.Campaign, 2)
 	for i := 0; i < 2; i++ {
-		expectedCampaigns[i] =&models.Campaign{
+		expectedCampaigns[i] = &models.Campaign{
 			Id:          int32(i),
 			Name:        "valid-campaign-name" + strconv.Itoa(i),
 			Description: "valid-campaign-description",
@@ -87,7 +88,7 @@ func TestGRPC_GetCreatedCampaign_NoCampaigns(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -131,7 +132,7 @@ func TestGRPC_GetCreatedCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -171,7 +172,7 @@ func TestGRPC_GetCurrentCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -202,9 +203,9 @@ func TestGRPC_GetCurrentCampaign_Success(t *testing.T) {
 
 	expectedCampaigns := make([]*models.CampaignForPlayer, 2)
 	for i := 0; i < 2; i++ {
-		expectedCampaigns[i] =&models.CampaignForPlayer{
-			Id:          int32(i),
-			Name:        "valid-campaign-name" + strconv.Itoa(i),
+		expectedCampaigns[i] = &models.CampaignForPlayer{
+			Id:   int32(i),
+			Name: "valid-campaign-name" + strconv.Itoa(i),
 		}
 	}
 
@@ -227,7 +228,7 @@ func TestGRPC_GetCurrentCampaign_NoCampaigns(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -271,7 +272,7 @@ func TestGRPC_GetCurrentCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,

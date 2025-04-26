@@ -1,0 +1,21 @@
+version: 3
+
+tasks:
+  migrate:
+    desc: "Apply database migrations"
+    cmds:
+      - go run ./cmd/migrator/main.go
+
+  run:
+    desc: "Run the server"
+    cmds:
+      - go run cmd/sso/main.go --config config/local_test.yaml  
+
+  test-migrate:
+    desc: "Database migrations for testing"
+    cmds:
+      - go run ./cmd/migrator/main.go --db-url="postgres:@localhost:5431/sso?sslmode=disable" --migrations-path="./tests/migrations" --migrations-table="test_migrations"
+
+  mockgen:
+    cmds:
+      - mockgen -source=./internal/services/auth/auth.go -destination=./tests/mocks/manager_mocks.go -package=mocks

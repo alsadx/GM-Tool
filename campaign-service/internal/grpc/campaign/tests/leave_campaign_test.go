@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -23,7 +24,7 @@ func TestGRPC_LeaveCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -70,7 +71,7 @@ func TestGRPC_LeaveCampaign_NotFound(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -106,7 +107,7 @@ func TestGRPC_LeaveCampaign_NotFound(t *testing.T) {
 		Return(models.ErrCampaignNotFound)
 
 	resp, err := client.LeaveCampaign(ctx, &campaignv1.LeaveCampaignRequest{
-		CampaignId:   campaignId,
+		CampaignId: campaignId,
 	})
 
 	require.Error(t, err)
@@ -118,7 +119,7 @@ func TestGRPC_LeaveCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(grpccampaign.AuthInterceptor))
+	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
