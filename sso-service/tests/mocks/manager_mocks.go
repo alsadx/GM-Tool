@@ -89,7 +89,7 @@ func (m *MockTokenManager) EXPECT() *MockTokenManagerMockRecorder {
 }
 
 // NewJWT mocks base method.
-func (m *MockTokenManager) NewJWT(user models.User, signKey string, ttl time.Duration) (string, error) {
+func (m *MockTokenManager) NewJWT(user *models.User, signKey string, ttl time.Duration) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NewJWT", user, signKey, ttl)
 	ret0, _ := ret[0].(string)

@@ -23,7 +23,7 @@ func NewTokenManager() *TokenManager {
 	return &TokenManager{}
 }
 
-func (m *TokenManager) NewJWT(user models.User, signKey string, ttl time.Duration) (string, error) {
+func (m *TokenManager) NewJWT(user *models.User, signKey string, ttl time.Duration) (string, error) {
 	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, ClaimsJWT{
 	// 	UserId:   userId,
 	// 	ExpiresAt: time.Now().Add(ttl).Unix(),

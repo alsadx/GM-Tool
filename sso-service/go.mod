@@ -2,10 +2,7 @@ module sso
 
 go 1.24.2
 
-replace auth => ../auth
-
 require (
-	auth v0.0.0-00010101000000-000000000000
 	github.com/alsadx/protos v0.0.19
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -21,6 +18,10 @@ require (
 	golang.org/x/crypto v0.33.0
 	google.golang.org/grpc v1.72.0
 )
+
+require protos v0.0.0
+
+replace protos => ../protos
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect

@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	campaignv1 "github.com/alsadx/protos/gen/go/campaign"
+	"protos/gen/go/campaignv1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

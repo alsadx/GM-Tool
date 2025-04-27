@@ -22,7 +22,7 @@ type Hasher interface {
 }
 
 type TokenManager interface {
-	NewJWT(user models.User, signKey string, ttl time.Duration) (string, error)
+	NewJWT(user *models.User, signKey string, ttl time.Duration) (string, error)
 	NewRefreshToken() (string, error)
 	ParseJWT(token string, signKey string) (*jwt.ParsedJWT, error)
 }
@@ -191,7 +191,7 @@ func (a *Auth) Logout(ctx context.Context, userId int64) error {
 	return nil
 }
 
-func (a *Auth) GetCurrentUser(ctx context.Context, token string) (models.User, error) {
+func (a *Auth) GetCurrentUser(ctx context.Context, token string) (*models.User, error) {
 	const op = "auth.GetCurrentUser"
 
 	log := a.Log.With(slog.String("op", op))
@@ -202,7 +202,7 @@ func (a *Auth) GetCurrentUser(ctx context.Context, token string) (models.User, e
 	if err != nil {
 		a.Log.Warn("invalid token", slog.String("error", err.Error()))
 
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	user, err := a.UserProvider.UserByEmail(ctx, parsedToken.Email)
@@ -210,11 +210,11 @@ func (a *Auth) GetCurrentUser(ctx context.Context, token string) (models.User, e
 		if errors.Is(err, models.ErrUserNotFound) {
 			a.Log.Warn("user not found", slog.String("error", err.Error()))
 
-			return models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
 		a.Log.Error("failed to get user", slog.String("error", err.Error()))
 
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("got current user", slog.String("email", user.Email))
@@ -222,7 +222,7 @@ func (a *Auth) GetCurrentUser(ctx context.Context, token string) (models.User, e
 	return user, nil
 }
 
-func (a *Auth) CreateSession(ctx context.Context, user models.User) (models.Tokens, error) {
+func (a *Auth) CreateSession(ctx context.Context, user *models.User) (models.Tokens, error) {
 	const op = "auth.CreateSession"
 
 	log := a.Log.With(slog.String("op", op), slog.String("email", user.Email))

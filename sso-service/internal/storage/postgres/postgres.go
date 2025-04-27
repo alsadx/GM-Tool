@@ -101,7 +101,7 @@ func (s *Storage) DeleteUser(ctx context.Context, userId int64) (error) {
 }
 
 // User returns user from storage by email
-func (s *Storage) UserByEmail(ctx context.Context, email string) (models.User, error) {
+func (s *Storage) UserByEmail(ctx context.Context, email string) (*models.User, error) {
 	op := "storage.postgres.UserByEmail"
 
 	user := models.User{}
@@ -115,15 +115,15 @@ func (s *Storage) UserByEmail(ctx context.Context, email string) (models.User, e
 	err := s.dbPool.QueryRow(ctx, query, email).Scan(&user.Id, &user.Email, &user.PassHash, &user.Name, &user.FullName, &user.IsAdmin, &user.AvatarUrl)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
-	return user, nil
+	return &user, nil
 }
 
 // User returns user from storage by id
-func (s *Storage) UserById(ctx context.Context, userId int64) (models.User, error) {
+func (s *Storage) UserById(ctx context.Context, userId int64) (*models.User, error) {
 	op := "storage.postgres.UserById"
 
 	user := models.User{}
@@ -137,14 +137,14 @@ func (s *Storage) UserById(ctx context.Context, userId int64) (models.User, erro
 	err := s.dbPool.QueryRow(ctx, query, userId).Scan(&user.Id, &user.Email, &user.PassHash, &user.Name, &user.FullName, &user.IsAdmin, &user.AvatarUrl)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
-	return user, nil
+	return &user, nil
 }
 
-func (s *Storage) UserByRefreshToken(ctx context.Context, refreshToken string) (models.User, error) {
+func (s *Storage) UserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error) {
 	op := "storage.postgres.UserByRefreshToken"
 
 	var user models.User
@@ -159,11 +159,11 @@ func (s *Storage) UserByRefreshToken(ctx context.Context, refreshToken string) (
 	err := s.dbPool.QueryRow(ctx, query, refreshToken).Scan(&user.Id, &user.Email, &user.PassHash, &user.Name, &user.FullName, &user.IsAdmin, &user.AvatarUrl)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
-			return models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		return models.User{}, fmt.Errorf("%s: %w", op, err)
+		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
-	return user, nil
+	return &user, nil
 }
 
 // IsAdmin returns true if user is admin and false otherwise

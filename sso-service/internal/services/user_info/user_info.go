@@ -45,7 +45,7 @@ func (u *UserInfo) GetUserById(ctx context.Context, userId int64) (*models.User,
 
 	log.Info("got user by id", slog.Int64("id", user.Id))
 
-	return &user, nil
+	return user, nil
 }
 
 func (u *UserInfo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
@@ -69,7 +69,7 @@ func (u *UserInfo) GetUserByEmail(ctx context.Context, email string) (*models.Us
 
 	log.Info("got user by email", slog.String("email", user.Email))
 
-	return &user, nil
+	return user, nil
 }
 func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[string]string) (*models.User, error) {
 	const op = "storage.postgres.UpdateUser"
@@ -97,7 +97,7 @@ func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[str
 		}
 	}
 
-	err = u.userSaver.UpdateUser(ctx, &user)
+	err = u.userSaver.UpdateUser(ctx, user)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidArgument) {
 			u.log.Warn("name is taken", slog.String("error", err.Error()))
@@ -109,7 +109,7 @@ func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[str
 		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (u *UserInfo) DeleteUser(ctx context.Context, userId int64) error {

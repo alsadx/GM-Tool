@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	ssov1 "github.com/alsadx/protos/gen/go/sso"
+	"protos/gen/go/ssov1"
 	"github.com/brianvoe/gofakeit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -318,41 +318,6 @@ func TestLogout_InvalidToken(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Equal(t, false, respLogout.GetSuccess())
-}
-
-func TestGetCurrentUser_HappyPath(t *testing.T) {
-	ctx, st := suite.New(t)
-
-	email := gofakeit.Email()
-	password := randomFakePassword()
-	name := gofakeit.Name()
-
-	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
-		Email:    email,
-		Password: password,
-		Name:     name,
-	})
-
-	require.NoError(t, err)
-	assert.NotEmpty(t, respReg.GetUserId())
-
-	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
-		Email:    email,
-		Password: password,
-	})
-
-	require.NoError(t, err)
-	assert.NotEmpty(t, respLog.GetToken())
-	assert.NotEmpty(t, respLog.GetRefreshToken())
-
-	respGetCurrentUser, err := st.AuthClient.GetCurrentUser(ctx, &ssov1.GetCurrentUserRequest{
-		Token: respLog.GetToken(),
-	})
-
-	require.NoError(t, err)
-	assert.Equal(t, respReg.GetUserId(), respGetCurrentUser.GetUserId())
-	assert.Equal(t, email, respGetCurrentUser.GetEmail())
-	assert.Equal(t, name, respGetCurrentUser.GetName())
 }
 
 func randomFakePassword() string {

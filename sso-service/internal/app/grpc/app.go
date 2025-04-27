@@ -9,7 +9,6 @@ import (
 
 	authgrpc "sso/internal/grpc/auth"
 	userinfogrpc "sso/internal/grpc/user_info"
-	"auth"
 )
 
 type App struct {
@@ -19,7 +18,7 @@ type App struct {
 }
 
 func New(log *slog.Logger, authService authgrpc.Auth, userInfoService userinfogrpc.UserInfo, port int) *App {
-	gRPCServer := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	gRPCServer := grpc.NewServer()
 	authgrpc.RegisterServerAPI(gRPCServer, authService)
 	userinfogrpc.RegisterUserInfoAPI(gRPCServer, userInfoService)
 

@@ -14,9 +14,9 @@ type UserSaver interface {
 }
 
 type UserProvider interface {
-	UserByEmail(ctx context.Context, email string) (models.User, error)
-	UserById(ctx context.Context, userId int64) (models.User, error)
-	UserByRefreshToken(ctx context.Context, refreshToken string) (models.User, error)
+	UserByEmail(ctx context.Context, email string) (*models.User, error)
+	UserById(ctx context.Context, userId int64) (*models.User, error)
+	UserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error)
 	IsAdmin(ctx context.Context, userId int64) (bool, error)
 	HealthCheck(ctx context.Context) (error)
 }

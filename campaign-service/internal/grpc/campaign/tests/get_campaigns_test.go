@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	campaignv1 "github.com/alsadx/protos/gen/go/campaign"
+	"protos/gen/go/campaignv1"
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"

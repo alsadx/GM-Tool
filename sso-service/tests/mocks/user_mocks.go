@@ -159,10 +159,10 @@ func (mr *MockUserProviderMockRecorder) IsAdmin(ctx, userId interface{}) *gomock
 }
 
 // UserByEmail mocks base method.
-func (m *MockUserProvider) UserByEmail(ctx context.Context, email string) (models.User, error) {
+func (m *MockUserProvider) UserByEmail(ctx context.Context, email string) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserByEmail", ctx, email)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -174,10 +174,10 @@ func (mr *MockUserProviderMockRecorder) UserByEmail(ctx, email interface{}) *gom
 }
 
 // UserById mocks base method.
-func (m *MockUserProvider) UserById(ctx context.Context, userId int64) (models.User, error) {
+func (m *MockUserProvider) UserById(ctx context.Context, userId int64) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserById", ctx, userId)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -189,10 +189,10 @@ func (mr *MockUserProviderMockRecorder) UserById(ctx, userId interface{}) *gomoc
 }
 
 // UserByRefreshToken mocks base method.
-func (m *MockUserProvider) UserByRefreshToken(ctx context.Context, refreshToken string) (models.User, error) {
+func (m *MockUserProvider) UserByRefreshToken(ctx context.Context, refreshToken string) (*models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserByRefreshToken", ctx, refreshToken)
-	ret0, _ := ret[0].(models.User)
+	ret0, _ := ret[0].(*models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

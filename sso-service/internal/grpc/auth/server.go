@@ -7,7 +7,7 @@ import (
 	"sso/internal/domain/models"
 	"strings"
 
-	ssov1 "github.com/alsadx/protos/gen/go/sso"
+	"protos/gen/go/ssov1"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -20,7 +20,7 @@ type Auth interface {
 	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
 	RefreshToken(ctx context.Context, refreshToken string) (token models.Tokens, err error)
 	Logout(ctx context.Context, userId int64) (err error)
-	GetCurrentUser(ctx context.Context, token string) (user models.User, err error)
+	GetCurrentUser(ctx context.Context, token string) (user *models.User, err error)
 	HealthCheck(ctx context.Context) (err error)
 }
 
@@ -156,10 +156,7 @@ func (s *ServerAPI) RefreshToken(ctx context.Context, req *ssov1.RefreshTokenReq
 }
 
 func (s *ServerAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov1.LogoutResponse, error) {
-	userId, ok := ctx.Value("user_id").(int64)
-	if !ok {
-		return &ssov1.LogoutResponse{Success: false}, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
+	userId := req.GetUserId()
 
 	err := s.Auth.Logout(ctx, userId)
 	if err != nil {
@@ -172,17 +169,17 @@ func (s *ServerAPI) Logout(ctx context.Context, req *ssov1.LogoutRequest) (*ssov
 	return &ssov1.LogoutResponse{Success: true}, nil
 }
 
-func (s *ServerAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUserRequest) (*ssov1.GetCurrentUserResponse, error) {
-	user, err := s.Auth.GetCurrentUser(ctx, req.GetToken())
-	if err != nil {
-		if errors.Is(err, models.ErrUserNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
-		}
-		return nil, status.Errorf(codes.Internal, "internal error")
-	}
+// func (s *ServerAPI) GetCurrentUser(ctx context.Context, req *ssov1.GetCurrentUserRequest) (*ssov1.GetCurrentUserResponse, error) {
+// 	user, err := s.Auth.GetCurrentUser(ctx, req.GetToken())
+// 	if err != nil {
+// 		if errors.Is(err, models.ErrUserNotFound) {
+// 			return nil, status.Errorf(codes.NotFound, "user not found")
+// 		}
+// 		return nil, status.Errorf(codes.Internal, "internal error")
+// 	}
 
-	return &ssov1.GetCurrentUserResponse{UserId: user.Id, Name: user.Name, Email: user.Email}, nil
-}
+// 	return &ssov1.GetCurrentUserResponse{UserId: user.Id, Name: user.Name, Email: user.Email}, nil
+// }
 
 func (s *ServerAPI) HealthCheck(ctx context.Context, req *ssov1.HealthCheckRequest) (*ssov1.HealthCheckResponse, error) {
 	// Проверяем подключение к базе данных

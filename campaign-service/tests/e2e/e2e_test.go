@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	campaignv1 "github.com/alsadx/protos/gen/go/campaign"
+	"protos/gen/go/campaignv1"
 	ssov1 "github.com/alsadx/protos/gen/go/sso"
 	"github.com/brianvoe/gofakeit"
 
