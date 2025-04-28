@@ -251,6 +251,8 @@ func (a *Auth) CreateSession(ctx context.Context, user *models.User) (models.Tok
 		ExpiresAt:    time.Now().Add(a.TokenTTL),
 	}
 
+	log.Info("session created", slog.String("refreshToken", session.RefreshToken), slog.Time("expiresAt", session.ExpiresAt))
+
 	if err := a.UserSaver.SetSession(ctx, user.Id, session); err != nil {
 		a.Log.Error("failed to set session", slog.String("error", err.Error()))
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRegister_Success(t *testing.T) {
@@ -29,7 +30,7 @@ func TestRegister_Success(t *testing.T) {
 		Return(int64(1), nil)
 
 	userId, err := service.Register(ctx, email, password, username)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, int64(1), userId)
 }
 
@@ -51,7 +52,7 @@ func TestRegister_AlreadyExists(t *testing.T) {
 		Return(int64(0), models.ErrUserExists)
 
 	userId, err := service.Register(ctx, email, password, username)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Equal(t, models.ErrUserExists, errors.Unwrap(err))
 	assert.Equal(t, int64(0), userId)
 }
@@ -65,7 +66,7 @@ func TestLogin_Success(t *testing.T) {
 	password := "testpassword"
 	hashedPassword := []byte("$2a$10$vR/gn5MPG9g5JVZPlhj")
 
-	user := models.User{
+	user := &models.User{
 		Id:        1,
 		Email:     email,
 		PassHash:  hashedPassword,
@@ -96,7 +97,7 @@ func TestLogin_Success(t *testing.T) {
 		Return(nil)
 
 	token, err := service.Login(ctx, email, password)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, token.AccessToken)
 	assert.NotEmpty(t, token.RefreshToken)
 }
@@ -112,7 +113,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 
 	mockUserProvider.EXPECT().
 		UserByEmail(ctx, email).
-		Return(models.User{
+		Return(&models.User{
 			Id:        1,
 			Email:     email,
 			PassHash:  hashedPassword,
@@ -127,7 +128,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		Return(errors.New("invalid password"))
 
 	token, err := service.Login(ctx, email, password)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Equal(t, models.ErrInvalidCredentials, errors.Unwrap(err))
 	assert.Empty(t, token.AccessToken)
 	assert.Empty(t, token.RefreshToken)
@@ -142,10 +143,10 @@ func TestLogin_UserNotFound(t *testing.T) {
 
 	mockUserProvider.EXPECT().
 		UserByEmail(ctx, email).
-		Return(models.User{}, models.ErrUserNotFound)
+		Return(&models.User{}, models.ErrUserNotFound)
 
 	token, err := service.Login(ctx, email, password)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Equal(t, models.ErrInvalidCredentials, errors.Unwrap(err))
 	assert.Empty(t, token.AccessToken)
 	assert.Empty(t, token.RefreshToken)

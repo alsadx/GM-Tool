@@ -9,6 +9,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRefreshToken_Success(t *testing.T) {
@@ -17,7 +18,7 @@ func TestRefreshToken_Success(t *testing.T) {
 
 	refreshToken := "refresh_token"
 
-	user := models.User{
+	user := &models.User{
 		Id:        1,
 		Email:     "email",
 		PassHash:  []byte("pass_hash"),
@@ -44,7 +45,7 @@ func TestRefreshToken_Success(t *testing.T) {
 		Return(nil)
 
 	tokens, err := service.RefreshToken(ctx, refreshToken)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotEmpty(t, tokens)
 	assert.Equal(t, "access_token", tokens.AccessToken)
 	assert.Equal(t, "new_refresh_token", tokens.RefreshToken)
@@ -58,10 +59,10 @@ func TestRefreshToken_UserNotFound(t *testing.T) {
 
 	mockUserProvider.EXPECT().
 		UserByRefreshToken(ctx, refreshToken).
-		Return(models.User{}, models.ErrUserNotFound)
+		Return(&models.User{}, models.ErrUserNotFound)
 
 	tokens, err := service.RefreshToken(ctx, refreshToken)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Empty(t, tokens)
 	assert.Equal(t, errors.Unwrap(err), models.ErrInvalidRefreshToken)
 }

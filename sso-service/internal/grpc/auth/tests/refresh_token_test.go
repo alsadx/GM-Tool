@@ -21,12 +21,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func TestGRPC_Logout_Success(t *testing.T) {
+func TestGRPC_RefreshToken_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
 	server := grpc.NewServer()
-	service, mockUserSaver, _, _, _ := setup.TestAuth(t)
+	service, mockUserSaver, mockUserProvider, _, mockTokenManager := setup.TestAuth(t)
 	srv := grpcauth.ServerAPI{
 		Auth: service,
 	}
@@ -52,24 +52,48 @@ func TestGRPC_Logout_Success(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	refreshToken := "refresh_token"
+	user := &models.User{
+		Id:        1,
+		Email:     "email",
+		PassHash:  []byte("password"),
+		Name:      "name",
+		FullName:  "full_name",
+		IsAdmin:   false,
+		AvatarUrl: "avatar",
+	}
+
+	mockUserProvider.EXPECT().
+		UserByRefreshToken(gomock.Any(), refreshToken).
+		Return(user, nil)
+
+	mockTokenManager.EXPECT().
+		NewJWT(user, "secret", gomock.Any()).
+		Return("access_token", nil)
+
+	mockTokenManager.EXPECT().
+		NewRefreshToken().
+		Return("new_refresh_token", nil)
+
 	mockUserSaver.EXPECT().
-		DeleteSession(gomock.Any(), int64(1)).
+		SetSession(gomock.Any(), user.Id, gomock.Any()).
 		Return(nil)
 
-	resp, err := client.Logout(ctx, &ssov1.LogoutRequest{
-		UserId: int64(1),
+	resp, err := client.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
+		RefreshToken: refreshToken,
 	})
 
 	require.NoError(t, err)
-	assert.True(t, resp.GetSuccess())
+	assert.Equal(t, "access_token", resp.GetToken())
+	assert.Equal(t, "new_refresh_token", resp.GetRefreshToken())
 }
 
-func TestGRPC_Logout_UserNotFound(t *testing.T) {
+func TestGRPC_RefreshToken_UserNotFound(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
 	server := grpc.NewServer()
-	service, mockUserSaver, _, _, _ := setup.TestAuth(t)
+	service, _, mockUserProvider, _, _ := setup.TestAuth(t)
 	srv := grpcauth.ServerAPI{
 		Auth: service,
 	}
@@ -95,20 +119,22 @@ func TestGRPC_Logout_UserNotFound(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	mockUserSaver.EXPECT().
-		DeleteSession(gomock.Any(), int64(1)).
-		Return(models.ErrUserNotFound)
+	refreshToken := "refresh_token"
 
-	resp, err := client.Logout(ctx, &ssov1.LogoutRequest{
-		UserId: int64(1),
+	mockUserProvider.EXPECT().
+		UserByRefreshToken(gomock.Any(), refreshToken).
+		Return(&models.User{}, models.ErrUserNotFound)
+
+	resp, err := client.RefreshToken(ctx, &ssov1.RefreshTokenRequest{
+		RefreshToken: refreshToken,
 	})
 
 	require.Error(t, err)
-	assert.False(t, resp.GetSuccess())
+	assert.Empty(t, resp)
 
 	st, ok := status.FromError(err)
 	require.True(t, ok, "error is not a gRPC status error")
 
-	require.Equal(t, codes.NotFound, st.Code(), "unexpected error code: %v", st.Code())
-	require.Equal(t, "user not found", st.Message(), "unexpected error message")
+	require.Equal(t, codes.Unauthenticated, st.Code(), "unexpected error code")
+	require.Equal(t, "invalid or expired refresh token", st.Message(), "unexpected error message")
 }

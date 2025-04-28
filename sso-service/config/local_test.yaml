@@ -12,5 +12,5 @@ grpc:
   timeout: 10h
 
 auth:
-  accessTokenTTL: 1h
-  refreshTokenTTL: 720h #30 days
+  accessTokenTTL: 5s
+  # refreshTokenTTL: 720h #30 days

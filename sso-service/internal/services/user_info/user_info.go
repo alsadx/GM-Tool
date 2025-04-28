@@ -11,34 +11,34 @@ import (
 )
 
 type UserInfo struct {
-	log          *slog.Logger
-	userSaver    srv.UserSaver
-	userProvider srv.UserProvider
+	Log          *slog.Logger
+	UserSaver    srv.UserSaver
+	UserProvider srv.UserProvider
 }
 
 func New(log *slog.Logger, userSaver srv.UserSaver, userProvider srv.UserProvider) *UserInfo {
 	return &UserInfo{
-		log:          log,
-		userSaver:    userSaver,
-		userProvider: userProvider,
+		Log:          log,
+		UserSaver:    userSaver,
+		UserProvider: userProvider,
 	}
 }
 
 func (u *UserInfo) GetUserById(ctx context.Context, userId int64) (*models.User, error) {
-	const op = "auth.GetUserById"
+	const op = "user_info.GetUserById"
 
-	log := u.log.With(slog.String("op", op))
+	log := u.Log.With(slog.String("op", op))
 
 	log.Info("getting user by id")
 
-	user, err := u.userProvider.UserById(ctx, userId)
+	user, err := u.UserProvider.UserById(ctx, userId)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
-			u.log.Warn("user not found", slog.String("error", err.Error()))
+			u.Log.Warn("user not found", slog.String("error", err.Error()))
 
 			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		u.log.Error("failed to get user by id", slog.String("error", err.Error()))
+		u.Log.Error("failed to get user by id", slog.String("error", err.Error()))
 
 		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -49,20 +49,20 @@ func (u *UserInfo) GetUserById(ctx context.Context, userId int64) (*models.User,
 }
 
 func (u *UserInfo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	const op = "auth.GetUserByEmail"
+	const op = "user_info.GetUserByEmail"
 
-	log := u.log.With(slog.String("op", op))
+	log := u.Log.With(slog.String("op", op))
 
 	log.Info("getting user by email")
 
-	user, err := u.userProvider.UserByEmail(ctx, email)
+	user, err := u.UserProvider.UserByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
-			u.log.Warn("user not found", slog.String("error", err.Error()))
+			u.Log.Warn("user not found", slog.String("error", err.Error()))
 
 			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		u.log.Error("failed to get user by email", slog.String("error", err.Error()))
+		u.Log.Error("failed to get user by email", slog.String("error", err.Error()))
 
 		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -72,39 +72,71 @@ func (u *UserInfo) GetUserByEmail(ctx context.Context, email string) (*models.Us
 	return user, nil
 }
 func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[string]string) (*models.User, error) {
-	const op = "storage.postgres.UpdateUser"
+	const op = "user_info.UpdateUser"
 
-	user, err := u.userProvider.UserById(ctx, userId)
+	user, err := u.UserProvider.UserById(ctx, userId)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
-			u.log.Warn("user not found", slog.String("error", err.Error()))
+			u.Log.Warn("user not found", slog.String("error", err.Error()))
 
 			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		u.log.Error("failed to get user by id", slog.String("error", err.Error()))
+		u.Log.Error("failed to get user by id", slog.String("error", err.Error()))
 
 		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	for key, value := range updates {
-		switch key {
-		case "name":
-			user.Name = value
-		case "full_name":
-			user.FullName = value
-		case "avatar":
-			user.AvatarUrl = value
-		}
-	}
+	if len(updates) == 0 {
+        u.Log.Info("no updates provided for the user", slog.Int64("user_id", userId))
 
-	err = u.userSaver.UpdateUser(ctx, user)
-	if err != nil {
-		if errors.Is(err, models.ErrInvalidArgument) {
-			u.log.Warn("name is taken", slog.String("error", err.Error()))
+        return nil, fmt.Errorf("%s: %w", op, models.ErrInvalidArgument)
+    }
+
+	hasChanges := false
+
+	// TODO: validate updates
+
+	for key, value := range updates {
+		if value == "" || len(value) > 255 {
+			u.Log.Warn("invalid update value", slog.String("key", key), slog.String("value", value))
 
 			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrInvalidArgument)
 		}
-		u.log.Error("failed to update user", slog.String("error", err.Error()))
+		switch key {
+		case "name":
+			if user.Name != value {
+				user.Name = value
+				hasChanges = true
+			}
+		case "full_name":
+			if user.FullName != value {
+				user.FullName = value
+				hasChanges = true
+			}
+		case "avatar_url":
+			if user.AvatarUrl != value {
+				user.AvatarUrl = value
+				hasChanges = true
+			}
+		default:
+			u.Log.Warn("unknown update key", slog.String("key", key))
+		}
+	}
+
+	if !hasChanges {
+		u.Log.Info("no changes detected for the user", slog.Int64("user_id", userId))
+
+		return user, nil
+	}
+
+	err = u.UserSaver.UpdateUser(ctx, user)
+	if err != nil {
+		if errors.Is(err, models.ErrNameIsTaken) {
+			u.Log.Warn("name is taken", slog.String("error", err.Error()))
+
+			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrNameIsTaken)
+		}
+		u.Log.Error("failed to update user", slog.String("error", err.Error()))
 
 		return &models.User{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -113,30 +145,28 @@ func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[str
 }
 
 func (u *UserInfo) DeleteUser(ctx context.Context, userId int64) error {
-	const op = "storage.postgres.DeleteUser"
+	const op = "user_info.DeleteUser"
 
-	err := u.userSaver.DeleteSession(ctx, userId)
+	err := u.UserSaver.DeleteSession(ctx, userId)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
-			u.log.Warn("user not found", slog.String("error", err.Error()))
+			u.Log.Warn("user not found", slog.String("error", err.Error()))
 
 			return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		u.log.Error("failed to delete session", slog.String("error", err.Error()))
+		u.Log.Error("failed to delete session", slog.String("error", err.Error()))
 
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	// TODO: delete user from campaigns and players
-
-	err = u.userSaver.DeleteUser(ctx, userId)
+	err = u.UserSaver.DeleteUser(ctx, userId)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
-			u.log.Warn("user not found", slog.String("error", err.Error()))
+			u.Log.Warn("user not found", slog.String("error", err.Error()))
 
 			return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
 		}
-		u.log.Error("failed to delete user", slog.String("error", err.Error()))
+		u.Log.Error("failed to delete user", slog.String("error", err.Error()))
 
 		return fmt.Errorf("%s: %w", op, err)
 	}

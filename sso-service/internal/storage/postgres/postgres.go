@@ -59,19 +59,19 @@ func (s *Storage) SaveUser(ctx context.Context, email, name string, passHash []b
 }
 
 // UpdateUser updates user info in storage
-func (s *Storage) UpdateUser(ctx context.Context, user *models.User) (error) {
+func (s *Storage) UpdateUser(ctx context.Context, user *models.User) error {
 	op := "storage.postgres.UpdateUser"
 
 	query := `
 		UPDATE users
-		SET name = $1, full_name = $2, avatar = $3
+		SET name = $1, full_name = $2, avatar_url = $3
 		WHERE id = $4
 	`
 	_, err := s.dbPool.Exec(ctx, query, user.Name, user.FullName, user.AvatarUrl, user.Id)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return fmt.Errorf("%s: %w", op, models.ErrInvalidArgument)
+			return fmt.Errorf("%s: %w", op, models.ErrNameIsTaken)
 		}
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -81,7 +81,7 @@ func (s *Storage) UpdateUser(ctx context.Context, user *models.User) (error) {
 }
 
 // DeleteUser deletes user from storage
-func (s *Storage) DeleteUser(ctx context.Context, userId int64) (error) {
+func (s *Storage) DeleteUser(ctx context.Context, userId int64) error {
 	op := "storage.postgres.DeleteUser"
 
 	query := `
@@ -94,8 +94,8 @@ func (s *Storage) DeleteUser(ctx context.Context, userId int64) (error) {
 	}
 
 	if commandTag.RowsAffected() == 0 {
-        return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
-    }
+		return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+	}
 
 	return nil
 }
@@ -222,8 +222,8 @@ func (s *Storage) DeleteSession(ctx context.Context, userId int64) error {
 	}
 
 	if commandTag.RowsAffected() == 0 {
-        return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
-    }
+		return fmt.Errorf("%s: %w", op, models.ErrUserNotFound)
+	}
 
 	return nil
 }

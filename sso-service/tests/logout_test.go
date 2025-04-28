@@ -1,61 +1,65 @@
 package tests
 
 import (
-	"sso/internal/lib/jwt"
 	"sso/tests/suite"
 	"testing"
-	"time"
 
 	"protos/gen/go/ssov1"
+
 	"github.com/brianvoe/gofakeit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func TestRegisterLogin_Logout_HappyPath(t *testing.T) {
-	ctx, suite := suite.New(t)
-	tokenManager := jwt.NewTokenManager()
+func TestLogout_HappyPath(t *testing.T) {
+	ctx, st := suite.New(t)
 
 	email := gofakeit.Email()
 	password := randomFakePassword()
 	name := gofakeit.Name()
 
-	respReg, err := suite.AuthClient.Register(ctx, &ssov1.RegisterRequest{
+	respReg, err := st.AuthClient.Register(ctx, &ssov1.RegisterRequest{
 		Email:    email,
 		Password: password,
 		Name:     name,
 	})
 
 	require.NoError(t, err)
-	assert.NotEmpty(t, respReg.GetUserId())
+	userId := respReg.GetUserId()
+	require.NotEmpty(t, userId)
 
-	respLog, err := suite.AuthClient.Login(ctx, &ssov1.LoginRequest{
+	respLog, err := st.AuthClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
 		Password: password,
 	})
+
 	require.NoError(t, err)
+	assert.NotEmpty(t, respLog.GetToken())
+	assert.NotEmpty(t, respLog.GetRefreshToken())
 
-	loginTime := time.Now()
+	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
+		UserId: userId,
+	})
 
-	token := respLog.GetToken()
-	require.NotEmpty(t, token)
-
-	parsedJWT, err := tokenManager.ParseJWT(respLog.Token, signKey)
 	require.NoError(t, err)
+	assert.Equal(t, true, respLogout.GetSuccess())
+}
 
-	assert.Equal(t, respReg.GetUserId(), parsedJWT.UserId)
-	assert.Equal(t, email, parsedJWT.Email)
+func TestLogout_UserNotFound(t *testing.T) {
+	ctx, st := suite.New(t)
 
-	const deltaSeconds = 1
+	respLogout, err := st.AuthClient.Logout(ctx, &ssov1.LogoutRequest{
+		UserId: int64(0),
+	})
 
-	assert.InDelta(t, loginTime.Add(suite.Cfg.Auth.AccessTokenTTL).Unix(), parsedJWT.ExpiresAt.Unix(), deltaSeconds)
+	require.Error(t, err)
+	assert.False(t, respLogout.GetSuccess())
 
-	md := metadata.Pairs("authorization", "Bearer "+token)
-	ctx = metadata.NewOutgoingContext(ctx, md)
+	stt, ok := status.FromError(err)
+	require.True(t, ok, "error is not a gRPC status error")
 
-	respOut, err := suite.AuthClient.Logout(ctx, &ssov1.LogoutRequest{})
-	require.NoError(t, err)
-
-	assert.True(t, respOut.GetSuccess())
+	require.Equal(t, codes.NotFound, stt.Code(), "unexpected error code")
+	require.Equal(t, "user not found", stt.Message(), "unexpected error message")
 }
