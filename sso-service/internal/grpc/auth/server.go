@@ -7,7 +7,7 @@ import (
 	"sso/internal/domain/models"
 	"strings"
 
-	"protos/gen/go/ssov1"
+	"sso/protos/ssov1"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

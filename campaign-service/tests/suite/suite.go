@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"testing"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

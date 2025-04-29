@@ -19,3 +19,8 @@ tasks:
   mockgen:
     cmds:
       - mockgen -source=./internal/services/auth/auth.go -destination=./tests/mocks/manager_mocks.go -package=mocks
+    
+  gen-proto:
+    desc: "Generate code from proto file"
+    cmds:
+      - protoc -I proto proto/*.proto --go_out=./gen/go/ --go_opt=paths=source_relative --go-grpc_out=./gen/ --go-grpc_opt=paths=source_relative

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"

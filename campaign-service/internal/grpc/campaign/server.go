@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"protos/gen/go/ssov1"
+	"sso/protos/ssov1"
 
 	"github.com/brianvoe/gofakeit"
 	"github.com/stretchr/testify/assert"

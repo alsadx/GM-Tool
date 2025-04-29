@@ -1,13 +1,16 @@
-FROM golang:1.24.1-alpine AS builder
+FROM golang:1.24.2-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
+# Копируем прото файлы
+COPY protos/ /app/protos/
+
+COPY sso-service/go.mod ./
+COPY sso-service/go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY sso-service/ .
 
 # Компилируем приложение
 RUN CGO_ENABLED=0 GOOS=linux go build -o sso ./cmd/sso
@@ -30,7 +33,7 @@ COPY --from=builder /app/migrator /migrator
 COPY --from=builder /app/sso .
 
 # Копируем конфигурационный файл
-COPY config/local.yaml /app/config/local.yaml
+COPY sso-service/config/local.yaml /app/config/local.yaml
 
 # Копируем миграции
 COPY --from=builder /app/migrations /migrations
