@@ -1,6 +1,6 @@
 package ability
 
-import "github.com/alsadx/GM-Tool/character-service/pkg/domain/utils"
+import "github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 
 type Ability int
 
@@ -38,7 +38,7 @@ func (s *Score) AddTemp(temp int) (removeTemp func()) {
 	return func() { s.temp -= temp }
 }
 
-func (s *Score) Check() (dice, modifier, result int) {
-	dice = utils.RollDice(20)
-	return dice, s.Modifier(), result
+func (s *Score) Check() (diceRes, modifier, result int) {
+	diceRes = dice.RollDice(dice.K20)
+	return diceRes, s.Modifier(), result
 }

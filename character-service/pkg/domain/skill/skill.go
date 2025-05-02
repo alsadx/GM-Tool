@@ -2,7 +2,7 @@ package skill
 
 import (
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/ability"
-	"github.com/alsadx/GM-Tool/character-service/pkg/domain/utils"
+	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 )
 
 type Skill struct {
@@ -14,8 +14,8 @@ func (s *Skill) SetBonus(bonus int) {
 	s.Bonus = bonus
 }
 
-func (s *Skill) Check() (dice, bonus, result int) {
-	dice = utils.RollDice(20)
+func (s *Skill) Check() (diceRes, bonus, result int) {
+	diceRes = dice.RollDice(dice.K20)
 	bonus = s.Ability.Modifier() + bonus
-	return dice, bonus, dice + bonus
+	return diceRes, bonus, diceRes + bonus
 }
