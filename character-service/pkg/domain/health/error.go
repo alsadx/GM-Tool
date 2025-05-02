@@ -2,5 +2,5 @@ package health
 
 import "errors"
 
-var ErrNoHitDiceAvailable = errors.New("Not available hit dice")
-var WrongTypeHitDice = errors.New("Wrong type of hit dice")
+var ErrNoHitDiceAvailable = errors.New("not available hit dice")
+var ErrWrongTypeHitDice = errors.New("wrong type of hit dice")

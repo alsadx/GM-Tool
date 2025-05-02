@@ -15,7 +15,7 @@ func (s *Skill) SetBonus(bonus int) {
 }
 
 func (s *Skill) Check() (diceRes, bonus, result int) {
-	diceRes = dice.RollDice(dice.K20)
+	diceRes = dice.RollDice(dice.D20)
 	bonus = s.Ability.Modifier() + bonus
 	return diceRes, bonus, diceRes + bonus
 }

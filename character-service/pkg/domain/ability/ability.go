@@ -39,6 +39,6 @@ func (s *Score) AddTemp(temp int) (removeTemp func()) {
 }
 
 func (s *Score) Check() (diceRes, modifier, result int) {
-	diceRes = dice.RollDice(dice.K20)
+	diceRes = dice.RollDice(dice.D20)
 	return diceRes, s.Modifier(), result
 }

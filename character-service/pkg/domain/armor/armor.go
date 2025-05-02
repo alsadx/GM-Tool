@@ -31,8 +31,5 @@ func (a *Armor) CalculateAC(dexMod int) int {
 }
 
 func (a *Armor) CheckRequirements(strenght int) bool {
-	if strenght < a.StrengthReq {
-		return true
-	}
-	return false
+	return strenght < a.StrengthReq
 }
