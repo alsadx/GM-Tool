@@ -17,6 +17,14 @@ func (a *amount) useDice(amountUsed int) error {
 	return ErrNoHitDiceAvailable
 }
 
+func (a *amount) resetDice(amountReset int) error {
+	if a.available+amountReset <= a.maxAvailable {
+		a.available += amountReset
+		return nil
+	}
+	return ErrCantResetHitDice
+}
+
 type HealthPoint struct {
 	currentHP int
 	maxHP     int
@@ -67,6 +75,19 @@ func (hp *HealthPoint) RollHitDiceRest(rollingDice map[dice.Dice]int) (result []
 	return result, nil
 }
 
+func (hp *HealthPoint) ResetHitDice(dicesReset map[dice.Dice]int) error {
+	for diceType, resetAmount := range dicesReset {
+		if amount, ok := hp.hitDice[diceType]; ok {
+			if err := amount.resetDice(resetAmount); err != nil {
+				return err
+			}
+		} else {
+			return ErrWrongTypeHitDice
+		}
+	}
+	return nil
+}
+
 func (hp *HealthPoint) AddTempHP(tempHP int) {
 	hp.tempHP = max(tempHP, hp.tempHP)
 }
@@ -83,4 +104,8 @@ func (hp *HealthPoint) TakeDamage(damage int) {
 			hp.currentHP = 0
 		}
 	}
+}
+
+func (hp *HealthPoint) Heal(heal int) {
+	hp.currentHP = min(hp.currentHP+heal, hp.maxHP)
 }
