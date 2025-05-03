@@ -13,11 +13,11 @@ const (
 	D20
 )
 
-func RollDice(dice Dice) int {
+var RollDice = func(dice Dice) int {
 	return rand.Intn(int(dice)) + 1
 }
 
-func MultiRollDice(dice Dice, amount int) []int {
+var MultiRollDice = func(dice Dice, amount int) []int {
 	results := make([]int, amount)
 	for i := range results {
 		results[i] = RollDice(dice)

@@ -19,6 +19,12 @@ type Score struct {
 	mod  int
 }
 
+func NewScore(base int) *Score {
+	score := Score{base: base}
+	score.UpdateModifier()
+	return &score
+}
+
 func (s *Score) UpdateModifier() {
 	total := s.base + s.temp
 	s.mod = (total - 10) / 2
@@ -35,10 +41,23 @@ func (s *Score) SetBase(base int) {
 
 func (s *Score) AddTemp(temp int) (removeTemp func()) {
 	s.temp += temp
-	return func() { s.temp -= temp }
+	s.UpdateModifier()
+	return func() {
+		s.temp -= temp
+		s.UpdateModifier()
+	}
 }
 
 func (s *Score) Check() (diceRes, modifier, result int) {
 	diceRes = dice.RollDice(dice.D20)
+	result = diceRes + s.Modifier()
 	return diceRes, s.Modifier(), result
+}
+
+func (s *Score) Temp() int {
+	return s.temp
+}
+
+func (s *Score) Base() int {
+	return s.base
 }
