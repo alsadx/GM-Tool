@@ -14,49 +14,49 @@ func TestSkill_Check(t *testing.T) {
 	defer func() { dice.RollDice = originalRoll }()
 
 	tests := []struct {
-		name          string
-		abilityMod    int
-		skillBonus    int
-		mockDiceRoll  int
-		wantDiceRes   int
+		name           string
+		abilityMod     int
+		skillBonus     int
+		mockDiceRoll   int
+		wantDiceRes    int
 		wantTotalBonus int
-		wantResult    int
+		wantResult     int
 	}{
 		{
-			name:          "base case",
-			abilityMod:    2,
-			skillBonus:    3,
-			mockDiceRoll:  15,
-			wantDiceRes:   15,
+			name:           "base case",
+			abilityMod:     2,
+			skillBonus:     3,
+			mockDiceRoll:   15,
+			wantDiceRes:    15,
 			wantTotalBonus: 5,
-			wantResult:    20,
+			wantResult:     20,
 		},
 		{
-			name:          "negative modifier",
-			abilityMod:    -1,
-			skillBonus:    2,
-			mockDiceRoll:  10,
-			wantDiceRes:   10,
+			name:           "negative modifier",
+			abilityMod:     -1,
+			skillBonus:     2,
+			mockDiceRoll:   10,
+			wantDiceRes:    10,
 			wantTotalBonus: 1,
-			wantResult:    11,
+			wantResult:     11,
 		},
 		{
-			name:          "zero values",
-			abilityMod:    0,
-			skillBonus:    0,
-			mockDiceRoll:  5,
-			wantDiceRes:   5,
+			name:           "zero values",
+			abilityMod:     0,
+			skillBonus:     0,
+			mockDiceRoll:   5,
+			wantDiceRes:    5,
 			wantTotalBonus: 0,
-			wantResult:    5,
+			wantResult:     5,
 		},
 		{
-			name:          "max values",
-			abilityMod:    5,
-			skillBonus:    10,
-			mockDiceRoll:  20,
-			wantDiceRes:   20,
+			name:           "max values",
+			abilityMod:     5,
+			skillBonus:     10,
+			mockDiceRoll:   20,
+			wantDiceRes:    20,
 			wantTotalBonus: 15,
-			wantResult:    35,
+			wantResult:     35,
 		},
 	}
 
@@ -93,10 +93,10 @@ func TestSkill_Check(t *testing.T) {
 
 func TestSkill_SetBonus(t *testing.T) {
 	tests := []struct {
-		name       string
-		initial    int
-		newBonus   int
-		wantBonus  int
+		name      string
+		initial   int
+		newBonus  int
+		wantBonus int
 	}{
 		{
 			name:      "set positive bonus",
