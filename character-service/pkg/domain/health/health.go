@@ -4,55 +4,69 @@ import (
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 )
 
-type amount struct {
-	maxAvailable int
-	available    int
+type Amount struct {
+	MaxAvailable int
+	Available    int
 }
 
-func (a *amount) useDice(amountUsed int) error {
-	if a.available >= amountUsed {
-		a.available -= amountUsed
+func (a *Amount) useDice(amountUsed int) error {
+	if a.Available >= amountUsed {
+		a.Available -= amountUsed
 		return nil
 	}
 	return ErrNoHitDiceAvailable
 }
 
-func (a *amount) resetDice(amountReset int) error {
-	if a.available+amountReset <= a.maxAvailable {
-		a.available += amountReset
+func (a *Amount) resetDice(amountReset int) error {
+	if a.Available+amountReset <= a.MaxAvailable {
+		a.Available += amountReset
 		return nil
 	}
 	return ErrCantResetHitDice
 }
 
 type HealthPoint struct {
-	currentHP int
-	maxHP     int
-	tempHP    int
-	hitDice   map[dice.Dice]amount
+	CurrentHP int
+	MaxHP     int
+	TempHP    int
+	HitDice   map[dice.Dice]*Amount
+}
+
+func New(maxHp int, hitDice dice.Dice) *HealthPoint {
+	hitDiceMap := make(map[dice.Dice]*Amount, 1)
+	hitDiceMap[hitDice] = &Amount{MaxAvailable: 1, Available: 1}
+	return &HealthPoint{
+		CurrentHP: maxHp,
+		MaxHP:     maxHp,
+		TempHP:    0,
+		HitDice:   hitDiceMap,
+	}
 }
 
 func (hp *HealthPoint) SetMaxHP(maxHP int) {
-	hp.maxHP = maxHP
+	hp.MaxHP = maxHP
+	if hp.CurrentHP > maxHP {
+		hp.CurrentHP = maxHP
+	}
 }
 
 func (hp *HealthPoint) AddHitDice(hitDiceType dice.Dice) {
-	if dice, ok := hp.hitDice[hitDiceType]; ok {
-		dice.maxAvailable++
-		dice.available++
+	if dice, ok := hp.HitDice[hitDiceType]; ok {
+		dice.MaxAvailable++
+		dice.Available++
 	} else {
-		hp.hitDice[hitDiceType] = amount{maxAvailable: 1, available: 1}
+		hp.HitDice[hitDiceType] = &Amount{MaxAvailable: 1, Available: 1}
 	}
 }
 
 func (hp *HealthPoint) RemoveHitDice(hitDiceType dice.Dice) error {
-	if dice, ok := hp.hitDice[hitDiceType]; ok {
-		dice.maxAvailable--
-		if dice.available > dice.maxAvailable {
-			dice.available = dice.maxAvailable
+	if dice, ok := hp.HitDice[hitDiceType]; ok {
+		dice.MaxAvailable--
+		if dice.Available > dice.MaxAvailable {
+			dice.Available = dice.MaxAvailable
 		}
-		if dice.maxAvailable == 0 {
-			delete(hp.hitDice, hitDiceType)
+		if dice.MaxAvailable == 0 {
+			delete(hp.HitDice, hitDiceType)
 		}
 		return nil
 	} else {
@@ -62,7 +76,7 @@ func (hp *HealthPoint) RemoveHitDice(hitDiceType dice.Dice) error {
 
 func (hp *HealthPoint) RollHitDiceRest(rollingDice map[dice.Dice]int) (result []int, err error) {
 	for diceType, needAmount := range rollingDice {
-		if amount, ok := hp.hitDice[diceType]; ok {
+		if amount, ok := hp.HitDice[diceType]; ok {
 			if err = amount.useDice(needAmount); err != nil {
 				return nil, ErrNoHitDiceAvailable
 			} else {
@@ -77,7 +91,7 @@ func (hp *HealthPoint) RollHitDiceRest(rollingDice map[dice.Dice]int) (result []
 
 func (hp *HealthPoint) ResetHitDice(dicesReset map[dice.Dice]int) error {
 	for diceType, resetAmount := range dicesReset {
-		if amount, ok := hp.hitDice[diceType]; ok {
+		if amount, ok := hp.HitDice[diceType]; ok {
 			if err := amount.resetDice(resetAmount); err != nil {
 				return err
 			}
@@ -89,23 +103,23 @@ func (hp *HealthPoint) ResetHitDice(dicesReset map[dice.Dice]int) error {
 }
 
 func (hp *HealthPoint) AddTempHP(tempHP int) {
-	hp.tempHP = max(tempHP, hp.tempHP)
+	hp.TempHP = max(tempHP, hp.TempHP)
 }
 
 func (hp *HealthPoint) TakeDamage(damage int) {
-	if hp.tempHP >= damage {
-		hp.tempHP -= damage
+	if hp.TempHP >= damage {
+		hp.TempHP -= damage
 	} else {
-		damage -= hp.tempHP
-		hp.tempHP = 0
-		if hp.currentHP > damage {
-			hp.currentHP -= damage
+		damage -= hp.TempHP
+		hp.TempHP = 0
+		if hp.CurrentHP > damage {
+			hp.CurrentHP -= damage
 		} else {
-			hp.currentHP = 0
+			hp.CurrentHP = 0
 		}
 	}
 }
 
 func (hp *HealthPoint) Heal(heal int) {
-	hp.currentHP = min(hp.currentHP+heal, hp.maxHP)
+	hp.CurrentHP = min(hp.CurrentHP+heal, hp.MaxHP)
 }
