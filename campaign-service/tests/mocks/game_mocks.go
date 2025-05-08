@@ -36,7 +36,7 @@ func (m *MockGameSaver) EXPECT() *MockGameSaverMockRecorder {
 }
 
 // AddPlayer mocks base method.
-func (m *MockGameSaver) AddPlayer(ctx context.Context, campaignId int32, userId int) error {
+func (m *MockGameSaver) AddPlayer(ctx context.Context, campaignId int64, userId int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddPlayer", ctx, campaignId, userId)
 	ret0, _ := ret[0].(error)
@@ -50,7 +50,7 @@ func (mr *MockGameSaverMockRecorder) AddPlayer(ctx, campaignId, userId interface
 }
 
 // DeleteCampaign mocks base method.
-func (m *MockGameSaver) DeleteCampaign(ctx context.Context, campaignId int32, userId int) error {
+func (m *MockGameSaver) DeleteCampaign(ctx context.Context, campaignId int64, userId int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCampaign", ctx, campaignId, userId)
 	ret0, _ := ret[0].(error)
@@ -64,7 +64,7 @@ func (mr *MockGameSaverMockRecorder) DeleteCampaign(ctx, campaignId, userId inte
 }
 
 // RemovePlayer mocks base method.
-func (m *MockGameSaver) RemovePlayer(ctx context.Context, campaignId int32, userId int) error {
+func (m *MockGameSaver) RemovePlayer(ctx context.Context, campaignId int64, userId int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemovePlayer", ctx, campaignId, userId)
 	ret0, _ := ret[0].(error)
@@ -78,10 +78,10 @@ func (mr *MockGameSaverMockRecorder) RemovePlayer(ctx, campaignId, userId interf
 }
 
 // SaveCampaign mocks base method.
-func (m *MockGameSaver) SaveCampaign(ctx context.Context, name, desc string, userId int) (int32, error) {
+func (m *MockGameSaver) SaveCampaign(ctx context.Context, name, desc string, userId int) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveCampaign", ctx, name, desc, userId)
-	ret0, _ := ret[0].(int32)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -93,7 +93,7 @@ func (mr *MockGameSaverMockRecorder) SaveCampaign(ctx, name, desc, userId interf
 }
 
 // SetInviteCode mocks base method.
-func (m *MockGameSaver) SetInviteCode(ctx context.Context, campaignId int32, inviteCode string) error {
+func (m *MockGameSaver) SetInviteCode(ctx context.Context, campaignId int64, inviteCode string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetInviteCode", ctx, campaignId, inviteCode)
 	ret0, _ := ret[0].(error)
@@ -130,10 +130,10 @@ func (m *MockGameProvider) EXPECT() *MockGameProviderMockRecorder {
 }
 
 // CheckInviteCode mocks base method.
-func (m *MockGameProvider) CheckInviteCode(ctx context.Context, inviteCode string) (int32, error) {
+func (m *MockGameProvider) CheckInviteCode(ctx context.Context, inviteCode string) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckInviteCode", ctx, inviteCode)
-	ret0, _ := ret[0].(int32)
+	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

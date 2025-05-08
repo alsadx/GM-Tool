@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"campaigntool/protos/campaignv1"
-	ssov1 "github.com/alsadx/protos/gen/go/sso"
+
+	"campaigntool/protos/ssov1"
 	"github.com/brianvoe/gofakeit"
 
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ var (
 )
 
 func SetUp() {
-	composeFilePath := "../../../SSO-service/sso/docker/docker-compose.yaml"
+	composeFilePath := "../../../sso-service/docker/docker-compose.yaml"
 	composeCmd := exec.Command("docker-compose", "-f", composeFilePath, "up", "-d")
 	output, err := composeCmd.CombinedOutput()
 	if err != nil {
@@ -41,7 +42,7 @@ func SetUp() {
 	fmt.Println("Waiting for SSO service to start...")
 	waitForServer("localhost:50051")
 
-	cc, err = grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cc, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("grpc server connection failed: %v", err)
 	}
@@ -53,7 +54,7 @@ func TearDown() {
 	if cc != nil {
 		cc.Close()
 	}
-	composeFilePath := "../../../SSO-service/sso/docker/docker-compose.yaml"
+	composeFilePath := "../../../sso-service/docker/docker-compose.yaml"
 	downCmd := exec.Command("docker-compose", "-f", composeFilePath, "down")
 	output, err := downCmd.CombinedOutput()
 	if err != nil {
@@ -87,7 +88,8 @@ func TestE2E_CreateDeleteGetCampaign_Success(t *testing.T) {
 		Name:     logName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
@@ -97,15 +99,13 @@ func TestE2E_CreateDeleteGetCampaign_Success(t *testing.T) {
 	token := logResp.GetToken()
 	require.NotEmpty(t, token, "expected non-empty token")
 
-	md := metadata.Pairs("authorization", "Bearer "+token)
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
 	campaignName := gofakeit.Name()
 	desc := gofakeit.Sentence(10)
 
 	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	campaignId := createResp.GetCampaignId()
@@ -113,30 +113,36 @@ func TestE2E_CreateDeleteGetCampaign_Success(t *testing.T) {
 
 	// Check created campaigns
 
-	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns := getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(0), campaigns[0].PlayerCount, "expected campaign players to be 0")
+	assert.Equal(t, int64(0), campaigns[0].PlayersCount, "expected campaign players to be 0")
+	assert.Empty(t, campaigns[0].PlayersId)
 
 	// Delete campaigns
 
 	delResp, err := suite.CampaignClient.DeleteCampaign(ctx, &campaignv1.DeleteCampaignRequest{
 		CampaignId: campaignId,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	assert.True(t, delResp.GetSuccess())
 
 	// Check created campaigns again
 
-	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	assert.Error(t, err)
-	assert.Nil(t, getCreatedResp)
+	assert.Empty(t, getCreatedResp)
 
 	st, ok := status.FromError(err)
 	require.True(t, ok, "error is not a gRPC status error")
@@ -158,7 +164,8 @@ func TestE2E_Create_CampaignAlreadyExists(t *testing.T) {
 		Name:     logName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
@@ -168,15 +175,13 @@ func TestE2E_Create_CampaignAlreadyExists(t *testing.T) {
 	token := logResp.GetToken()
 	require.NotEmpty(t, token, "expected non-empty token")
 
-	md := metadata.Pairs("authorization", "Bearer "+token)
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
 	campaignName := gofakeit.Name()
 	desc := gofakeit.Sentence(10)
 
 	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	campaignId := createResp.GetCampaignId()
@@ -185,9 +190,10 @@ func TestE2E_Create_CampaignAlreadyExists(t *testing.T) {
 	createResp, err = suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 	assert.Error(t, err)
-	assert.Nil(t, createResp)
+	assert.Empty(t, createResp)
 
 	st, ok := status.FromError(err)
 	require.True(t, ok, "error is not a gRPC status error")
@@ -209,7 +215,8 @@ func TestE2E_Create_EmptyCampaignName(t *testing.T) {
 		Name:     logName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
@@ -228,10 +235,11 @@ func TestE2E_Create_EmptyCampaignName(t *testing.T) {
 	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 
 	assert.Error(t, err)
-	assert.Nil(t, createResp)
+	assert.Empty(t, createResp)
 
 	st, ok := status.FromError(err)
 	require.True(t, ok, "error is not a gRPC status error")
@@ -249,38 +257,16 @@ func TestE2E_Create_Unauthenticated(t *testing.T) {
 	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: int64(0),
 	})
 	assert.Error(t, err)
-	assert.Nil(t, createResp)
+	assert.Empty(t, createResp)
 
 	st, ok := status.FromError(err)
 	require.True(t, ok, "error is not a gRPC status error")
 
 	require.Equal(t, codes.Unauthenticated, st.Code(), "unexpected error code")
-	require.Equal(t, "missing authorization header", st.Message(), "unexpected error message")
-}
-
-func TestE2E_Create_InvalidToken(t *testing.T) {
-	ctx, suite := suite.New(t)
-
-	md := metadata.Pairs("authorization", "Bearer invalid-token")
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
-	campaignName := gofakeit.Name()
-	desc := gofakeit.Sentence(10)
-
-	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
-		Name:        campaignName,
-		Description: &desc,
-	})
-	assert.Error(t, err)
-	assert.Nil(t, createResp)
-
-	st, ok := status.FromError(err)
-	require.True(t, ok, "error is not a gRPC status error")
-
-	require.Equal(t, codes.Unauthenticated, st.Code(), "unexpected error code")
-	require.Equal(t, "invalid token", st.Message(), "unexpected error message")
+	require.Equal(t, "unauthenticated", st.Message(), "unexpected error message")
 }
 
 func TestE2E_Delete_CampaignNotFound(t *testing.T) {
@@ -296,7 +282,8 @@ func TestE2E_Delete_CampaignNotFound(t *testing.T) {
 		Name:     logName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    email,
@@ -306,11 +293,9 @@ func TestE2E_Delete_CampaignNotFound(t *testing.T) {
 	token := logResp.GetToken()
 	require.NotEmpty(t, token, "expected non-empty token")
 
-	md := metadata.Pairs("authorization", "Bearer "+token)
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
 	delResp, err := suite.CampaignClient.DeleteCampaign(ctx, &campaignv1.DeleteCampaignRequest{
-		CampaignId: int32(123),
+		CampaignId: int64(123),
+		UserId: masterId,
 	})
 	assert.Error(t, err)
 	require.False(t, delResp.GetSuccess())
@@ -326,7 +311,8 @@ func TestE2E_Delete_Unauthenticated(t *testing.T) {
 	ctx, suite := suite.New(t)
 
 	delResp, err := suite.CampaignClient.DeleteCampaign(ctx, &campaignv1.DeleteCampaignRequest{
-		CampaignId: int32(123),
+		CampaignId: int64(123),
+		UserId: int64(0),
 	})
 	assert.Error(t, err)
 	assert.False(t, delResp.GetSuccess())
@@ -335,26 +321,7 @@ func TestE2E_Delete_Unauthenticated(t *testing.T) {
 	require.True(t, ok, "error is not a gRPC status error")
 
 	require.Equal(t, codes.Unauthenticated, st.Code(), "unexpected error code")
-	require.Equal(t, "missing authorization header", st.Message(), "unexpected error message")
-}
-
-func TestE2E_Delete_InvalidToken(t *testing.T) {
-	ctx, suite := suite.New(t)
-
-	md := metadata.Pairs("authorization", "Bearer invalid-token")
-	ctx = metadata.NewOutgoingContext(ctx, md)
-
-	delResp, err := suite.CampaignClient.DeleteCampaign(ctx, &campaignv1.DeleteCampaignRequest{
-		CampaignId: int32(123),
-	})
-	assert.Error(t, err)
-	assert.False(t, delResp.GetSuccess())
-
-	st, ok := status.FromError(err)
-	require.True(t, ok, "error is not a gRPC status error")
-
-	require.Equal(t, codes.Unauthenticated, st.Code(), "unexpected error code")
-	require.Equal(t, "invalid token", st.Message(), "unexpected error message")
+	require.Equal(t, "unauthenticated", st.Message(), "unexpected error message")
 }
 
 func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
@@ -372,7 +339,8 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 		Name:     masterName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    masterEmail,
@@ -382,22 +350,21 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 	masterToken := logResp.GetToken()
 	require.NotEmpty(t, masterToken, "expected non-empty token")
 
-	md := metadata.Pairs("authorization", "Bearer "+masterToken)
-	mCtx := metadata.NewOutgoingContext(ctx, md)
-
 	campaignName := gofakeit.Name()
 	desc := gofakeit.Sentence(10)
 
-	createResp, err := suite.CampaignClient.CreateCampaign(mCtx, &campaignv1.CreateCampaignRequest{
+	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	campaignId := createResp.GetCampaignId()
 	assert.NotEmpty(t, campaignId, "campaign id should not be empty")
 
-	genResp, err := suite.CampaignClient.GenerateInviteCode(mCtx, &campaignv1.GenerateInviteCodeRequest{
+	genResp, err := suite.CampaignClient.GenerateInviteCode(ctx, &campaignv1.GenerateInviteCodeRequest{
 		CampaignId: campaignId,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	inviteCode := genResp.GetInviteCode()
@@ -405,16 +372,19 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 
 	// Check created campaigns
 
-	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(mCtx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns := getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(0), campaigns[0].PlayerCount, "expected campaign players to be 0")
+	assert.Equal(t, int64(0), campaigns[0].PlayersCount, "expected campaign players to be 0")
+	assert.Empty(t, campaigns[0].PlayersId)
 
 	// Register player and join with invite code
 
@@ -428,7 +398,8 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 		Name:     playerName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	playerId := regResp.GetUserId()
+	assert.NotEmpty(t, playerId)
 
 	logResp, err = authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    playerEmail,
@@ -438,41 +409,46 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 	playerToken := logResp.GetToken()
 	require.NotEmpty(t, playerToken, "expected non-empty token")
 
-	md = metadata.Pairs("authorization", "Bearer "+playerToken)
-	pCtx := metadata.NewOutgoingContext(ctx, md)
-
-	joinResp, err := suite.CampaignClient.JoinCampaign(pCtx, &campaignv1.JoinCampaignRequest{
+	joinResp, err := suite.CampaignClient.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
 		InviteCode: inviteCode,
+		UserId: playerId,
 	})
 	require.NoError(t, err)
 	assert.True(t, joinResp.GetSuccess())
 
-	// Get campaigns
+	// Get current campaigns
 
-	getCurrentResp, err := suite.CampaignClient.GetCurrentCampaigns(pCtx, &campaignv1.GetCurrentCampaignsRequest{})
+	getCurrentResp, err := suite.CampaignClient.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{
+		UserId: playerId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCurrentResp, "no current campaigns")
 	currentCampaigns := getCurrentResp.GetCampaigns()
 	assert.Equal(t, campaignName, currentCampaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, campaignId, currentCampaigns[0].CampaignId, "expected campaign id to match")
+	assert.Equal(t, masterId, currentCampaigns[0].MasterId, "expectd master id to match: ", masterId, currentCampaigns[0].MasterId)
 
 	// Check created campaigns again
 
-	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(mCtx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns = getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(1), campaigns[0].PlayerCount, "expected campaign players to be 1")
+	assert.Equal(t, int64(1), campaigns[0].PlayersCount, "expected campaign players to be 1")
+	assert.Equal(t, playerId, campaigns[0].PlayersId[0])
 
 	// Try to join again
 
-	joinResp, err = suite.CampaignClient.JoinCampaign(pCtx, &campaignv1.JoinCampaignRequest{
+	joinResp, err = suite.CampaignClient.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
 		InviteCode: inviteCode,
+		UserId: playerId,
 	})
 	require.Error(t, err)
 	st, ok := status.FromError(err)
@@ -484,27 +460,39 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 
 	// Leave campaign
 
-	leaveResp, err := suite.CampaignClient.LeaveCampaign(pCtx, &campaignv1.LeaveCampaignRequest{
+	leaveResp, err := suite.CampaignClient.LeaveCampaign(ctx, &campaignv1.LeaveCampaignRequest{
 		CampaignId: campaignId,
+		UserId: playerId,
 	})
 	require.NoError(t, err)
 	assert.True(t, leaveResp.GetSuccess())
 
+	// Check current campaigns again
+
+	getCurrentResp, err = suite.CampaignClient.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{
+		UserId: playerId,
+	})
+	require.Error(t, err)
+	assert.Empty(t, getCurrentResp, "should be no current campaigns")
+
 	// Check created campaigns again
 
-	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(mCtx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns = getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(0), campaigns[0].PlayerCount, "expected campaign players to be 0")
+	assert.Equal(t, int64(0), campaigns[0].PlayersCount, "expected campaign players to be 0")
+	assert.Empty(t, campaigns[0].PlayersId)
 }
 
-func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
+func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T) {
 	ctx, suite := suite.New(t)
 
 	// Register master and create campaign
@@ -519,7 +507,8 @@ func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
 		Name:     masterName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	masterId := regResp.GetUserId()
+	assert.NotEmpty(t, masterId)
 
 	logResp, err := authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    masterEmail,
@@ -529,22 +518,21 @@ func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
 	masterToken := logResp.GetToken()
 	require.NotEmpty(t, masterToken, "expected non-empty token")
 
-	md := metadata.Pairs("authorization", "Bearer "+masterToken)
-	mCtx := metadata.NewOutgoingContext(ctx, md)
-
 	campaignName := gofakeit.Name()
 	desc := gofakeit.Sentence(10)
 
-	createResp, err := suite.CampaignClient.CreateCampaign(mCtx, &campaignv1.CreateCampaignRequest{
+	createResp, err := suite.CampaignClient.CreateCampaign(ctx, &campaignv1.CreateCampaignRequest{
 		Name:        campaignName,
 		Description: &desc,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	campaignId := createResp.GetCampaignId()
 	assert.NotEmpty(t, campaignId, "campaign id should not be empty")
 
-	genResp, err := suite.CampaignClient.GenerateInviteCode(mCtx, &campaignv1.GenerateInviteCodeRequest{
+	genResp, err := suite.CampaignClient.GenerateInviteCode(ctx, &campaignv1.GenerateInviteCodeRequest{
 		CampaignId: campaignId,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	inviteCode := genResp.GetInviteCode()
@@ -552,16 +540,19 @@ func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
 
 	// Check created campaigns
 
-	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(mCtx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err := suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns := getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(0), campaigns[0].PlayerCount, "expected campaign players to be 0")
+	assert.Equal(t, int64(0), campaigns[0].PlayersCount, "expected campaign players to be 0")
+	assert.Empty(t, campaigns[0].PlayersId)
 
 	// Register player and join with invite code
 
@@ -575,7 +566,8 @@ func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
 		Name:     playerName,
 	})
 	require.NoError(t, err)
-	assert.NotEmpty(t, regResp.GetUserId())
+	playerId := regResp.GetUserId()
+	assert.NotEmpty(t, playerId)
 
 	logResp, err = authClient.Login(ctx, &ssov1.LoginRequest{
 		Email:    playerEmail,
@@ -585,41 +577,46 @@ func TestE2E_DeleteCampaignWithPlayers_Success(t *testing.T){
 	playerToken := logResp.GetToken()
 	require.NotEmpty(t, playerToken, "expected non-empty token")
 
-	md = metadata.Pairs("authorization", "Bearer "+playerToken)
-	pCtx := metadata.NewOutgoingContext(ctx, md)
-
-	joinResp, err := suite.CampaignClient.JoinCampaign(pCtx, &campaignv1.JoinCampaignRequest{
+	joinResp, err := suite.CampaignClient.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
 		InviteCode: inviteCode,
+		UserId: playerId,
 	})
 	require.NoError(t, err)
 	assert.True(t, joinResp.GetSuccess())
 
-	// Get campaigns
+	// Get current campaigns
 
-	getCurrentResp, err := suite.CampaignClient.GetCurrentCampaigns(pCtx, &campaignv1.GetCurrentCampaignsRequest{})
+	getCurrentResp, err := suite.CampaignClient.GetCurrentCampaigns(ctx, &campaignv1.GetCurrentCampaignsRequest{
+		UserId: playerId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCurrentResp, "no current campaigns")
 	currentCampaigns := getCurrentResp.GetCampaigns()
 	assert.Equal(t, campaignName, currentCampaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, campaignId, currentCampaigns[0].CampaignId, "expected campaign id to match")
+	assert.Equal(t, masterId, currentCampaigns[0].MasterId, "expected master id match")
 
 	// Check created campaigns again
 
-	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(mCtx, &campaignv1.GetCreatedCampaignsRequest{})
+	getCreatedResp, err = suite.CampaignClient.GetCreatedCampaigns(ctx, &campaignv1.GetCreatedCampaignsRequest{
+		UserId: masterId,
+	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, getCreatedResp, "no created campaigns")
 	campaigns = getCreatedResp.GetCampaigns()
 	assert.NotEmpty(t, campaigns, "no created campaigns")
 	assert.Equal(t, 1, len(campaigns), "expected one created campaign")
-	assert.Equal(t, campaignId, int32(campaigns[0].CampaignId), "expected campaign id to match")
+	assert.Equal(t, campaignId, int64(campaigns[0].CampaignId), "expected campaign id to match")
 	assert.Equal(t, campaignName, campaigns[0].Name, "expected campaign name to match")
 	assert.Equal(t, desc, *campaigns[0].Description, "expected campaign description to match")
-	assert.Equal(t, int32(1), campaigns[0].PlayerCount, "expected campaign players to be 1")
+	assert.Equal(t, int64(1), campaigns[0].PlayersCount, "expected campaign players to be 1")
+	assert.Equal(t, playerId, campaigns[0].PlayersId[0])
 
 	// Delete campaigns
 
-	delResp, err := suite.CampaignClient.DeleteCampaign(mCtx, &campaignv1.DeleteCampaignRequest{
+	delResp, err := suite.CampaignClient.DeleteCampaign(ctx, &campaignv1.DeleteCampaignRequest{
 		CampaignId: campaignId,
+		UserId: masterId,
 	})
 	require.NoError(t, err)
 	assert.True(t, delResp.GetSuccess())

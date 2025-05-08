@@ -2,15 +2,12 @@ FROM golang:1.24.2-alpine AS builder
 
 WORKDIR /app
 
-# Копируем прото файлы
-COPY protos/ /app/protos/
-
-COPY sso-service/go.mod ./
-COPY sso-service/go.sum ./
+COPY go.mod ./
+COPY go.sum ./
 
 RUN go mod download
 
-COPY sso-service/ .
+COPY . .
 
 # Компилируем приложение
 RUN CGO_ENABLED=0 GOOS=linux go build -o sso ./cmd/sso
@@ -32,17 +29,20 @@ COPY --from=builder /app/migrator /migrator
 
 COPY --from=builder /app/sso .
 
+# Копируем прото файлы
+COPY protos/ /app/protos/
+
 # Копируем конфигурационный файл
-COPY sso-service/config/local.yaml /app/config/local.yaml
+COPY config/local.yaml /app/config/local.yaml
 
 # Копируем миграции
-COPY --from=builder /app/migrations /migrations
+COPY migrations/ /app/migrations/
 
 # Порт, на котором работает SSO-сервис
 EXPOSE 8080
 
 # Команда для миграций и запуска сервиса
-CMD ["/bin/sh", "-c", "sleep 10 && /migrator --db-url=postgres://postgres:postgres@postgres:5432/sso?sslmode=disable --migrations-path=/migrations --migrations-table=sso_migrations && ./sso"]
+CMD ["/bin/sh", "-c", "sleep 10 && /migrator && ./sso"]
 
 # RUN go build -o sso ./cmd/sso
 

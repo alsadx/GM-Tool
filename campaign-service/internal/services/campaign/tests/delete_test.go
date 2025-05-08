@@ -15,7 +15,7 @@ func TestDeleteCampaign_Success(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "user_id", 1)
 	name := "Test Campaign"
 	description := "This is a test campaign"
-	expectedCampaignId := int32(123)
+	expectedCampaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		SaveCampaign(ctx, name, description, 1).
@@ -43,7 +43,7 @@ func TestDeleteCampaign_CampaignNotFound(t *testing.T) {
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 	GetCampaignPlayers(ctx, int(campaignId)).
@@ -65,7 +65,7 @@ func TestDeleteCampaign_CampaignNotFound2(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "user_id", 1)
 	name := "Test Campaign"
 	description := "This is a test campaign"
-	expectedCampaignId := int32(123)
+	expectedCampaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		SaveCampaign(ctx, name, description, 1).
@@ -94,7 +94,7 @@ func TestDeleteCampaign_CampaignWithPlayers(t *testing.T) {
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 		GetCampaignPlayers(ctx, int(campaignId)).

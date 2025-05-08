@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"campaigntool/protos/campaignv1"
+
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestGRPC_LeaveCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -53,7 +53,7 @@ func TestGRPC_LeaveCampaign_Success(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		RemovePlayer(gomock.Any(), campaignId, 1).
@@ -71,7 +71,7 @@ func TestGRPC_LeaveCampaign_NotFound(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -100,7 +100,7 @@ func TestGRPC_LeaveCampaign_NotFound(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer valid-token"))
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		RemovePlayer(gomock.Any(), campaignId, 1).
@@ -119,7 +119,7 @@ func TestGRPC_LeaveCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -148,7 +148,7 @@ func TestGRPC_LeaveCampaign_InvalidToken(t *testing.T) {
 
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer invalid-token"))
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	resp, err := client.LeaveCampaign(ctx, &campaignv1.LeaveCampaignRequest{
 		CampaignId: campaignId,

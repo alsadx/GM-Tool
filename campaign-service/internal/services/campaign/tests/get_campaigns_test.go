@@ -14,7 +14,7 @@ func TestGetCreatedCampaign_Success(t *testing.T) {
 	service, _, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 		CreatedCampaigns(ctx, 1).
@@ -49,7 +49,7 @@ func TestGetCurrentCampaign_Success(t *testing.T) {
 	service, _, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 		CurrentCampaigns(ctx, 1).

@@ -15,7 +15,7 @@ func TestJoinCampaign_Success(t *testing.T) {
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 		CheckInviteCode(ctx, gomock.Any()).
@@ -34,7 +34,7 @@ func TestJoinCampaign_CampaignNotFound(t *testing.T) {
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameProvider.EXPECT().
 		CheckInviteCode(ctx, gomock.Any()).
@@ -57,7 +57,7 @@ func TestJoinCampaign_InvalidCode(t *testing.T) {
 
 	mockGameProvider.EXPECT().
 		CheckInviteCode(ctx, gomock.Any()).
-		Return(int32(0), models.ErrInvalidCode)
+		Return(int64(0), models.ErrInvalidCode)
 
 	err := service.JoinCampaign(ctx, "ABCDEF", 1)
 
@@ -69,7 +69,7 @@ func TestLeaveCampaign_HappyPath(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		RemovePlayer(ctx, campaignId, 1).
@@ -84,7 +84,7 @@ func TestLeaveCampaign_CampaignNotFound(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		RemovePlayer(ctx, campaignId, 1).

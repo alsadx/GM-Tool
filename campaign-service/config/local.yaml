@@ -2,7 +2,7 @@ env: "local"
 postgres:
   host: "localhost"
   port: 5431
-  user: "postgres"
+  user: "alinasad"
   password: ""
   database: "sso"
   maxConn: 10
