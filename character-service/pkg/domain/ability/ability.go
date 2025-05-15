@@ -1,17 +1,18 @@
 package ability
 
-import "github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
-
-type Ability int
-
-const (
-	Strength Ability = iota
-	Dexterity
-	Constitution
-	Intelligence
-	Wisdom
-	Charisma
+import (
+	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
+	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
+	"github.com/alsadx/GM-Tool/character-service/pkg/domain/types"
 )
+
+func floorDiv(a, b int) int {
+    q := a / b
+    if a % b != 0 && a < 0 {
+        q--
+    }
+    return q
+}
 
 type Score struct {
 	base int
@@ -27,7 +28,8 @@ func NewScore(base int) *Score {
 
 func (s *Score) UpdateModifier() {
 	total := s.base + s.temp
-	s.mod = (total - 10) / 2
+	
+	s.mod = floorDiv(total-10, 2)
 }
 
 func (s *Score) Modifier() int {
@@ -60,4 +62,20 @@ func (s *Score) Temp() int {
 
 func (s *Score) Base() int {
 	return s.base
+}
+
+type Ability struct {
+	*Score
+	Skills map[types.SkillType]skill.Skill
+}
+
+func New(abilityType types.AbilityType) *Ability {
+	a := &Ability{
+		Score:  NewScore(10),
+		Skills: make(map[types.SkillType]skill.Skill),
+	}
+	for _, skillType := range types.AbilityToSkill[abilityType] {
+		a.Skills[skillType] = *skill.NewSkill(0)
+	}
+	return a
 }

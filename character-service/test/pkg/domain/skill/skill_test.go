@@ -3,7 +3,6 @@ package skill_test
 import (
 	"testing"
 
-	"github.com/alsadx/GM-Tool/character-service/pkg/domain/ability"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
 )
@@ -15,77 +14,80 @@ func TestSkill_Check(t *testing.T) {
 
 	tests := []struct {
 		name           string
-		abilityMod     int
 		skillBonus     int
+		modifier       int
 		mockDiceRoll   int
-		wantDiceRes    int
-		wantTotalBonus int
-		wantResult     int
+		expectedDice   int
+		expectedBonus  int
+		expectedResult int
 	}{
 		{
-			name:           "base case",
-			abilityMod:     2,
-			skillBonus:     3,
-			mockDiceRoll:   15,
-			wantDiceRes:    15,
-			wantTotalBonus: 5,
-			wantResult:     20,
-		},
-		{
-			name:           "negative modifier",
-			abilityMod:     -1,
+			name:           "Base case",
 			skillBonus:     2,
+			modifier:       3,
+			mockDiceRoll:   15,
+			expectedDice:   15,
+			expectedBonus:  5,
+			expectedResult: 20,
+		},
+		{
+			name:           "Negative values",
+			skillBonus:     -1,
+			modifier:       -2,
 			mockDiceRoll:   10,
-			wantDiceRes:    10,
-			wantTotalBonus: 1,
-			wantResult:     11,
+			expectedDice:   10,
+			expectedBonus:  -3,
+			expectedResult: 7,
 		},
 		{
-			name:           "zero values",
-			abilityMod:     0,
+			name:           "Zero values",
 			skillBonus:     0,
+			modifier:       0,
 			mockDiceRoll:   5,
-			wantDiceRes:    5,
-			wantTotalBonus: 0,
-			wantResult:     5,
+			expectedDice:   5,
+			expectedBonus:  0,
+			expectedResult: 5,
 		},
 		{
-			name:           "max values",
-			abilityMod:     5,
+			name:           "Max values",
 			skillBonus:     10,
+			modifier:       5,
 			mockDiceRoll:   20,
-			wantDiceRes:    20,
-			wantTotalBonus: 15,
-			wantResult:     35,
+			expectedDice:   20,
+			expectedBonus:  15,
+			expectedResult: 35,
+		},
+		{
+			name:           "Mixed signs",
+			skillBonus:     3,
+			modifier:       -2,
+			mockDiceRoll:   12,
+			expectedDice:   12,
+			expectedBonus:  1,
+			expectedResult: 13,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Мокаем бросок костей
 			dice.RollDice = func(d dice.Dice) int { return tt.mockDiceRoll }
 
-			abil := ability.NewScore(10)
-			abil.SetBase(10 + tt.abilityMod*2)
+			// Создаем навык с заданным бонусом
+			sk := skill.NewSkill(tt.skillBonus)
 
-			if abil.Modifier() != tt.abilityMod {
-				t.Errorf("Modifier() = %v, want %v", abil.Modifier(), tt.abilityMod)
-			}
+			// Выполняем проверку
+			diceRes, bonus, result := sk.Check(tt.modifier)
 
-			sk := &skill.Skill{
-				Ability: abil,
-				Bonus:   tt.skillBonus,
+			// Проверяем результаты
+			if diceRes != tt.expectedDice {
+				t.Errorf("Dice result = %d, want %d", diceRes, tt.expectedDice)
 			}
-
-			diceRes, bonus, result := sk.Check()
-
-			if diceRes != tt.wantDiceRes {
-				t.Errorf("Dice result = %d, want %d", diceRes, tt.wantDiceRes)
+			if bonus != tt.expectedBonus {
+				t.Errorf("Total bonus = %d, want %d", bonus, tt.expectedBonus)
 			}
-			if bonus != tt.wantTotalBonus {
-				t.Errorf("Total bonus = %d, want %d", bonus, tt.wantTotalBonus)
-			}
-			if result != tt.wantResult {
-				t.Errorf("Final result = %d, want %d", result, tt.wantResult)
+			if result != tt.expectedResult {
+				t.Errorf("Final result = %d, want %d", result, tt.expectedResult)
 			}
 		})
 	}
@@ -93,42 +95,60 @@ func TestSkill_Check(t *testing.T) {
 
 func TestSkill_SetBonus(t *testing.T) {
 	tests := []struct {
-		name      string
-		initial   int
-		newBonus  int
-		wantBonus int
+		name         string
+		initialBonus int
+		newBonus     int
 	}{
 		{
-			name:      "set positive bonus",
-			initial:   0,
-			newBonus:  5,
-			wantBonus: 5,
+			name:         "Positive to positive",
+			initialBonus: 2,
+			newBonus:     4,
 		},
 		{
-			name:      "set negative bonus",
-			initial:   3,
-			newBonus:  -2,
-			wantBonus: -2,
+			name:         "Positive to negative",
+			initialBonus: 3,
+			newBonus:     -1,
 		},
 		{
-			name:      "set zero bonus",
-			initial:   10,
-			newBonus:  0,
-			wantBonus: 0,
+			name:         "Zero to positive",
+			initialBonus: 0,
+			newBonus:     5,
+		},
+		{
+			name:         "Negative to zero",
+			initialBonus: -2,
+			newBonus:     0,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			sk := &skill.Skill{
-				Ability: ability.NewScore(10),
-				Bonus:   tt.initial,
-			}
-
+			sk := skill.NewSkill(tt.initialBonus)
 			sk.SetBonus(tt.newBonus)
 
-			if sk.Bonus != tt.wantBonus {
-				t.Errorf("Bonus = %d, want %d", sk.Bonus, tt.wantBonus)
+			if sk.Bonus != tt.newBonus {
+				t.Errorf("Bonus = %d, want %d", sk.Bonus, tt.newBonus)
+			}
+		})
+	}
+}
+
+func TestNewSkill(t *testing.T) {
+	tests := []struct {
+		name     string
+		bonus    int
+		expected int
+	}{
+		{"Positive bonus", 5, 5},
+		{"Negative bonus", -2, -2},
+		{"Zero bonus", 0, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sk := skill.NewSkill(tt.bonus)
+			if sk.Bonus != tt.expected {
+				t.Errorf("NewSkill() bonus = %d, want %d", sk.Bonus, tt.expected)
 			}
 		})
 	}
