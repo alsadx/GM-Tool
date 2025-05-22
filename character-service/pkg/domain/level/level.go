@@ -36,6 +36,12 @@ func (ls *LevelSystem) AddExp(amount int) {
 	}
 }
 
+func (ls *LevelSystem) SetLevel(lvl int) {
+	ls.currentExp = ls.thresholds[lvl-1]
+	ls.currentLevel = lvl
+	ls.updateEarnedLevel()
+}
+
 func (ls *LevelSystem) RemoveExp(amount int) {
 	if amount <= 0 || ls.currentExp == 0 {
 		return
@@ -45,10 +51,6 @@ func (ls *LevelSystem) RemoveExp(amount int) {
 
 	if ls.currentExp < ls.thresholds[ls.earnedLevel-1] {
 		ls.updateEarnedLevelDown()
-	}
-
-	if ls.currentLevel > ls.earnedLevel {
-		ls.currentLevel = ls.earnedLevel
 	}
 }
 
