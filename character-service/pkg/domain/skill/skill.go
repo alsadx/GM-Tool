@@ -6,27 +6,6 @@ import (
 
 type Name int
 
-const (
-	Athletics Name = iota
-	Acrobatics
-	SleightOfHand
-	Stealth
-	Arcana
-	History
-	Investigation
-	Nature
-	Religion
-	AnimalHandling
-	Insight
-	Medicine
-	Perception
-	Survival
-	Deception
-	Intimidation
-	Performance
-	Persuasion
-)
-
 type Skill struct {
 	Bonus int
 }
