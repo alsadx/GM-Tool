@@ -7,11 +7,11 @@ import (
 )
 
 func floorDiv(a, b int) int {
-    q := a / b
-    if a % b != 0 && a < 0 {
-        q--
-    }
-    return q
+	q := a / b
+	if a%b != 0 && a < 0 {
+		q--
+	}
+	return q
 }
 
 type Score struct {
@@ -28,7 +28,7 @@ func NewScore(base int) *Score {
 
 func (s *Score) UpdateModifier() {
 	total := s.base + s.temp
-	
+
 	s.mod = floorDiv(total-10, 2)
 }
 
@@ -66,16 +66,31 @@ func (s *Score) Base() int {
 
 type Ability struct {
 	*Score
-	Skills map[types.SkillType]skill.Skill
+	Skills map[types.SkillType]*skill.Skill
 }
 
 func New(abilityType types.AbilityType) *Ability {
 	a := &Ability{
 		Score:  NewScore(10),
-		Skills: make(map[types.SkillType]skill.Skill),
+		Skills: make(map[types.SkillType]*skill.Skill),
 	}
 	for _, skillType := range types.AbilityToSkill[abilityType] {
-		a.Skills[skillType] = *skill.NewSkill(0)
+		a.Skills[skillType] = skill.NewSkill(0)
 	}
 	return a
+}
+
+func (a *Ability) CheckSkill(skillType types.SkillType) (diceRes, bonus, result int) {
+	skill := a.Skills[skillType]
+	diceRes, bonus, result = skill.Check(a.Modifier())
+	return diceRes, bonus, result
+}
+
+func NewStats() map[types.AbilityType]*Ability {
+	stats := make(map[types.AbilityType]*Ability, 6)
+	abilityTypes := []types.AbilityType{types.Strength, types.Dexterity, types.Intelligence, types.Wisdom, types.Charisma, types.Constitution}
+	for _, at := range abilityTypes {
+		stats[at] = New(at)
+	}
+	return stats
 }

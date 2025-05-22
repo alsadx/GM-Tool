@@ -132,7 +132,7 @@ func TestAbility(t *testing.T) {
 		})
 
 		t.Run("Modify skill", func(t *testing.T) {
-			newSkill := skill.Skill{Bonus: 2}
+			newSkill := &skill.Skill{Bonus: 2}
 			a.Skills[skillType] = newSkill
 			if a.Skills[skillType].Bonus != 2 {
 				t.Error("Skill modification failed")
