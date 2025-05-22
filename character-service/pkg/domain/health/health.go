@@ -123,3 +123,11 @@ func (hp *HealthPoint) TakeDamage(damage int) {
 func (hp *HealthPoint) Heal(heal int) {
 	hp.CurrentHP = min(hp.CurrentHP+heal, hp.MaxHP)
 }
+
+func (hp *HealthPoint) GetHitDiceCount() int {
+	var maxAvailable int
+	for _, amount := range hp.HitDice {
+		maxAvailable += amount.MaxAvailable
+	}
+	return maxAvailable
+}
