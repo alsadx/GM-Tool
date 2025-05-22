@@ -4,6 +4,7 @@ import (
 	"campaigntool/internal/config"
 	"campaigntool/internal/domain/models"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -36,9 +37,9 @@ func New(dbConfig *config.DBConfig) (*Storage, error) {
 	}, nil
 }
 
-func (s *Storage) SaveCampaign(ctx context.Context, name, desc string, userId int) (int32, error) {
+func (s *Storage) SaveCampaign(ctx context.Context, name, desc string, userId int) (int64, error) {
 	op := "storage.postgres.SaveCampaign"
-	var campaignId int32
+	var campaignId int64
 
 	query := `
 		INSERT INTO campaigns (name, description, master_id)
@@ -57,7 +58,7 @@ func (s *Storage) SaveCampaign(ctx context.Context, name, desc string, userId in
 	return campaignId, nil
 }
 
-func (s *Storage) DeleteCampaign(ctx context.Context, campaignId int32, userId int) error {
+func (s *Storage) DeleteCampaign(ctx context.Context, campaignId int64, userId int) error {
 	op := "storage.postgres.DeleteCampaign"
 
 	query := `
@@ -68,15 +69,15 @@ func (s *Storage) DeleteCampaign(ctx context.Context, campaignId int32, userId i
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
-	
+
 	if commandTag.RowsAffected() == 0 {
-        return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
-    }
+		return fmt.Errorf("%s: %w", op, models.ErrCampaignNotFound)
+	}
 
 	return nil
 }
 
-func (s *Storage) SetInviteCode(ctx context.Context, campaignId int32, inviteCode string) error {
+func (s *Storage) SetInviteCode(ctx context.Context, campaignId int64, inviteCode string) error {
 	op := "storage.postgres.SetInviteCode"
 
 	query := `
@@ -96,14 +97,14 @@ func (s *Storage) SetInviteCode(ctx context.Context, campaignId int32, inviteCod
 	return nil
 }
 
-func (s *Storage) CheckInviteCode(ctx context.Context, inviteCode string) (int32, error) {
+func (s *Storage) CheckInviteCode(ctx context.Context, inviteCode string) (int64, error) {
 	op := "storage.postgres.CheckInviteCode"
 
 	query := `
 		SELECT id FROM campaigns
 		WHERE invite_code = $1
 	`
-	var campaignId int32
+	var campaignId int64
 	err := s.dbPool.QueryRow(ctx, query, inviteCode).Scan(&campaignId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) || strings.Contains(err.Error(), "no rows in result set") {
@@ -116,7 +117,7 @@ func (s *Storage) CheckInviteCode(ctx context.Context, inviteCode string) (int32
 	return campaignId, nil
 }
 
-func (s *Storage) AddPlayer(ctx context.Context, campaignId int32, userId int) error {
+func (s *Storage) AddPlayer(ctx context.Context, campaignId int64, userId int) error {
 	op := "storage.postgres.AddPlayer"
 
 	query := `
@@ -138,7 +139,7 @@ func (s *Storage) AddPlayer(ctx context.Context, campaignId int32, userId int) e
 	return nil
 }
 
-func (s *Storage) RemovePlayer(ctx context.Context, campaignId int32, userId int) error {
+func (s *Storage) RemovePlayer(ctx context.Context, campaignId int64, userId int) error {
 	op := "storage.postgres.RemovePlayer"
 
 	query := `
@@ -165,7 +166,7 @@ func (s *Storage) CreatedCampaigns(ctx context.Context, userId int) ([]*models.C
             c.id,
             c.name,
             c.description,
-            COUNT(p.player_id) AS player_count,
+			COALESCE(jsonb_agg(p.player_id) FILTER (WHERE p.player_id IS NOT NULL), '[]') AS players_id,
             c.created_at
         FROM
             campaigns c
@@ -182,24 +183,36 @@ func (s *Storage) CreatedCampaigns(ctx context.Context, userId int) ([]*models.C
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-    defer rows.Close()
+	defer rows.Close()
 
 	var campaigns []*models.Campaign
 	for rows.Next() {
 		var campaign models.Campaign
-		if err := rows.Scan(&campaign.Id, &campaign.Name, &campaign.Description, &campaign.PlayerCount, &campaign.CreatedAt); err != nil {
+		var rawPlayersId []byte
+
+		if err := rows.Scan(&campaign.Id, &campaign.Name, &campaign.Description, &rawPlayersId, &campaign.CreatedAt); err != nil {
+			fmt.Println("rows.Scan error")
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
+
+		fmt.Println("Raw players_id:", string(rawPlayersId))
+		var playersId []int64
+		if err := json.Unmarshal(rawPlayersId, &playersId); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal players_id: %w", err)
+		}
+
+		campaign.PlayersId = &playersId
+		campaign.PlayersCount = int64(len(playersId))
 
 		campaigns = append(campaigns, &campaign)
 	}
 	if err := rows.Err(); err != nil {
-        return nil, fmt.Errorf("%s: %w", op, err)
-    }
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 
 	if len(campaigns) == 0 {
-        return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
-    }
+		return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+	}
 
 	return campaigns, nil
 }
@@ -208,7 +221,7 @@ func (s *Storage) CurrentCampaigns(ctx context.Context, userId int) ([]*models.C
 	op := "storage.postgres.CurrentCampaigns"
 
 	query := `
-		SELECT c.id, c.name
+		SELECT c.id, c.name, c.master_id
 		FROM campaigns c
 		JOIN players p ON c.id = p.campaign_id
 		WHERE p.player_id = $1
@@ -217,24 +230,24 @@ func (s *Storage) CurrentCampaigns(ctx context.Context, userId int) ([]*models.C
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-    defer rows.Close()
+	defer rows.Close()
 
 	var campaigns []*models.CampaignForPlayer
 	for rows.Next() {
 		var campaign models.CampaignForPlayer
-		if err := rows.Scan(&campaign.Id, &campaign.Name); err != nil {
+		if err := rows.Scan(&campaign.Id, &campaign.Name, &campaign.MasterId); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
 		campaigns = append(campaigns, &campaign)
 	}
 	if err := rows.Err(); err != nil {
-        return nil, fmt.Errorf("%s: %w", op, err)
-    }
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 
 	if len(campaigns) == 0 {
-        return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
-    }
+		return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+	}
 
 	return campaigns, nil
 }
@@ -254,7 +267,7 @@ func (s *Storage) GetCampaignPlayers(ctx context.Context, campaignId int) ([]int
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-    defer rows.Close()
+	defer rows.Close()
 
 	var players []int
 	for rows.Next() {
@@ -266,8 +279,8 @@ func (s *Storage) GetCampaignPlayers(ctx context.Context, campaignId int) ([]int
 		players = append(players, player)
 	}
 	if err := rows.Err(); err != nil {
-        return nil, fmt.Errorf("%s: %w", op, err)
-    }
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 
 	return players, nil
 }

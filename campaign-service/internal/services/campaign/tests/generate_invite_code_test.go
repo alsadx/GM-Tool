@@ -15,7 +15,7 @@ func TestGenerateInviteCode_Success(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		SetInviteCode(ctx, campaignId, gomock.Any()).
@@ -32,7 +32,7 @@ func TestGenerateInviteCode_CampaignNotFound(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
 	ctx := context.WithValue(context.Background(), "user_id", 1)
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	mockGameSaver.EXPECT().
 		SetInviteCode(ctx, campaignId, gomock.Any()).

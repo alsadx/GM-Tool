@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -10,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +23,7 @@ func TestGRPC_CreateCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -74,7 +73,7 @@ func TestGRPC_CreateCampaign_EmptyName(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -120,7 +119,7 @@ func TestGRPC_CreateCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -166,7 +165,7 @@ func TestGRPC_CreateCampaign_CampaignAlreadyExists(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,

@@ -19,6 +19,7 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=sso
+      - MIGRATION_PATH=/app/migrations/
       - TEST_ENV=
       - CONFIG_PATH=/app/config/local.yaml
     depends_on:

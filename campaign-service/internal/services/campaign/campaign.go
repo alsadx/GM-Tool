@@ -10,15 +10,15 @@ import (
 )
 
 type GameSaver interface {
-	SaveCampaign(ctx context.Context, name, desc string, userId int) (int32, error)
-	DeleteCampaign(ctx context.Context, campaignId int32, userId int) error
-	AddPlayer(ctx context.Context, campaignId int32, userId int) error
-	RemovePlayer(ctx context.Context, campaignId int32, userId int) error
-	SetInviteCode(ctx context.Context, campaignId int32, inviteCode string) error
+	SaveCampaign(ctx context.Context, name, desc string, userId int) (int64, error)
+	DeleteCampaign(ctx context.Context, campaignId int64, userId int) error
+	AddPlayer(ctx context.Context, campaignId int64, userId int) error
+	RemovePlayer(ctx context.Context, campaignId int64, userId int) error
+	SetInviteCode(ctx context.Context, campaignId int64, inviteCode string) error
 }
 
 type GameProvider interface {
-	CheckInviteCode(ctx context.Context, inviteCode string) (int32, error)
+	CheckInviteCode(ctx context.Context, inviteCode string) (int64, error)
 	CreatedCampaigns(ctx context.Context, userId int) ([]*models.Campaign, error)
 	CurrentCampaigns(ctx context.Context, userId int) ([]*models.CampaignForPlayer, error)
 	GetCampaignPlayers(ctx context.Context, campaignId int) ([]int, error)
@@ -38,7 +38,7 @@ func New(log *slog.Logger, gameSaver GameSaver, gameProvider GameProvider) *Camp
 	}
 }
 
-func (s *CampaignTool) CreateCampaign(ctx context.Context, name, desc string, userId int) (campaignId int32, err error) {
+func (s *CampaignTool) CreateCampaign(ctx context.Context, name, desc string, userId int) (campaignId int64, err error) {
 	op := "campaign.CreateCampaign"
 
 	log := s.Log.With(slog.String("op", op), slog.String("name", name))
@@ -62,7 +62,7 @@ func (s *CampaignTool) CreateCampaign(ctx context.Context, name, desc string, us
 	return campaignId, nil
 }
 
-func (s *CampaignTool) DeleteCampaign(ctx context.Context, campaignId int32, userId int) (err error) {
+func (s *CampaignTool) DeleteCampaign(ctx context.Context, campaignId int64, userId int) (err error) {
 	op := "campaign.DeleteCampaign"
 
 	log := s.Log.With(slog.String("op", op), slog.Int("campaignId", int(campaignId)))
@@ -106,7 +106,7 @@ func (s *CampaignTool) DeleteCampaign(ctx context.Context, campaignId int32, use
 	return nil
 }
 
-func (s *CampaignTool) GenerateInviteCode(ctx context.Context, campaignId int32, userId int) (inviteCode string, err error) {
+func (s *CampaignTool) GenerateInviteCode(ctx context.Context, campaignId int64, userId int) (inviteCode string, err error) {
 	op := "campaign.GenerateInviteCode"
 
 	log := s.Log.With(slog.String("op", op), slog.Int("campaignId", int(campaignId)))
@@ -178,7 +178,7 @@ func (s *CampaignTool) JoinCampaign(ctx context.Context, inviteCode string, user
 	return nil
 }
 
-func (s *CampaignTool) LeaveCampaign(ctx context.Context, campaignId int32, userId int) (err error) {
+func (s *CampaignTool) LeaveCampaign(ctx context.Context, campaignId int64, userId int) (err error) {
 	op := "campaign.LeaveCampaign"
 
 	log := s.Log.With(slog.String("op", op))
@@ -206,11 +206,11 @@ func (s *CampaignTool) GetCreatedCampaigns(ctx context.Context, userId int) (cam
 
 	campaigns, err = s.GameProvider.CreatedCampaigns(ctx, userId)
 	if err != nil {
-		// if errors.Is(err, models.ErrNoCampaigns) {
-		// 	s.Log.Error("created campaigns not found", slog.String("error", err.Error()))
+		if errors.Is(err, models.ErrNoCampaigns) {
+			s.Log.Error("created campaigns not found", slog.String("error", err.Error()))
 
-		// 	return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
-		// }
+			return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+		}
 		log.Error("failed to get created campaigns", slog.String("error", err.Error()))
 
 		return nil, fmt.Errorf("%s: %w", op, err)
@@ -230,11 +230,11 @@ func (s *CampaignTool) GetCurrentCampaigns(ctx context.Context, userId int) (cam
 
 	campaigns, err = s.GameProvider.CurrentCampaigns(ctx, userId)
 	if err != nil {
-		// if errors.Is(err, models.ErrNoCampaigns) {
-		// 	s.Log.Error("current campaigns not found", slog.String("error", err.Error()))
+		if errors.Is(err, models.ErrNoCampaigns) {
+			s.Log.Error("current campaigns not found", slog.String("error", err.Error()))
 
-		// 	return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
-		// }
+			return nil, fmt.Errorf("%s: %w", op, models.ErrNoCampaigns)
+		}
 		log.Error("failed to get current campaigns", slog.String("error", err.Error()))
 
 		return nil, fmt.Errorf("%s: %w", op, err)

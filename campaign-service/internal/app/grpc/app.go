@@ -1,7 +1,6 @@
 package grpcapp
 
 import (
-	"auth"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"fmt"
 
@@ -18,7 +17,7 @@ type App struct {
 }
 
 func New(log *slog.Logger, campaignToolService grpccampaign.CampaignTool, port int) *App {
-	gRPCServer := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	gRPCServer := grpc.NewServer()
 	grpccampaign.RegisterServerAPI(gRPCServer, campaignToolService)
 
 	return &App{

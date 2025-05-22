@@ -19,3 +19,8 @@ tasks:
   mockgen:
     cmds:
       - mockgen -source=./internal/services/campaign/campaign.go -destination=./tests/mocks/game_mocks.go -package=mocks
+
+  gen-proto:
+    desc: "Generate code from proto file"
+    cmds:
+      - protoc -I protos/proto protos/proto/*.proto --go_out=protos/campaignv1 --go_opt=paths=source_relative --go-grpc_out=protos/campaignv1 --go-grpc_opt=paths=source_relative

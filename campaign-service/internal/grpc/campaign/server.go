@@ -5,18 +5,18 @@ import (
 	"context"
 	"errors"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type CampaignTool interface {
-	CreateCampaign(ctx context.Context, name, desc string, userId int) (campaignId int32, err error)
-	DeleteCampaign(ctx context.Context, campaignId int32, userId int) (err error)
-	GenerateInviteCode(ctx context.Context, campaignId int32, userId int) (inviteCode string, err error)
+	CreateCampaign(ctx context.Context, name, desc string, userId int) (campaignId int64, err error)
+	DeleteCampaign(ctx context.Context, campaignId int64, userId int) (err error)
+	GenerateInviteCode(ctx context.Context, campaignId int64, userId int) (inviteCode string, err error)
 	JoinCampaign(ctx context.Context, inviteCode string, userId int) (err error)
-	LeaveCampaign(ctx context.Context, campaignId int32, userId int) (err error)
+	LeaveCampaign(ctx context.Context, campaignId int64, userId int) (err error)
 	GetCreatedCampaigns(ctx context.Context, userId int) (campaigns []*models.Campaign, err error)
 	GetCurrentCampaigns(ctx context.Context, userId int) (campaigns []*models.CampaignForPlayer, err error)
 }
@@ -36,8 +36,8 @@ func (s *ServerAPI) CreateCampaign(ctx context.Context, req *campaignv1.CreateCa
 		return nil, status.Errorf(codes.InvalidArgument, "name is required")
 	}
 
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
+	userId := int(req.GetUserId())
+	if userId == 0 {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
@@ -54,9 +54,9 @@ func (s *ServerAPI) CreateCampaign(ctx context.Context, req *campaignv1.CreateCa
 }
 
 func (s *ServerAPI) DeleteCampaign(ctx context.Context, req *campaignv1.DeleteCampaignRequest) (*campaignv1.DeleteCampaignResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
-		return &campaignv1.DeleteCampaignResponse{Success: false}, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	userId := int(req.GetUserId())
+	if userId == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	err := s.CampaignTool.DeleteCampaign(ctx, req.GetCampaignId(), userId)
@@ -72,8 +72,8 @@ func (s *ServerAPI) DeleteCampaign(ctx context.Context, req *campaignv1.DeleteCa
 }
 
 func (s *ServerAPI) GenerateInviteCode(ctx context.Context, req *campaignv1.GenerateInviteCodeRequest) (*campaignv1.GenerateInviteCodeResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
+	userId := int(req.GetUserId())
+	if userId == 0 {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
@@ -89,9 +89,9 @@ func (s *ServerAPI) GenerateInviteCode(ctx context.Context, req *campaignv1.Gene
 }
 
 func (s *ServerAPI) JoinCampaign(ctx context.Context, req *campaignv1.JoinCampaignRequest) (*campaignv1.JoinCampaignResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
-		return &campaignv1.JoinCampaignResponse{Success: false}, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	userId := int(req.GetUserId())
+	if userId == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	err := s.CampaignTool.JoinCampaign(ctx, req.GetInviteCode(), userId)
@@ -112,9 +112,9 @@ func (s *ServerAPI) JoinCampaign(ctx context.Context, req *campaignv1.JoinCampai
 }
 
 func (s *ServerAPI) LeaveCampaign(ctx context.Context, req *campaignv1.LeaveCampaignRequest) (*campaignv1.LeaveCampaignResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
-		return &campaignv1.LeaveCampaignResponse{Success: false}, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	userId := int(req.GetUserId())
+	if userId == 0 {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
 	err := s.CampaignTool.LeaveCampaign(ctx, req.GetCampaignId(), userId)
@@ -129,8 +129,8 @@ func (s *ServerAPI) LeaveCampaign(ctx context.Context, req *campaignv1.LeaveCamp
 }
 
 func (s *ServerAPI) GetCreatedCampaigns(ctx context.Context, req *campaignv1.GetCreatedCampaignsRequest) (*campaignv1.GetCreatedCampaignsResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
+	userId := int(req.GetUserId())
+	if userId == 0 {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
@@ -148,7 +148,8 @@ func (s *ServerAPI) GetCreatedCampaigns(ctx context.Context, req *campaignv1.Get
 			CampaignId:  campaign.Id,
 			Name:        campaign.Name,
 			Description: &campaign.Description,
-			PlayerCount: campaign.PlayerCount,
+			PlayersCount: campaign.PlayersCount,
+			PlayersId: *campaign.PlayersId,
 		})
 	}
 
@@ -156,8 +157,8 @@ func (s *ServerAPI) GetCreatedCampaigns(ctx context.Context, req *campaignv1.Get
 }
 
 func (s *ServerAPI) GetCurrentCampaigns(ctx context.Context, req *campaignv1.GetCurrentCampaignsRequest) (*campaignv1.GetCurrentCampaignsResponse, error) {
-	userId, ok := ctx.Value("user_id").(int)
-	if !ok {
+	userId := int(req.GetUserId())
+	if userId == 0 {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
@@ -174,6 +175,7 @@ func (s *ServerAPI) GetCurrentCampaigns(ctx context.Context, req *campaignv1.Get
 		res = append(res, &campaignv1.CampaignForPlayer{
 			CampaignId: campaign.Id,
 			Name:       campaign.Name,
+			MasterId: campaign.MasterId,
 		})
 	}
 

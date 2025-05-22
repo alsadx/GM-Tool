@@ -9,7 +9,7 @@ postgres:
 
 grpc:
   port: 50051
-  timeout: 5s
+  timeout: 1h
 
 auth:
   accessTokenTTL: 1h

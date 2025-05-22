@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"auth"
 	"campaigntool/internal/domain/models"
 	grpccampaign "campaigntool/internal/grpc/campaign"
 	"context"
@@ -10,7 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"protos/gen/go/campaignv1"
+	"campaigntool/protos/campaignv1"
+
 	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestGRPC_DeleteCampaign_Success(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -48,7 +48,7 @@ func TestGRPC_DeleteCampaign_Success(t *testing.T) {
 
 	client := campaignv1.NewCampaignToolClient(clientConn)
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -75,7 +75,7 @@ func TestGRPC_DeleteCampaign_NotFound(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -99,7 +99,7 @@ func TestGRPC_DeleteCampaign_NotFound(t *testing.T) {
 
 	client := campaignv1.NewCampaignToolClient(clientConn)
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -127,7 +127,7 @@ func TestGRPC_DeleteCampaign_InvalidToken(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, _, _ := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -151,7 +151,7 @@ func TestGRPC_DeleteCampaign_InvalidToken(t *testing.T) {
 
 	client := campaignv1.NewCampaignToolClient(clientConn)
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -171,7 +171,7 @@ func TestGRPC_DeleteCampaign_CampaignWithPlayers(t *testing.T) {
 	os.Setenv("TEST_ENV", "true")
 	defer os.Setenv("TEST_ENV", "")
 
-	server := grpc.NewServer(grpc.UnaryInterceptor(auth.AuthInterceptor))
+	server := grpc.NewServer()
 	service, mockGameSaver, mockGameProvider := setupTest(t)
 	srv := grpccampaign.ServerAPI{
 		CampaignTool: service,
@@ -195,7 +195,7 @@ func TestGRPC_DeleteCampaign_CampaignWithPlayers(t *testing.T) {
 
 	client := campaignv1.NewCampaignToolClient(clientConn)
 
-	campaignId := int32(123)
+	campaignId := int64(123)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

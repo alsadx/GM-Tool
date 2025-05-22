@@ -10,20 +10,20 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 )
 
 func main() {
-	if err := godotenv.Load(".env.development"); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	// if err := godotenv.Load(".env.development"); err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
 
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
-	migrationsPath := "./migrations" // Путь к миграциям
+	migrationsPath := os.Getenv("MIGRATION_PATH") // Путь к миграциям
 	migrationsTable := "sso_migrations"
 
 	fmt.Println(dbUser, dbPassword, dbHost, dbPort, dbName, migrationsPath, migrationsTable)
@@ -40,7 +40,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := m.Down(); err != nil {
+	if err := m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			fmt.Println("no migrations to apply")
 			return
