@@ -8,12 +8,12 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[Strength-0]
-	_ = x[Dexterity-1]
-	_ = x[Constitution-2]
-	_ = x[Intelligence-3]
-	_ = x[Wisdom-4]
-	_ = x[Charisma-5]
+	_ = x[Strength-1]
+	_ = x[Dexterity-2]
+	_ = x[Constitution-3]
+	_ = x[Intelligence-4]
+	_ = x[Wisdom-5]
+	_ = x[Charisma-6]
 }
 
 const _AbilityType_name = "StrengthDexterityConstitutionIntelligenceWisdomCharisma"
@@ -21,8 +21,9 @@ const _AbilityType_name = "StrengthDexterityConstitutionIntelligenceWisdomCharis
 var _AbilityType_index = [...]uint8{0, 8, 17, 29, 41, 47, 55}
 
 func (i AbilityType) String() string {
+	i -= 1
 	if i < 0 || i >= AbilityType(len(_AbilityType_index)-1) {
-		return "AbilityType(" + strconv.FormatInt(int64(i), 10) + ")"
+		return "AbilityType(" + strconv.FormatInt(int64(i+1), 10) + ")"
 	}
 	return _AbilityType_name[_AbilityType_index[i]:_AbilityType_index[i+1]]
 }
@@ -30,24 +31,24 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[Athletics-0]
-	_ = x[Acrobatics-1]
-	_ = x[SleightOfHand-2]
-	_ = x[Stealth-3]
-	_ = x[Arcana-4]
-	_ = x[History-5]
-	_ = x[Investigation-6]
-	_ = x[Nature-7]
-	_ = x[Religion-8]
-	_ = x[AnimalHandling-9]
-	_ = x[Insight-10]
-	_ = x[Medicine-11]
-	_ = x[Perception-12]
-	_ = x[Survival-13]
-	_ = x[Deception-14]
-	_ = x[Intimidation-15]
-	_ = x[Performance-16]
-	_ = x[Persuasion-17]
+	_ = x[Athletics-1]
+	_ = x[Acrobatics-2]
+	_ = x[SleightOfHand-3]
+	_ = x[Stealth-4]
+	_ = x[Arcana-5]
+	_ = x[History-6]
+	_ = x[Investigation-7]
+	_ = x[Nature-8]
+	_ = x[Religion-9]
+	_ = x[AnimalHandling-10]
+	_ = x[Insight-11]
+	_ = x[Medicine-12]
+	_ = x[Perception-13]
+	_ = x[Survival-14]
+	_ = x[Deception-15]
+	_ = x[Intimidation-16]
+	_ = x[Performance-17]
+	_ = x[Persuasion-18]
 }
 
 const _SkillType_name = "AthleticsAcrobaticsSleightOfHandStealthArcanaHistoryInvestigationNatureReligionAnimalHandlingInsightMedicinePerceptionSurvivalDeceptionIntimidationPerformancePersuasion"
@@ -55,8 +56,9 @@ const _SkillType_name = "AthleticsAcrobaticsSleightOfHandStealthArcanaHistoryInv
 var _SkillType_index = [...]uint8{0, 9, 19, 32, 39, 45, 52, 65, 71, 79, 93, 100, 108, 118, 126, 135, 147, 158, 168}
 
 func (i SkillType) String() string {
+	i -= 1
 	if i < 0 || i >= SkillType(len(_SkillType_index)-1) {
-		return "SkillType(" + strconv.FormatInt(int64(i), 10) + ")"
+		return "SkillType(" + strconv.FormatInt(int64(i+1), 10) + ")"
 	}
 	return _SkillType_name[_SkillType_index[i]:_SkillType_index[i+1]]
 }

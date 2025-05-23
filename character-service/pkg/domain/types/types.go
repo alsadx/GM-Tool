@@ -5,7 +5,7 @@ package types
 type AbilityType int
 
 const (
-	Strength AbilityType = iota
+	Strength AbilityType = iota + 1
 	Dexterity
 	Constitution
 	Intelligence
@@ -16,7 +16,7 @@ const (
 type SkillType int
 
 const (
-	Athletics SkillType = iota
+	Athletics SkillType = iota + 1
 	Acrobatics
 	SleightOfHand
 	Stealth
