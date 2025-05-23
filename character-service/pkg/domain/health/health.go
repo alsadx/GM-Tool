@@ -1,12 +1,27 @@
 package health
 
 import (
+	"github.com/alsadx/GM-Tool/character-service/gen"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 )
 
 type Amount struct {
 	MaxAvailable int
 	Available    int
+}
+
+func (a *Amount) toProto0() *gen.Amount {
+	return &gen.Amount{
+		MaxAvailable: int32(a.MaxAvailable),
+		Available:    int32(a.Available),
+	}
+}
+
+func fromProtoAmount(amountProto *gen.Amount) *Amount {
+	return &Amount{
+		MaxAvailable: int(amountProto.MaxAvailable),
+		Available:    int(amountProto.Available),
+	}
 }
 
 func (a *Amount) useDice(amountUsed int) error {
@@ -40,6 +55,32 @@ func New(maxHp int, hitDice dice.Dice) *HealthPoint {
 		MaxHP:     maxHp,
 		TempHP:    0,
 		HitDice:   hitDiceMap,
+	}
+}
+
+func (hp *HealthPoint) ToProto() *gen.HealthPoint {
+	hitDiceProto := make(map[int32]*gen.Amount, len(hp.HitDice))
+	for diceType, amount := range hp.HitDice {
+		hitDiceProto[int32(diceType)] = amount.toProto0()
+	}
+	return &gen.HealthPoint{
+		CurrentHp: int32(hp.CurrentHP),
+		MaxHp:     int32(hp.MaxHP),
+		TempHp:    int32(hp.TempHP),
+		HitDice:   hitDiceProto,
+	}
+}
+
+func FromProtoHP(protoHP *gen.HealthPoint) *HealthPoint {
+	hitDice := make(map[dice.Dice]*Amount, len(protoHP.HitDice))
+	for diceType, amount := range protoHP.HitDice {
+		hitDice[dice.Dice(diceType)] = fromProtoAmount(amount)
+	}
+	return &HealthPoint{
+		CurrentHP: int(protoHP.CurrentHp),
+		MaxHP:     int(protoHP.MaxHp),
+		TempHP:    int(protoHP.TempHp),
+		HitDice:   hitDice,
 	}
 }
 

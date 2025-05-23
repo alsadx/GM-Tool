@@ -1,6 +1,7 @@
 package ability
 
 import (
+	"github.com/alsadx/GM-Tool/character-service/gen"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/types"
@@ -26,9 +27,24 @@ func NewScore(base int) *Score {
 	return &score
 }
 
+func (s *Score) toProto() *gen.Score {
+	return &gen.Score{
+		Base: int32(s.base),
+		Temp: int32(s.temp),
+		Mod:  int32(s.mod),
+	}
+}
+
+func fromProto(protoScore *gen.Score) *Score {
+	return &Score{
+		base: int(protoScore.Base),
+		temp: int(protoScore.Temp),
+		mod:  int(protoScore.Mod),
+	}
+}
+
 func (s *Score) UpdateModifier() {
 	total := s.base + s.temp
-
 	s.mod = floorDiv(total-10, 2)
 }
 
@@ -78,6 +94,28 @@ func New(abilityType types.AbilityType) *Ability {
 		a.Skills[skillType] = skill.NewSkill(0)
 	}
 	return a
+}
+
+func (a *Ability) ToProto() *gen.Ability {
+	protoSkills := make(map[int32]*gen.Skill, len(a.Skills))
+	for skillType, skill := range a.Skills {
+		protoSkills[int32(skillType)] = skill.ToProto()
+	}
+	return &gen.Ability{
+		Score:  a.toProto(),
+		Skills: protoSkills,
+	}
+}
+
+func FromProto(abilityProto *gen.Ability) *Ability {
+	skills := make(map[types.SkillType]*skill.Skill, len(abilityProto.Skills))
+	for skillType, skillProto := range abilityProto.Skills {
+		skills[types.SkillType(skillType)] = skill.FromProto(skillProto)
+	}
+	return &Ability{
+		Score:  fromProto(abilityProto.Score),
+		Skills: skills,
+	}
 }
 
 func (a *Ability) CheckSkill(skillType types.SkillType) (diceRes, bonus, result int) {

@@ -1,6 +1,7 @@
 package character
 
 import (
+	"github.com/alsadx/GM-Tool/character-service/gen"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/ability"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/health"
@@ -42,6 +43,42 @@ func New(id int, ownerID int, name, class, subclass, race string) (*Character, e
 		stats:    ability.NewStats(),
 		health:   health.New(9, dice.D6),
 	}, nil
+}
+
+func (c *Character) ToProto() *gen.Character {
+	statsProto := make(map[int32]*gen.Ability, len(c.stats))
+	for ablType, abil := range c.stats {
+		statsProto[int32(ablType)] = abil.ToProto()
+	}
+	return &gen.Character{
+		Id:        int64(c.ID),
+		Owner:     int64(c.Owner),
+		Name:      c.Name,
+		ClassName: c.Class,
+		Subclass:  c.Subclass,
+		Race:      c.Race,
+		Lvl:       c.lvl.ToProto(),
+		Stats:     statsProto,
+		Health:    c.health.ToProto(),
+	}
+}
+
+func FromProto(protoChar *gen.Character) *Character {
+	stats := make(map[types.AbilityType]*ability.Ability, len(protoChar.Stats))
+	for ablType, abil := range protoChar.Stats {
+		stats[types.AbilityType(ablType)] = ability.FromProto(abil)
+	}
+	return &Character{
+		ID:       int(protoChar.Id),
+		Owner:    int(protoChar.Owner),
+		Name:     protoChar.Name,
+		Class:    protoChar.ClassName,
+		Subclass: protoChar.Subclass,
+		Race:     protoChar.Race,
+		lvl:      level.FromProto(protoChar.Lvl),
+		stats:    stats,
+		health:   health.FromProtoHP(protoChar.Health),
+	}
 }
 
 func (c *Character) WithDice(maxHp int, hitDice dice.Dice) *Character {

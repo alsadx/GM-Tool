@@ -1,16 +1,18 @@
 package level
 
-type LevelSystem struct {
-	currentLevel  int
-	earnedLevel   int
-	currentExp    int
-	nextThreshold int
-}
+import "github.com/alsadx/GM-Tool/character-service/gen"
 
 var Thresholds = []int{
 	0, 300, 900, 2700, 6500, 14000, 23000, 34000,
 	48000, 64000, 85000, 100000, 120000, 140000,
 	165000, 195000, 225000, 265000, 305000, 355000,
+}
+
+type LevelSystem struct {
+	currentLevel  int
+	earnedLevel   int
+	currentExp    int
+	nextThreshold int
 }
 
 func NewLevelSystem() *LevelSystem {
@@ -20,6 +22,24 @@ func NewLevelSystem() *LevelSystem {
 		earnedLevel:   1,
 		currentExp:    0,
 		nextThreshold: Thresholds[1],
+	}
+}
+
+func (ls *LevelSystem) ToProto() *gen.LevelSystem {
+	return &gen.LevelSystem{
+		CurrentLevel:  int32(ls.currentLevel),
+		EarnedLevel:   int32(ls.earnedLevel),
+		CurrentExp:    int32(ls.currentExp),
+		NextThreshold: int32(ls.nextThreshold),
+	}
+}
+
+func FromProto(protoLevelSystem *gen.LevelSystem) *LevelSystem {
+	return &LevelSystem{
+		currentLevel:  int(protoLevelSystem.CurrentLevel),
+		earnedLevel:   int(protoLevelSystem.EarnedLevel),
+		currentExp:    int(protoLevelSystem.CurrentExp),
+		nextThreshold: int(protoLevelSystem.NextThreshold),
 	}
 }
 
