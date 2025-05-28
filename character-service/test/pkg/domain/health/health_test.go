@@ -24,7 +24,7 @@ func TestHealthPoint(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				hp := &health.HealthPoint{CurrentHP: tt.initialHP, MaxHP: tt.initialHP}
+				hp := &health.Health{CurrentHP: tt.initialHP, MaxHP: tt.initialHP}
 				hp.SetMaxHP(tt.newMaxHP)
 				if hp.MaxHP != tt.expectedHP || hp.CurrentHP != tt.expectedCurrent {
 					t.Errorf("SetMaxHP() = %d/%d, want %d/%d", hp.MaxHP, hp.CurrentHP, tt.expectedHP, tt.expectedCurrent)
@@ -64,7 +64,7 @@ func TestHealthPoint(t *testing.T) {
 		defer func() { dice.MultiRollDice = originalRoll }()
 		dice.MultiRollDice = func(d dice.Dice, n int) []int { return []int{4, 5} }
 
-		hp := &health.HealthPoint{
+		hp := &health.Health{
 			HitDice: map[dice.Dice]*health.Amount{
 				dice.D8: {MaxAvailable: 3, Available: 2},
 			},
@@ -95,7 +95,7 @@ func TestHealthPoint(t *testing.T) {
 	})
 
 	t.Run("TakeDamage/Heal", func(t *testing.T) {
-		hp := &health.HealthPoint{
+		hp := &health.Health{
 			CurrentHP: 30,
 			MaxHP:     50,
 			TempHP:    10,
@@ -129,7 +129,7 @@ func TestHealthPoint(t *testing.T) {
 	})
 
 	t.Run("AddTempHP", func(t *testing.T) {
-		hp := &health.HealthPoint{TempHP: 5}
+		hp := &health.Health{TempHP: 5}
 		hp.AddTempHP(3)
 		if hp.TempHP != 5 {
 			t.Error("AddTempHP() should keep higher value")
