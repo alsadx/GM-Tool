@@ -128,7 +128,7 @@ func (x *Skill) GetBonus() int32 {
 type Ability struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Score         *Score                 `protobuf:"bytes,1,opt,name=score,proto3" json:"score,omitempty"`
-	Skills        map[int32]*Skill       `protobuf:"bytes,2,rep,name=skills,proto3" json:"skills,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Skills        map[string]*Skill      `protobuf:"bytes,2,rep,name=skills,proto3" json:"skills,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -170,7 +170,7 @@ func (x *Ability) GetScore() *Score {
 	return nil
 }
 
-func (x *Ability) GetSkills() map[int32]*Skill {
+func (x *Ability) GetSkills() map[string]*Skill {
 	if x != nil {
 		return x.Skills
 	}
@@ -179,10 +179,7 @@ func (x *Ability) GetSkills() map[int32]*Skill {
 
 type LevelSystem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CurrentLevel  int32                  `protobuf:"varint,1,opt,name=current_level,json=currentLevel,proto3" json:"current_level,omitempty"`
-	EarnedLevel   int32                  `protobuf:"varint,2,opt,name=earned_level,json=earnedLevel,proto3" json:"earned_level,omitempty"`
-	CurrentExp    int32                  `protobuf:"varint,3,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
-	NextThreshold int32                  `protobuf:"varint,4,opt,name=next_threshold,json=nextThreshold,proto3" json:"next_threshold,omitempty"`
+	CurrentExp    int32                  `protobuf:"varint,1,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -217,30 +214,9 @@ func (*LevelSystem) Descriptor() ([]byte, []int) {
 	return file_character_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *LevelSystem) GetCurrentLevel() int32 {
-	if x != nil {
-		return x.CurrentLevel
-	}
-	return 0
-}
-
-func (x *LevelSystem) GetEarnedLevel() int32 {
-	if x != nil {
-		return x.EarnedLevel
-	}
-	return 0
-}
-
 func (x *LevelSystem) GetCurrentExp() int32 {
 	if x != nil {
 		return x.CurrentExp
-	}
-	return 0
-}
-
-func (x *LevelSystem) GetNextThreshold() int32 {
-	if x != nil {
-		return x.NextThreshold
 	}
 	return 0
 }
@@ -375,7 +351,7 @@ type Character struct {
 	Subclass      string                 `protobuf:"bytes,6,opt,name=subclass,proto3" json:"subclass,omitempty"`
 	Race          string                 `protobuf:"bytes,7,opt,name=race,proto3" json:"race,omitempty"`
 	Lvl           *LevelSystem           `protobuf:"bytes,8,opt,name=lvl,proto3" json:"lvl,omitempty"`
-	Stats         map[int32]*Ability     `protobuf:"bytes,9,rep,name=stats,proto3" json:"stats,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Stats         map[string]*Ability    `protobuf:"bytes,9,rep,name=stats,proto3" json:"stats,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Health        *HealthPoint           `protobuf:"bytes,10,opt,name=health,proto3" json:"health,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -467,7 +443,7 @@ func (x *Character) GetLvl() *LevelSystem {
 	return nil
 }
 
-func (x *Character) GetStats() map[int32]*Ability {
+func (x *Character) GetStats() map[string]*Ability {
 	if x != nil {
 		return x.Stats
 	}
@@ -496,14 +472,11 @@ const file_character_proto_rawDesc = "" +
 	"\x05score\x18\x01 \x01(\v2\x10.character.ScoreR\x05score\x126\n" +
 	"\x06skills\x18\x02 \x03(\v2\x1e.character.Ability.SkillsEntryR\x06skills\x1aK\n" +
 	"\vSkillsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\x05R\x03key\x12&\n" +
-	"\x05value\x18\x02 \x01(\v2\x10.character.SkillR\x05value:\x028\x01\"\x9d\x01\n" +
-	"\vLevelSystem\x12#\n" +
-	"\rcurrent_level\x18\x01 \x01(\x05R\fcurrentLevel\x12!\n" +
-	"\fearned_level\x18\x02 \x01(\x05R\vearnedLevel\x12\x1f\n" +
-	"\vcurrent_exp\x18\x03 \x01(\x05R\n" +
-	"currentExp\x12%\n" +
-	"\x0enext_threshold\x18\x04 \x01(\x05R\rnextThreshold\"K\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12&\n" +
+	"\x05value\x18\x02 \x01(\v2\x10.character.SkillR\x05value:\x028\x01\".\n" +
+	"\vLevelSystem\x12\x1f\n" +
+	"\vcurrent_exp\x18\x01 \x01(\x05R\n" +
+	"currentExp\"K\n" +
 	"\x06Amount\x12#\n" +
 	"\rmax_available\x18\x01 \x01(\x05R\fmaxAvailable\x12\x1c\n" +
 	"\tavailable\x18\x02 \x01(\x05R\tavailable\"\xeb\x01\n" +
@@ -532,7 +505,7 @@ const file_character_proto_rawDesc = "" +
 	" \x01(\v2\x16.character.HealthPointR\x06health\x1aL\n" +
 	"\n" +
 	"StatsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\x05R\x03key\x12(\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12(\n" +
 	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01B1Z/github.com/alsadx/GM-Tool/character-service/genb\x06proto3"
 
 var (

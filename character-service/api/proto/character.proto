@@ -15,14 +15,11 @@ message Skill {
 
 message Ability {
   Score score = 1;
-  map<int32, Skill> skills = 2;
+  map<string, Skill> skills = 2;
 }
 
 message LevelSystem {
-  int32 current_level = 1;
-  int32 earned_level = 2;
-  int32 current_exp = 3;
-  int32 next_threshold = 4;
+  int32 current_exp = 1;
 }
 
 message Amount {
@@ -46,6 +43,6 @@ message Character {
   string subclass = 6;
   string race = 7;
   LevelSystem lvl = 8;
-  map<int32, Ability> stats = 9;
+  map<string, Ability> stats = 9;
   HealthPoint health = 10;
 }
