@@ -3,7 +3,7 @@ package dto_test
 import (
 	"testing"
 
-	"github.com/alsadx/GM-Tool/character-service/gen"
+	gen "github.com/alsadx/GM-Tool/character-service/gen/character"
 	"github.com/alsadx/GM-Tool/character-service/internal/dto"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/health"
@@ -66,7 +66,7 @@ func TestHealthDTO_Conversions(t *testing.T) {
 			},
 		}
 
-		dto := dto.HealthDTOFromDomain(*domain)
+		dto := dto.HealthDTOFromDomain(domain)
 		assert.Equal(t, 40, dto.CurrentHP)
 		assert.Equal(t, 45, dto.MaxHP)
 		assert.Equal(t, 2, dto.TempHP)

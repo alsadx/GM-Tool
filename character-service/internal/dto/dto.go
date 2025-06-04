@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/alsadx/GM-Tool/character-service/gen"
+	gen "github.com/alsadx/GM-Tool/character-service/gen/character"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/ability"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/character"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
@@ -40,7 +40,7 @@ func SkillDTOFromProto(protoSkill *gen.Skill) *SkillDTO {
 type ScoreDTO struct {
 	Base int `json:"base" bson:"base"`
 	Temp int `json:"temp" bson:"temp"`
-	Mod  int `json:"mod" bson:"mod"`
+	Mod  int `json:"mod" bson:"-"`
 }
 
 func (s *ScoreDTO) toDomain() *ability.Score {
@@ -62,6 +62,14 @@ func scoreDTOFromProto(protoScore *gen.Score) *ScoreDTO {
 		Base: int(protoScore.Base),
 		Temp: int(protoScore.Temp),
 		Mod:  int(protoScore.Mod),
+	}
+}
+
+func scoreDTOFromDomain(scoreDomain *ability.Score) *ScoreDTO {
+	return &ScoreDTO{
+		Base: scoreDomain.Base(),
+		Temp: scoreDomain.Temp(),
+		Mod:  scoreDomain.Modifier(),
 	}
 }
 
@@ -103,6 +111,17 @@ func AbilityDTOFromProto(abilityProto *gen.Ability) *AbilityDTO {
 	}
 	return &AbilityDTO{
 		ScoreDTO: scoreDTOFromProto(abilityProto.Score),
+		Skills:   skills,
+	}
+}
+
+func AbilityDTOFromDomain(abilityDomain *ability.Ability) *AbilityDTO {
+	skills := make(map[string]*SkillDTO, len(abilityDomain.Skills))
+	for skillType, skillDomain := range abilityDomain.Skills {
+		skills[skillType.String()] = SkillDTOFromDomain(skillDomain)
+	}
+	return &AbilityDTO{
+		ScoreDTO: scoreDTOFromDomain(abilityDomain.Score),
 		Skills:   skills,
 	}
 }
@@ -186,7 +205,7 @@ func HealthDTOFromProto(healthProto *gen.HealthPoint) *HealthDTO {
 	}
 }
 
-func HealthDTOFromDomain(healthDomain health.Health) *HealthDTO {
+func HealthDTOFromDomain(healthDomain *health.Health) *HealthDTO {
 	hitDice := make(map[dice.Dice]*AmountDTO, len(healthDomain.HitDice))
 	for diceType, amount := range healthDomain.HitDice {
 		hitDice[dice.Dice(diceType)] = amountDTOFromDomain(amount)
@@ -200,12 +219,18 @@ func HealthDTOFromDomain(healthDomain health.Health) *HealthDTO {
 }
 
 type LevelDTO struct {
-	CurrentExp int `json:"current_exp" bson:"current_exp"`
+	CurrentExp    int `json:"current_exp" bson:"current_exp"`
+	EarnedLevel   int `json:"eanred_lvl" bson:"-"`
+	CurrentLevel  int `json:"current_lvl" bson:"-"`
+	NextThreshold int `json:"next_threshold" bson:"-"`
 }
 
 func (l *LevelDTO) ToProto() *gen.LevelSystem {
 	return &gen.LevelSystem{
-		CurrentExp: int32(l.CurrentExp),
+		CurrentExp:    int32(l.CurrentExp),
+		CurrentLvl:    int32(l.CurrentLevel),
+		EarnedLvl:     int32(l.EarnedLevel),
+		NextThreshold: int32(l.NextThreshold),
 	}
 }
 
@@ -228,8 +253,8 @@ func LevelDTOFromDomain(domainLevel *level.LevelSystem) *LevelDTO {
 }
 
 type CharacterDTO struct {
-	ID    int `json:"id" bson:"id"`
-	Owner int `json:"id_owner" bson:"id_owner"`
+	ID    string `json:"id" bson:"_id,omitempty"`
+	Owner int    `json:"owner_id" bson:"owner_id"`
 
 	IsKnocked bool `json:"is_knocked" bson:"is_knocked"`
 
@@ -238,7 +263,7 @@ type CharacterDTO struct {
 	Subclass string `json:"subclass" bson:"subclass"`
 	Race     string `json:"race" bson:"race"`
 
-	Lvl    LevelDTO               `json:"level" bson:"level"`
+	Lvl    *LevelDTO              `json:"level" bson:"level"`
 	Stats  map[string]*AbilityDTO `json:"stats" bson:"stats"`
 	Health *HealthDTO             `json:"health" bson:"health"`
 }
@@ -249,7 +274,7 @@ func (c *CharacterDTO) ToProto() *gen.Character {
 		statsProto[ablType] = abil.ToProto()
 	}
 	return &gen.Character{
-		Id:        int64(c.ID),
+		Id:        c.ID,
 		Owner:     int64(c.Owner),
 		Name:      c.Name,
 		ClassName: c.Class,
@@ -286,20 +311,46 @@ func (c *CharacterDTO) ToDomain() (*character.Character, error) {
 	return char, nil
 }
 
-func FromProto(protoChar *gen.Character) *CharacterDTO {
+func CharacterDTOFromProto(protoChar *gen.Character) *CharacterDTO {
 	stats := make(map[string]*AbilityDTO, len(protoChar.Stats))
 	for ablType, abil := range protoChar.Stats {
 		stats[ablType] = AbilityDTOFromProto(abil)
 	}
 	return &CharacterDTO{
-		ID:       int(protoChar.Id),
+		ID:       protoChar.Id,
 		Owner:    int(protoChar.Owner),
 		Name:     protoChar.Name,
 		Class:    protoChar.ClassName,
 		Subclass: protoChar.Subclass,
 		Race:     protoChar.Race,
-		Lvl:      *LevelDTOFromProto(protoChar.Lvl),
+		Lvl:      LevelDTOFromProto(protoChar.Lvl),
 		Stats:    stats,
 		Health:   HealthDTOFromProto(protoChar.Health),
 	}
+}
+
+func CharacterDTOFromDomain(domainChar *character.Character) *CharacterDTO {
+	stats := make(map[string]*AbilityDTO, len(domainChar.GetStats()))
+	for ablType, abil := range domainChar.GetStats() {
+		stats[ablType.String()] = AbilityDTOFromDomain(abil)
+	}
+	return &CharacterDTO{
+		ID:       domainChar.ID,
+		Owner:    domainChar.Owner,
+		Name:     domainChar.Name,
+		Class:    domainChar.Class,
+		Subclass: domainChar.Subclass,
+		Race:     domainChar.Race,
+		Lvl:      LevelDTOFromDomain(domainChar.GetLvlSystem()),
+		Stats:    stats,
+		Health:   HealthDTOFromDomain(domainChar.GetHealth()),
+	}
+}
+
+type UpdateCharDTO struct {
+	ID       string
+	Name     string
+	Class    string
+	Subclass string
+	Race     string
 }

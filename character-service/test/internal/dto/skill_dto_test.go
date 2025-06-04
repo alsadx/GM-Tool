@@ -3,7 +3,7 @@ package dto_test
 import (
 	"testing"
 
-	"github.com/alsadx/GM-Tool/character-service/gen"
+	gen "github.com/alsadx/GM-Tool/character-service/gen/character"
 	"github.com/alsadx/GM-Tool/character-service/internal/dto"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
 	"github.com/stretchr/testify/assert"

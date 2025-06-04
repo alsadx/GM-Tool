@@ -3,7 +3,7 @@ package dto_test
 import (
 	"testing"
 
-	"github.com/alsadx/GM-Tool/character-service/gen"
+	gen "github.com/alsadx/GM-Tool/character-service/gen/character"
 	"github.com/alsadx/GM-Tool/character-service/internal/dto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,20 +23,20 @@ func TestCharacterDTO_Conversions(t *testing.T) {
 	}
 
 	dtoObj := &dto.CharacterDTO{
-		ID:       1,
+		ID:       "1",
 		Owner:    100,
 		Name:     "Test Hero",
 		Class:    "Warrior",
 		Subclass: "Berserker",
 		Race:     "Human",
-		Lvl:      dto.LevelDTO{CurrentExp: 900},
+		Lvl:      &dto.LevelDTO{CurrentExp: 900},
 		Stats:    stats,
 		Health:   healthDTO,
 	}
 
 	t.Run("ToProto", func(t *testing.T) {
 		proto := dtoObj.ToProto()
-		assert.Equal(t, int64(1), proto.Id)
+		assert.Equal(t, "1", proto.Id)
 		assert.Equal(t, "Test Hero", proto.Name)
 		assert.Equal(t, "Warrior", proto.ClassName)
 		assert.Equal(t, int32(900), proto.Lvl.CurrentExp)
@@ -53,7 +53,7 @@ func TestCharacterDTO_Conversions(t *testing.T) {
 
 	t.Run("FromProto", func(t *testing.T) {
 		proto := &gen.Character{
-			Id:        2,
+			Id:        "2",
 			Owner:     200,
 			Name:      "Proto Hero",
 			ClassName: "Wizard",
@@ -74,8 +74,8 @@ func TestCharacterDTO_Conversions(t *testing.T) {
 			},
 		}
 
-		dto := dto.FromProto(proto)
-		assert.Equal(t, 2, dto.ID)
+		dto := dto.CharacterDTOFromProto(proto)
+		assert.Equal(t, "2", dto.ID)
 		assert.Equal(t, "Proto Hero", dto.Name)
 		assert.Equal(t, "Wizard", dto.Class)
 		assert.Equal(t, "Illusionist", dto.Subclass)
