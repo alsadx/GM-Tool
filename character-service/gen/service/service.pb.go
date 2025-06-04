@@ -4,9 +4,10 @@
 // 	protoc        v6.31.0
 // source: service.proto
 
-package gen
+package service
 
 import (
+	character "github.com/alsadx/GM-Tool/character-service/gen/character"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,7 +24,7 @@ const (
 
 type ExpRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -59,11 +60,11 @@ func (*ExpRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ExpRequest) GetCharacterId() int64 {
+func (x *ExpRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *ExpRequest) GetAmount() int32 {
@@ -75,7 +76,7 @@ func (x *ExpRequest) GetAmount() int32 {
 
 type DamageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Damage        int32                  `protobuf:"varint,2,opt,name=damage,proto3" json:"damage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -111,11 +112,11 @@ func (*DamageRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *DamageRequest) GetCharacterId() int64 {
+func (x *DamageRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *DamageRequest) GetDamage() int32 {
@@ -127,7 +128,7 @@ func (x *DamageRequest) GetDamage() int32 {
 
 type HealRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -163,11 +164,11 @@ func (*HealRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *HealRequest) GetCharacterId() int64 {
+func (x *HealRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *HealRequest) GetAmount() int32 {
@@ -179,7 +180,7 @@ func (x *HealRequest) GetAmount() int32 {
 
 type LevelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -214,16 +215,16 @@ func (*LevelRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *LevelRequest) GetCharacterId() int64 {
+func (x *LevelRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 type SetLevelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -259,11 +260,11 @@ func (*SetLevelRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *SetLevelRequest) GetCharacterId() int64 {
+func (x *SetLevelRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *SetLevelRequest) GetLevel() int32 {
@@ -275,7 +276,7 @@ func (x *SetLevelRequest) GetLevel() int32 {
 
 type HitDiceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	DiceType      int32                  `protobuf:"varint,2,opt,name=dice_type,json=diceType,proto3" json:"dice_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -311,11 +312,11 @@ func (*HitDiceRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *HitDiceRequest) GetCharacterId() int64 {
+func (x *HitDiceRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *HitDiceRequest) GetDiceType() int32 {
@@ -325,28 +326,28 @@ func (x *HitDiceRequest) GetDiceType() int32 {
 	return 0
 }
 
-type TempHpRequest struct {
+type HpRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TempHpRequest) Reset() {
-	*x = TempHpRequest{}
+func (x *HpRequest) Reset() {
+	*x = HpRequest{}
 	mi := &file_service_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TempHpRequest) String() string {
+func (x *HpRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TempHpRequest) ProtoMessage() {}
+func (*HpRequest) ProtoMessage() {}
 
-func (x *TempHpRequest) ProtoReflect() protoreflect.Message {
+func (x *HpRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -358,19 +359,19 @@ func (x *TempHpRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TempHpRequest.ProtoReflect.Descriptor instead.
-func (*TempHpRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use HpRequest.ProtoReflect.Descriptor instead.
+func (*HpRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *TempHpRequest) GetCharacterId() int64 {
+func (x *HpRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
-func (x *TempHpRequest) GetAmount() int32 {
+func (x *HpRequest) GetAmount() int32 {
 	if x != nil {
 		return x.Amount
 	}
@@ -379,7 +380,7 @@ func (x *TempHpRequest) GetAmount() int32 {
 
 type CheckAbilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Ability       int32                  `protobuf:"varint,2,opt,name=ability,proto3" json:"ability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -415,11 +416,11 @@ func (*CheckAbilityRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *CheckAbilityRequest) GetCharacterId() int64 {
+func (x *CheckAbilityRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *CheckAbilityRequest) GetAbility() int32 {
@@ -431,7 +432,7 @@ func (x *CheckAbilityRequest) GetAbility() int32 {
 
 type CheckSkillRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	Skill         int32                  `protobuf:"varint,2,opt,name=skill,proto3" json:"skill,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -467,11 +468,11 @@ func (*CheckSkillRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *CheckSkillRequest) GetCharacterId() int64 {
+func (x *CheckSkillRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 func (x *CheckSkillRequest) GetSkill() int32 {
@@ -543,7 +544,7 @@ func (x *CheckResponse) GetTotal() int32 {
 
 type GetStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   int64                  `protobuf:"varint,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -578,11 +579,11 @@ func (*GetStatusRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *GetStatusRequest) GetCharacterId() int64 {
+func (x *GetStatusRequest) GetCharacterId() string {
 	if x != nil {
 		return x.CharacterId
 	}
-	return 0
+	return ""
 }
 
 type StatusResponse struct {
@@ -679,7 +680,7 @@ func (x *StatusResponse) GetExpToNext() int32 {
 
 type CharacterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	Character     *character.Character   `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -714,7 +715,7 @@ func (*CharacterResponse) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *CharacterResponse) GetCharacter() *Character {
+func (x *CharacterResponse) GetCharacter() *character.Character {
 	if x != nil {
 		return x.Character
 	}
@@ -723,12 +724,11 @@ func (x *CharacterResponse) GetCharacter() *Character {
 
 type CreateCharRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	OwnerId       int64                  `protobuf:"varint,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	ClassName     string                 `protobuf:"bytes,4,opt,name=class_name,json=className,proto3" json:"class_name,omitempty"`
-	Subclass      string                 `protobuf:"bytes,5,opt,name=subclass,proto3" json:"subclass,omitempty"`
-	Race          string                 `protobuf:"bytes,6,opt,name=race,proto3" json:"race,omitempty"`
+	OwnerId       int64                  `protobuf:"varint,1,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ClassName     string                 `protobuf:"bytes,3,opt,name=class_name,json=className,proto3" json:"class_name,omitempty"`
+	Subclass      string                 `protobuf:"bytes,4,opt,name=subclass,proto3" json:"subclass,omitempty"`
+	Race          string                 `protobuf:"bytes,5,opt,name=race,proto3" json:"race,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -761,13 +761,6 @@ func (x *CreateCharRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateCharRequest.ProtoReflect.Descriptor instead.
 func (*CreateCharRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *CreateCharRequest) GetId() int64 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
 }
 
 func (x *CreateCharRequest) GetOwnerId() int64 {
@@ -807,7 +800,7 @@ func (x *CreateCharRequest) GetRace() string {
 
 type CreateCharResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -842,16 +835,16 @@ func (*CreateCharResponse) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *CreateCharResponse) GetCharacter() *Character {
+func (x *CreateCharResponse) GetId() string {
 	if x != nil {
-		return x.Character
+		return x.Id
 	}
-	return nil
+	return ""
 }
 
 type GetCharRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -886,16 +879,16 @@ func (*GetCharRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *GetCharRequest) GetId() int64 {
+func (x *GetCharRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 type GetCharResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	Character     *character.Character   `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -930,7 +923,7 @@ func (*GetCharResponse) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *GetCharResponse) GetCharacter() *Character {
+func (x *GetCharResponse) GetCharacter() *character.Character {
 	if x != nil {
 		return x.Character
 	}
@@ -939,7 +932,11 @@ func (x *GetCharResponse) GetCharacter() *Character {
 
 type UpdateCharRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Class         string                 `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`
+	Subclass      string                 `protobuf:"bytes,4,opt,name=subclass,proto3" json:"subclass,omitempty"`
+	Race          string                 `protobuf:"bytes,5,opt,name=race,proto3" json:"race,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -974,16 +971,44 @@ func (*UpdateCharRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *UpdateCharRequest) GetCharacter() *Character {
+func (x *UpdateCharRequest) GetId() string {
 	if x != nil {
-		return x.Character
+		return x.Id
 	}
-	return nil
+	return ""
+}
+
+func (x *UpdateCharRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateCharRequest) GetClass() string {
+	if x != nil {
+		return x.Class
+	}
+	return ""
+}
+
+func (x *UpdateCharRequest) GetSubclass() string {
+	if x != nil {
+		return x.Subclass
+	}
+	return ""
+}
+
+func (x *UpdateCharRequest) GetRace() string {
+	if x != nil {
+		return x.Race
+	}
+	return ""
 }
 
 type UpdateCharResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Character     *Character             `protobuf:"bytes,1,opt,name=character,proto3" json:"character,omitempty"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1018,16 +1043,16 @@ func (*UpdateCharResponse) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *UpdateCharResponse) GetCharacter() *Character {
+func (x *UpdateCharResponse) GetSuccess() bool {
 	if x != nil {
-		return x.Character
+		return x.Success
 	}
-	return nil
+	return false
 }
 
 type DeleteCharRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1062,11 +1087,11 @@ func (*DeleteCharRequest) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *DeleteCharRequest) GetId() int64 {
+func (x *DeleteCharRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 type DeleteCharResponse struct {
@@ -1159,7 +1184,7 @@ func (x *ListCharRequest) GetOwnerId() int64 {
 
 type ListCharResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Characters    []*Character           `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty"`
+	Characters    []*character.Character `protobuf:"bytes,1,rep,name=characters,proto3" json:"characters,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1194,7 +1219,7 @@ func (*ListCharResponse) Descriptor() ([]byte, []int) {
 	return file_service_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *ListCharResponse) GetCharacters() []*Character {
+func (x *ListCharResponse) GetCharacters() []*character.Character {
 	if x != nil {
 		return x.Characters
 	}
@@ -1208,30 +1233,30 @@ const file_service_proto_rawDesc = "" +
 	"\rservice.proto\x12\x11character_service\x1a\x0fcharacter.proto\"G\n" +
 	"\n" +
 	"ExpRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x16\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x05R\x06amount\"J\n" +
 	"\rDamageRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x16\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x16\n" +
 	"\x06damage\x18\x02 \x01(\x05R\x06damage\"H\n" +
 	"\vHealRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x16\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x05R\x06amount\"1\n" +
 	"\fLevelRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\"J\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\"J\n" +
 	"\x0fSetLevelRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x14\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x05R\x05level\"P\n" +
 	"\x0eHitDiceRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x1b\n" +
-	"\tdice_type\x18\x02 \x01(\x05R\bdiceType\"J\n" +
-	"\rTempHpRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x16\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x1b\n" +
+	"\tdice_type\x18\x02 \x01(\x05R\bdiceType\"F\n" +
+	"\tHpRequest\x12!\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x05R\x06amount\"R\n" +
 	"\x13CheckAbilityRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x18\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x18\n" +
 	"\aability\x18\x02 \x01(\x05R\aability\"L\n" +
 	"\x11CheckSkillRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\x12\x14\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\x12\x14\n" +
 	"\x05skill\x18\x02 \x01(\x05R\x05skill\"\\\n" +
 	"\rCheckResponse\x12\x1f\n" +
 	"\vdice_result\x18\x01 \x01(\x05R\n" +
@@ -1239,7 +1264,7 @@ const file_service_proto_rawDesc = "" +
 	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\x12\x14\n" +
 	"\x05total\x18\x03 \x01(\x05R\x05total\"5\n" +
 	"\x10GetStatusRequest\x12!\n" +
-	"\fcharacter_id\x18\x01 \x01(\x03R\vcharacterId\"\xd5\x01\n" +
+	"\fcharacter_id\x18\x01 \x01(\tR\vcharacterId\"\xd5\x01\n" +
 	"\x0eStatusResponse\x12\x1d\n" +
 	"\n" +
 	"current_hp\x18\x01 \x01(\x05R\tcurrentHp\x12\x17\n" +
@@ -1252,27 +1277,30 @@ const file_service_proto_rawDesc = "" +
 	"currentExp\x12\x1e\n" +
 	"\vexp_to_next\x18\a \x01(\x05R\texpToNext\"G\n" +
 	"\x11CharacterResponse\x122\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"\xa1\x01\n" +
-	"\x11CreateCharRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x19\n" +
-	"\bowner_id\x18\x02 \x01(\x03R\aownerId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n" +
+	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"\x91\x01\n" +
+	"\x11CreateCharRequest\x12\x19\n" +
+	"\bowner_id\x18\x01 \x01(\x03R\aownerId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +
-	"class_name\x18\x04 \x01(\tR\tclassName\x12\x1a\n" +
-	"\bsubclass\x18\x05 \x01(\tR\bsubclass\x12\x12\n" +
-	"\x04race\x18\x06 \x01(\tR\x04race\"H\n" +
-	"\x12CreateCharResponse\x122\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\" \n" +
+	"class_name\x18\x03 \x01(\tR\tclassName\x12\x1a\n" +
+	"\bsubclass\x18\x04 \x01(\tR\bsubclass\x12\x12\n" +
+	"\x04race\x18\x05 \x01(\tR\x04race\"$\n" +
+	"\x12CreateCharResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\" \n" +
 	"\x0eGetCharRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"E\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"E\n" +
 	"\x0fGetCharResponse\x122\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"G\n" +
-	"\x11UpdateCharRequest\x122\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"H\n" +
-	"\x12UpdateCharResponse\x122\n" +
-	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"#\n" +
+	"\tcharacter\x18\x01 \x01(\v2\x14.character.CharacterR\tcharacter\"}\n" +
+	"\x11UpdateCharRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
+	"\x05class\x18\x03 \x01(\tR\x05class\x12\x1a\n" +
+	"\bsubclass\x18\x04 \x01(\tR\bsubclass\x12\x12\n" +
+	"\x04race\x18\x05 \x01(\tR\x04race\".\n" +
+	"\x12UpdateCharResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"#\n" +
 	"\x11DeleteCharRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\".\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\".\n" +
 	"\x12DeleteCharResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\",\n" +
 	"\x0fListCharRequest\x12\x19\n" +
@@ -1280,7 +1308,7 @@ const file_service_proto_rawDesc = "" +
 	"\x10ListCharResponse\x124\n" +
 	"\n" +
 	"characters\x18\x01 \x03(\v2\x14.character.CharacterR\n" +
-	"characters2\xd7\v\n" +
+	"characters2\xfd\f\n" +
 	"\x10CharacterService\x12^\n" +
 	"\x0fCreateCharacter\x12$.character_service.CreateCharRequest\x1a%.character_service.CreateCharResponse\x12U\n" +
 	"\fGetCharacter\x12!.character_service.GetCharRequest\x1a\".character_service.GetCharResponse\x12^\n" +
@@ -1296,12 +1324,14 @@ const file_service_proto_rawDesc = "" +
 	"\tLevelDown\x12\x1f.character_service.LevelRequest\x1a$.character_service.CharacterResponse\x12T\n" +
 	"\bSetLevel\x12\".character_service.SetLevelRequest\x1a$.character_service.CharacterResponse\x12U\n" +
 	"\n" +
-	"AddHitDice\x12!.character_service.HitDiceRequest\x1a$.character_service.CharacterResponse\x12S\n" +
-	"\tAddTempHp\x12 .character_service.TempHpRequest\x1a$.character_service.CharacterResponse\x12X\n" +
+	"AddHitDice\x12!.character_service.HitDiceRequest\x1a$.character_service.CharacterResponse\x12X\n" +
+	"\rRemoveHitDice\x12!.character_service.HitDiceRequest\x1a$.character_service.CharacterResponse\x12N\n" +
+	"\bSetMaxHp\x12\x1c.character_service.HpRequest\x1a$.character_service.CharacterResponse\x12O\n" +
+	"\tSetTempHp\x12\x1c.character_service.HpRequest\x1a$.character_service.CharacterResponse\x12X\n" +
 	"\fCheckAbility\x12&.character_service.CheckAbilityRequest\x1a .character_service.CheckResponse\x12T\n" +
 	"\n" +
 	"CheckSkill\x12$.character_service.CheckSkillRequest\x1a .character_service.CheckResponse\x12S\n" +
-	"\tGetStatus\x12#.character_service.GetStatusRequest\x1a!.character_service.StatusResponseB1Z/github.com/alsadx/GM-Tool/character-service/genb\x06proto3"
+	"\tGetStatus\x12#.character_service.GetStatusRequest\x1a!.character_service.StatusResponseB9Z7github.com/alsadx/GM-Tool/character-service/gen/serviceb\x06proto3"
 
 var (
 	file_service_proto_rawDescOnce sync.Once
@@ -1323,7 +1353,7 @@ var file_service_proto_goTypes = []any{
 	(*LevelRequest)(nil),        // 3: character_service.LevelRequest
 	(*SetLevelRequest)(nil),     // 4: character_service.SetLevelRequest
 	(*HitDiceRequest)(nil),      // 5: character_service.HitDiceRequest
-	(*TempHpRequest)(nil),       // 6: character_service.TempHpRequest
+	(*HpRequest)(nil),           // 6: character_service.HpRequest
 	(*CheckAbilityRequest)(nil), // 7: character_service.CheckAbilityRequest
 	(*CheckSkillRequest)(nil),   // 8: character_service.CheckSkillRequest
 	(*CheckResponse)(nil),       // 9: character_service.CheckResponse
@@ -1340,54 +1370,55 @@ var file_service_proto_goTypes = []any{
 	(*DeleteCharResponse)(nil),  // 20: character_service.DeleteCharResponse
 	(*ListCharRequest)(nil),     // 21: character_service.ListCharRequest
 	(*ListCharResponse)(nil),    // 22: character_service.ListCharResponse
-	(*Character)(nil),           // 23: character.Character
+	(*character.Character)(nil), // 23: character.Character
 }
 var file_service_proto_depIdxs = []int32{
 	23, // 0: character_service.CharacterResponse.character:type_name -> character.Character
-	23, // 1: character_service.CreateCharResponse.character:type_name -> character.Character
-	23, // 2: character_service.GetCharResponse.character:type_name -> character.Character
-	23, // 3: character_service.UpdateCharRequest.character:type_name -> character.Character
-	23, // 4: character_service.UpdateCharResponse.character:type_name -> character.Character
-	23, // 5: character_service.ListCharResponse.characters:type_name -> character.Character
-	13, // 6: character_service.CharacterService.CreateCharacter:input_type -> character_service.CreateCharRequest
-	15, // 7: character_service.CharacterService.GetCharacter:input_type -> character_service.GetCharRequest
-	17, // 8: character_service.CharacterService.UpdateCharacter:input_type -> character_service.UpdateCharRequest
-	19, // 9: character_service.CharacterService.DeleteCharacter:input_type -> character_service.DeleteCharRequest
-	21, // 10: character_service.CharacterService.ListCharacters:input_type -> character_service.ListCharRequest
-	0,  // 11: character_service.CharacterService.GainExp:input_type -> character_service.ExpRequest
-	0,  // 12: character_service.CharacterService.RemoveExp:input_type -> character_service.ExpRequest
-	1,  // 13: character_service.CharacterService.TakeDamage:input_type -> character_service.DamageRequest
-	2,  // 14: character_service.CharacterService.Heal:input_type -> character_service.HealRequest
-	3,  // 15: character_service.CharacterService.LevelUp:input_type -> character_service.LevelRequest
-	3,  // 16: character_service.CharacterService.LevelDown:input_type -> character_service.LevelRequest
-	4,  // 17: character_service.CharacterService.SetLevel:input_type -> character_service.SetLevelRequest
-	5,  // 18: character_service.CharacterService.AddHitDice:input_type -> character_service.HitDiceRequest
-	6,  // 19: character_service.CharacterService.AddTempHp:input_type -> character_service.TempHpRequest
-	7,  // 20: character_service.CharacterService.CheckAbility:input_type -> character_service.CheckAbilityRequest
-	8,  // 21: character_service.CharacterService.CheckSkill:input_type -> character_service.CheckSkillRequest
-	10, // 22: character_service.CharacterService.GetStatus:input_type -> character_service.GetStatusRequest
-	14, // 23: character_service.CharacterService.CreateCharacter:output_type -> character_service.CreateCharResponse
-	16, // 24: character_service.CharacterService.GetCharacter:output_type -> character_service.GetCharResponse
-	18, // 25: character_service.CharacterService.UpdateCharacter:output_type -> character_service.UpdateCharResponse
-	20, // 26: character_service.CharacterService.DeleteCharacter:output_type -> character_service.DeleteCharResponse
-	22, // 27: character_service.CharacterService.ListCharacters:output_type -> character_service.ListCharResponse
-	12, // 28: character_service.CharacterService.GainExp:output_type -> character_service.CharacterResponse
-	12, // 29: character_service.CharacterService.RemoveExp:output_type -> character_service.CharacterResponse
-	12, // 30: character_service.CharacterService.TakeDamage:output_type -> character_service.CharacterResponse
-	12, // 31: character_service.CharacterService.Heal:output_type -> character_service.CharacterResponse
-	12, // 32: character_service.CharacterService.LevelUp:output_type -> character_service.CharacterResponse
-	12, // 33: character_service.CharacterService.LevelDown:output_type -> character_service.CharacterResponse
-	12, // 34: character_service.CharacterService.SetLevel:output_type -> character_service.CharacterResponse
-	12, // 35: character_service.CharacterService.AddHitDice:output_type -> character_service.CharacterResponse
-	12, // 36: character_service.CharacterService.AddTempHp:output_type -> character_service.CharacterResponse
-	9,  // 37: character_service.CharacterService.CheckAbility:output_type -> character_service.CheckResponse
-	9,  // 38: character_service.CharacterService.CheckSkill:output_type -> character_service.CheckResponse
-	11, // 39: character_service.CharacterService.GetStatus:output_type -> character_service.StatusResponse
-	23, // [23:40] is the sub-list for method output_type
-	6,  // [6:23] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	23, // 1: character_service.GetCharResponse.character:type_name -> character.Character
+	23, // 2: character_service.ListCharResponse.characters:type_name -> character.Character
+	13, // 3: character_service.CharacterService.CreateCharacter:input_type -> character_service.CreateCharRequest
+	15, // 4: character_service.CharacterService.GetCharacter:input_type -> character_service.GetCharRequest
+	17, // 5: character_service.CharacterService.UpdateCharacter:input_type -> character_service.UpdateCharRequest
+	19, // 6: character_service.CharacterService.DeleteCharacter:input_type -> character_service.DeleteCharRequest
+	21, // 7: character_service.CharacterService.ListCharacters:input_type -> character_service.ListCharRequest
+	0,  // 8: character_service.CharacterService.GainExp:input_type -> character_service.ExpRequest
+	0,  // 9: character_service.CharacterService.RemoveExp:input_type -> character_service.ExpRequest
+	1,  // 10: character_service.CharacterService.TakeDamage:input_type -> character_service.DamageRequest
+	2,  // 11: character_service.CharacterService.Heal:input_type -> character_service.HealRequest
+	3,  // 12: character_service.CharacterService.LevelUp:input_type -> character_service.LevelRequest
+	3,  // 13: character_service.CharacterService.LevelDown:input_type -> character_service.LevelRequest
+	4,  // 14: character_service.CharacterService.SetLevel:input_type -> character_service.SetLevelRequest
+	5,  // 15: character_service.CharacterService.AddHitDice:input_type -> character_service.HitDiceRequest
+	5,  // 16: character_service.CharacterService.RemoveHitDice:input_type -> character_service.HitDiceRequest
+	6,  // 17: character_service.CharacterService.SetMaxHp:input_type -> character_service.HpRequest
+	6,  // 18: character_service.CharacterService.SetTempHp:input_type -> character_service.HpRequest
+	7,  // 19: character_service.CharacterService.CheckAbility:input_type -> character_service.CheckAbilityRequest
+	8,  // 20: character_service.CharacterService.CheckSkill:input_type -> character_service.CheckSkillRequest
+	10, // 21: character_service.CharacterService.GetStatus:input_type -> character_service.GetStatusRequest
+	14, // 22: character_service.CharacterService.CreateCharacter:output_type -> character_service.CreateCharResponse
+	16, // 23: character_service.CharacterService.GetCharacter:output_type -> character_service.GetCharResponse
+	18, // 24: character_service.CharacterService.UpdateCharacter:output_type -> character_service.UpdateCharResponse
+	20, // 25: character_service.CharacterService.DeleteCharacter:output_type -> character_service.DeleteCharResponse
+	22, // 26: character_service.CharacterService.ListCharacters:output_type -> character_service.ListCharResponse
+	12, // 27: character_service.CharacterService.GainExp:output_type -> character_service.CharacterResponse
+	12, // 28: character_service.CharacterService.RemoveExp:output_type -> character_service.CharacterResponse
+	12, // 29: character_service.CharacterService.TakeDamage:output_type -> character_service.CharacterResponse
+	12, // 30: character_service.CharacterService.Heal:output_type -> character_service.CharacterResponse
+	12, // 31: character_service.CharacterService.LevelUp:output_type -> character_service.CharacterResponse
+	12, // 32: character_service.CharacterService.LevelDown:output_type -> character_service.CharacterResponse
+	12, // 33: character_service.CharacterService.SetLevel:output_type -> character_service.CharacterResponse
+	12, // 34: character_service.CharacterService.AddHitDice:output_type -> character_service.CharacterResponse
+	12, // 35: character_service.CharacterService.RemoveHitDice:output_type -> character_service.CharacterResponse
+	12, // 36: character_service.CharacterService.SetMaxHp:output_type -> character_service.CharacterResponse
+	12, // 37: character_service.CharacterService.SetTempHp:output_type -> character_service.CharacterResponse
+	9,  // 38: character_service.CharacterService.CheckAbility:output_type -> character_service.CheckResponse
+	9,  // 39: character_service.CharacterService.CheckSkill:output_type -> character_service.CheckResponse
+	11, // 40: character_service.CharacterService.GetStatus:output_type -> character_service.StatusResponse
+	22, // [22:41] is the sub-list for method output_type
+	3,  // [3:22] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_service_proto_init() }
@@ -1395,7 +1426,6 @@ func file_service_proto_init() {
 	if File_service_proto != nil {
 		return
 	}
-	file_character_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

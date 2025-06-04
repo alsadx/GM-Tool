@@ -4,7 +4,7 @@
 // 	protoc        v6.31.0
 // source: character.proto
 
-package gen
+package character
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -180,6 +180,9 @@ func (x *Ability) GetSkills() map[string]*Skill {
 type LevelSystem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CurrentExp    int32                  `protobuf:"varint,1,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
+	CurrentLvl    int32                  `protobuf:"varint,2,opt,name=current_lvl,json=currentLvl,proto3" json:"current_lvl,omitempty"`
+	EarnedLvl     int32                  `protobuf:"varint,3,opt,name=earned_lvl,json=earnedLvl,proto3" json:"earned_lvl,omitempty"`
+	NextThreshold int32                  `protobuf:"varint,4,opt,name=next_threshold,json=nextThreshold,proto3" json:"next_threshold,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -217,6 +220,27 @@ func (*LevelSystem) Descriptor() ([]byte, []int) {
 func (x *LevelSystem) GetCurrentExp() int32 {
 	if x != nil {
 		return x.CurrentExp
+	}
+	return 0
+}
+
+func (x *LevelSystem) GetCurrentLvl() int32 {
+	if x != nil {
+		return x.CurrentLvl
+	}
+	return 0
+}
+
+func (x *LevelSystem) GetEarnedLvl() int32 {
+	if x != nil {
+		return x.EarnedLvl
+	}
+	return 0
+}
+
+func (x *LevelSystem) GetNextThreshold() int32 {
+	if x != nil {
+		return x.NextThreshold
 	}
 	return 0
 }
@@ -343,7 +367,7 @@ func (x *HealthPoint) GetHitDice() map[int32]*Amount {
 
 type Character struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Owner         int64                  `protobuf:"varint,2,opt,name=owner,proto3" json:"owner,omitempty"`
 	IsKnocked     bool                   `protobuf:"varint,3,opt,name=is_knocked,json=isKnocked,proto3" json:"is_knocked,omitempty"`
 	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
@@ -387,11 +411,11 @@ func (*Character) Descriptor() ([]byte, []int) {
 	return file_character_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *Character) GetId() int64 {
+func (x *Character) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 func (x *Character) GetOwner() int64 {
@@ -473,10 +497,15 @@ const file_character_proto_rawDesc = "" +
 	"\x06skills\x18\x02 \x03(\v2\x1e.character.Ability.SkillsEntryR\x06skills\x1aK\n" +
 	"\vSkillsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12&\n" +
-	"\x05value\x18\x02 \x01(\v2\x10.character.SkillR\x05value:\x028\x01\".\n" +
+	"\x05value\x18\x02 \x01(\v2\x10.character.SkillR\x05value:\x028\x01\"\x95\x01\n" +
 	"\vLevelSystem\x12\x1f\n" +
 	"\vcurrent_exp\x18\x01 \x01(\x05R\n" +
-	"currentExp\"K\n" +
+	"currentExp\x12\x1f\n" +
+	"\vcurrent_lvl\x18\x02 \x01(\x05R\n" +
+	"currentLvl\x12\x1d\n" +
+	"\n" +
+	"earned_lvl\x18\x03 \x01(\x05R\tearnedLvl\x12%\n" +
+	"\x0enext_threshold\x18\x04 \x01(\x05R\rnextThreshold\"K\n" +
 	"\x06Amount\x12#\n" +
 	"\rmax_available\x18\x01 \x01(\x05R\fmaxAvailable\x12\x1c\n" +
 	"\tavailable\x18\x02 \x01(\x05R\tavailable\"\xeb\x01\n" +
@@ -490,7 +519,7 @@ const file_character_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12'\n" +
 	"\x05value\x18\x02 \x01(\v2\x11.character.AmountR\x05value:\x028\x01\"\x92\x03\n" +
 	"\tCharacter\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05owner\x18\x02 \x01(\x03R\x05owner\x12\x1d\n" +
 	"\n" +
 	"is_knocked\x18\x03 \x01(\bR\tisKnocked\x12\x12\n" +
@@ -506,7 +535,7 @@ const file_character_proto_rawDesc = "" +
 	"\n" +
 	"StatsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12(\n" +
-	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01B1Z/github.com/alsadx/GM-Tool/character-service/genb\x06proto3"
+	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01B;Z9github.com/alsadx/GM-Tool/character-service/gen/characterb\x06proto3"
 
 var (
 	file_character_proto_rawDescOnce sync.Once

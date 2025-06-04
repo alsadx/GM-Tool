@@ -1,7 +1,7 @@
 syntax = "proto3";
 package character_service;
 
-option go_package = "github.com/alsadx/GM-Tool/character-service/gen";
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/service";
 
 import "character.proto";
 
@@ -20,53 +20,55 @@ service CharacterService {
   rpc LevelDown(LevelRequest) returns (CharacterResponse);
   rpc SetLevel(SetLevelRequest) returns (CharacterResponse);
   rpc AddHitDice(HitDiceRequest) returns (CharacterResponse);
-  rpc AddTempHp(TempHpRequest) returns (CharacterResponse);
+  rpc RemoveHitDice(HitDiceRequest) returns (CharacterResponse);
+  rpc SetMaxHp(HpRequest) returns (CharacterResponse);
+  rpc SetTempHp(HpRequest) returns (CharacterResponse);
   rpc CheckAbility(CheckAbilityRequest) returns (CheckResponse);
   rpc CheckSkill(CheckSkillRequest) returns (CheckResponse);
   rpc GetStatus(GetStatusRequest) returns (StatusResponse);
 }
 
 message ExpRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 amount = 2;
 }
 
 message DamageRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 damage = 2;
 }
 
 message HealRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 amount = 2;
 }
 
 message LevelRequest {
-  int64 character_id = 1;
+  string character_id = 1;
 }
 
 message SetLevelRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 level = 2;
 }
 
 message HitDiceRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 dice_type = 2;
 }
 
-message TempHpRequest {
-  int64 character_id = 1;
+message HpRequest {
+  string character_id = 1;
   int32 amount = 2;
 }
 
 message CheckAbilityRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 ability = 2;
 }
 
 message CheckSkillRequest {
-  int64 character_id = 1;
+  string character_id = 1;
   int32 skill = 2;
 }
 
@@ -77,7 +79,7 @@ message CheckResponse {
 }
 
 message GetStatusRequest {
-  int64 character_id = 1;
+  string character_id = 1;
 }
 
 message StatusResponse {
@@ -95,20 +97,19 @@ message CharacterResponse {
 }
 
 message CreateCharRequest {
-  int64 id = 1;
-  int64 owner_id = 2;
-  string name = 3;
-  string class_name = 4;
-  string subclass = 5;
-  string race = 6;
+  int64 owner_id = 1;
+  string name = 2;
+  string class_name = 3;
+  string subclass = 4;
+  string race = 5;
 }
 
 message CreateCharResponse {
-  character.Character character = 1;
+  string id = 1;
 }
 
 message GetCharRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message GetCharResponse {
@@ -116,15 +117,19 @@ message GetCharResponse {
 }
 
 message UpdateCharRequest {
-  character.Character character = 1;
+  string id = 1;
+  string name = 2;
+  string class = 3;
+  string subclass = 4;
+  string race = 5;
 }
 
 message UpdateCharResponse {
-  character.Character character = 1;
+  bool success = 1;
 }
 
 message DeleteCharRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message DeleteCharResponse {

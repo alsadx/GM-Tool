@@ -1,7 +1,7 @@
 syntax = "proto3";
 package character;
 
-option go_package = "github.com/alsadx/GM-Tool/character-service/gen";
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/character";
 
 message Score {
   int32 base = 1;
@@ -20,6 +20,9 @@ message Ability {
 
 message LevelSystem {
   int32 current_exp = 1;
+  int32 current_lvl = 2;
+  int32 earned_lvl = 3;
+  int32 next_threshold = 4;
 }
 
 message Amount {
@@ -35,7 +38,7 @@ message HealthPoint {
 }
 
 message Character {
-  int64 id = 1;
+  string id = 1;
   int64 owner = 2;
   bool is_knocked = 3;
   string name = 4;
