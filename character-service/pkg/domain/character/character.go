@@ -6,10 +6,12 @@ import (
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/health"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/level"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/types"
+
+	"github.com/google/uuid"
 )
 
 type Character struct {
-	ID    int
+	ID    string
 	Owner int
 
 	isKnocked bool
@@ -24,7 +26,7 @@ type Character struct {
 	health *health.Health
 }
 
-func New(id int, ownerID int, name, class, subclass, race string) (*Character, error) {
+func New(id string, ownerID int, name, class, subclass, race string) (*Character, error) {
 	if name == "" {
 		return nil, ErrInvalidCharacterName
 	}
@@ -33,6 +35,26 @@ func New(id int, ownerID int, name, class, subclass, race string) (*Character, e
 	}
 	return &Character{
 		ID:       id,
+		Owner:    ownerID,
+		Name:     name,
+		Class:    class,
+		Subclass: subclass,
+		Race:     race,
+		lvl:      level.NewLevelSystem(),
+		stats:    ability.NewStats(),
+		health:   health.New(9, dice.D6),
+	}, nil
+}
+
+func NewWitoutID(ownerID int, name, class, subclass, race string) (*Character, error) {
+	if name == "" {
+		return nil, ErrInvalidCharacterName
+	}
+	if ownerID < 0 {
+		return nil, ErrInvalidOwnerID
+	}
+	return &Character{
+		ID:       uuid.NewString(),
 		Owner:    ownerID,
 		Name:     name,
 		Class:    class,
@@ -74,6 +96,8 @@ func (c *Character) RemoveExp(amountExp int) {
 
 func (c *Character) GetLvl() int { return c.lvl.CurrentLevel() }
 
+func (c *Character) GetLvlSystem() *level.LevelSystem { return c.lvl }
+
 func (c *Character) SetLvl(lvl int) { c.lvl.SetLevel(lvl) }
 
 func (c *Character) GetCurrentExp() int { return c.lvl.CurrentExp() }
@@ -102,7 +126,22 @@ func (c *Character) Heal(healthAmount int) {
 	}
 }
 
+func (c *Character) RollHitDice(rollingDice map[dice.Dice]int) (result []int, bonus int, err error) {
+	result, err = c.health.RollHitDiceRest(rollingDice)
+	if err != nil {
+		return nil, 0, err
+	}
+	for _, diceRes := range result {
+		c.Heal(diceRes)
+	}
+	bonus = c.Ability(types.Constitution).Modifier()
+	c.Heal(bonus)
+	return result, bonus, nil
+}
+
 func (c *Character) GetCurrentHP() int { return c.health.CurrentHP }
+
+func (c *Character) GetHealth() *health.Health { return c.health }
 
 func (c *Character) GetTempHP() int { return c.health.TempHP }
 
@@ -122,9 +161,9 @@ func (c *Character) AddHitDice(hidDiceType dice.Dice) error {
 	return nil
 }
 
-func (c *Character) AddTempHp(tempHp int) { c.health.AddTempHP(tempHp) }
+func (c *Character) SetTempHP(tempHp int) { c.health.SetTempHP(tempHp) }
 
-func (c *Character) RemoveHidDice(hitDiceType dice.Dice) error {
+func (c *Character) RemoveHitDice(hitDiceType dice.Dice) error {
 	return c.health.RemoveHitDice(hitDiceType)
 }
 
@@ -143,4 +182,8 @@ func (c *Character) CheckSkill(skillType types.SkillType) (diceRes, bonus, resul
 
 func (c *Character) Ability(abilityType types.AbilityType) *ability.Ability {
 	return c.stats[abilityType]
+}
+
+func (c *Character) GetStats() map[types.AbilityType]*ability.Ability {
+	return c.stats
 }
