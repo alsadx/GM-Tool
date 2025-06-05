@@ -24,7 +24,7 @@ const (
 type Score struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Base          int32                  `protobuf:"varint,1,opt,name=base,proto3" json:"base,omitempty"`
-	Temp          int32                  `protobuf:"varint,2,opt,name=temp,proto3" json:"temp,omitempty"`
+	Bonus         int32                  `protobuf:"varint,2,opt,name=bonus,proto3" json:"bonus,omitempty"`
 	Mod           int32                  `protobuf:"varint,3,opt,name=mod,proto3" json:"mod,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -67,9 +67,9 @@ func (x *Score) GetBase() int32 {
 	return 0
 }
 
-func (x *Score) GetTemp() int32 {
+func (x *Score) GetBonus() int32 {
 	if x != nil {
-		return x.Temp
+		return x.Bonus
 	}
 	return 0
 }
@@ -485,10 +485,10 @@ var File_character_proto protoreflect.FileDescriptor
 
 const file_character_proto_rawDesc = "" +
 	"\n" +
-	"\x0fcharacter.proto\x12\tcharacter\"A\n" +
+	"\x0fcharacter.proto\x12\tcharacter\"C\n" +
 	"\x05Score\x12\x12\n" +
-	"\x04base\x18\x01 \x01(\x05R\x04base\x12\x12\n" +
-	"\x04temp\x18\x02 \x01(\x05R\x04temp\x12\x10\n" +
+	"\x04base\x18\x01 \x01(\x05R\x04base\x12\x14\n" +
+	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\x12\x10\n" +
 	"\x03mod\x18\x03 \x01(\x05R\x03mod\"\x1d\n" +
 	"\x05Skill\x12\x14\n" +
 	"\x05bonus\x18\x01 \x01(\x05R\x05bonus\"\xb6\x01\n" +

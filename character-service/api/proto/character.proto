@@ -5,7 +5,7 @@ option go_package = "github.com/alsadx/GM-Tool/character-service/gen/character";
 
 message Score {
   int32 base = 1;
-  int32 temp = 2;
+  int32 bonus = 2;
   int32 mod = 3;
 }
 

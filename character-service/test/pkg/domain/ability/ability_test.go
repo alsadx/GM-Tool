@@ -7,6 +7,7 @@ import (
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/types"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestScore(t *testing.T) {
@@ -14,13 +15,13 @@ func TestScore(t *testing.T) {
 		tests := []struct {
 			name     string
 			base     int
-			temp     int
+			bonus    int
 			expected int
 		}{
 			{"Average score", 10, 0, 0},
 			{"Positive modifier", 15, 0, 2},
-			{"Temp adjustment", 8, 2, 0},
-			{"Negative temp", 12, -2, 0},
+			{"Bonus adjustment", 8, 2, 0},
+			{"Negative bonus", 12, -2, 0},
 			{"High score", 18, 3, 5},
 			{"Negative modifier", 9, -1, -1},
 		}
@@ -28,13 +29,8 @@ func TestScore(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				s := ability.NewScore(tt.base)
-				if tt.temp != 0 {
-					remove := s.AddTemp(tt.temp)
-					defer remove()
-				}
-				if got := s.Modifier(); got != tt.expected {
-					t.Errorf("Modifier() = %d, want %d", got, tt.expected)
-				}
+				s.SetBonus(tt.bonus)
+				assert.Equal(t, tt.expected, s.Modifier(), "Wrong modifier")
 			})
 		}
 	})
@@ -56,29 +52,9 @@ func TestScore(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
 				s := ability.NewScore(tt.initial)
 				s.SetBase(tt.newBase)
-				if s.Modifier() != tt.expected {
-					t.Errorf("Modifier after SetBase() = %d, want %d", s.Modifier(), tt.expected)
-				}
+				assert.Equalf(t, tt.expected, s.Modifier(), "Modifier after SetBase() = %d, want %d", s.Modifier(), tt.expected)
 			})
 		}
-	})
-
-	t.Run("Temp operations", func(t *testing.T) {
-		s := ability.NewScore(10)
-		remove := s.AddTemp(3)
-
-		t.Run("Add temp", func(t *testing.T) {
-			if s.Modifier() != 1 {
-				t.Error("Temp modifier not applied correctly")
-			}
-		})
-
-		t.Run("Remove temp", func(t *testing.T) {
-			remove()
-			if s.Modifier() != 0 {
-				t.Error("Temp modifier not removed correctly")
-			}
-		})
 	})
 
 	t.Run("Check", func(t *testing.T) {

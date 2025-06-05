@@ -38,38 +38,38 @@ func SkillDTOFromProto(protoSkill *gen.Skill) *SkillDTO {
 }
 
 type ScoreDTO struct {
-	Base int `json:"base" bson:"base"`
-	Temp int `json:"temp" bson:"temp"`
-	Mod  int `json:"mod" bson:"-"`
+	Base  int `json:"base" bson:"base"`
+	Bonus int `json:"bonus" bson:"bonus"`
+	Mod   int `json:"mod" bson:"-"`
 }
 
 func (s *ScoreDTO) toDomain() *ability.Score {
 	score := ability.NewScore(s.Base)
-	score.AddTemp(s.Temp)
+	score.SetBonus(s.Bonus)
 	return score
 }
 
 func (s *ScoreDTO) toProto() *gen.Score {
 	return &gen.Score{
 		Base: int32(s.Base),
-		Temp: int32(s.Temp),
+		Bonus: int32(s.Bonus),
 		Mod:  int32(s.Mod),
 	}
 }
 
 func scoreDTOFromProto(protoScore *gen.Score) *ScoreDTO {
 	return &ScoreDTO{
-		Base: int(protoScore.Base),
-		Temp: int(protoScore.Temp),
-		Mod:  int(protoScore.Mod),
+		Base:  int(protoScore.Base),
+		Bonus: int(protoScore.Bonus),
+		Mod:   int(protoScore.Mod),
 	}
 }
 
 func scoreDTOFromDomain(scoreDomain *ability.Score) *ScoreDTO {
 	return &ScoreDTO{
-		Base: scoreDomain.Base(),
-		Temp: scoreDomain.Temp(),
-		Mod:  scoreDomain.Modifier(),
+		Base:  scoreDomain.Base(),
+		Bonus: scoreDomain.Bonus(),
+		Mod:   scoreDomain.Modifier(),
 	}
 }
 

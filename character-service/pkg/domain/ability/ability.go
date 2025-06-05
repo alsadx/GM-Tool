@@ -15,19 +15,19 @@ func floorDiv(a, b int) int {
 }
 
 type Score struct {
-	base int
-	temp int
-	mod  int
+	base  int
+	bonus int
+	mod   int
 }
 
 func NewScore(base int) *Score {
 	score := Score{base: base}
-	score.UpdateModifier()
+	score.updateModifier()
 	return &score
 }
 
-func (s *Score) UpdateModifier() {
-	total := s.base + s.temp
+func (s *Score) updateModifier() {
+	total := s.base + s.bonus
 	s.mod = floorDiv(total-10, 2)
 }
 
@@ -37,16 +37,12 @@ func (s *Score) Modifier() int {
 
 func (s *Score) SetBase(base int) {
 	s.base = base
-	s.UpdateModifier()
+	s.updateModifier()
 }
 
-func (s *Score) AddTemp(temp int) (removeTemp func()) {
-	s.temp += temp
-	s.UpdateModifier()
-	return func() {
-		s.temp -= temp
-		s.UpdateModifier()
-	}
+func (s *Score) SetBonus(bonus int) {
+	s.bonus = bonus
+	s.updateModifier()
 }
 
 func (s *Score) Check() (diceRes, modifier, result int) {
@@ -55,8 +51,8 @@ func (s *Score) Check() (diceRes, modifier, result int) {
 	return diceRes, s.Modifier(), result
 }
 
-func (s *Score) Temp() int {
-	return s.temp
+func (s *Score) Bonus() int {
+	return s.bonus
 }
 
 func (s *Score) Base() int {
