@@ -354,3 +354,18 @@ type UpdateCharDTO struct {
 	Subclass string
 	Race     string
 }
+
+type CharacterInfoDTO struct {
+	OwnerID int
+	Name     string
+	Class    string
+	Subclass string
+	Race     string
+}
+
+type CharacterHPState struct {
+	MaxHP int
+	CurrentHP int
+	TempHP int
+	IsKnocked bool
+}
