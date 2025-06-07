@@ -1,0 +1,110 @@
+syntax = "proto3";
+package character_progress.v1;
+
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/service/character-progress";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+service CharacterProgressService {
+  // GainExp adds experience points to character
+  rpc GainExp(ModifyExpRequest) returns (ExpResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{character_id}/exp/gain"
+      body: "amount"
+    };
+  }
+
+  // RemoveExp subtracts experience points from character
+  rpc RemoveExp(ModifyExpRequest) returns (ExpResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{character_id}/exp/remove"
+      body: "amount"
+    };
+  }
+
+  // LevelUp increases character level by 1
+  rpc LevelUp(CharacterID) returns (ExpResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{character_id}/level/up"
+    };
+  }
+
+  // LevelDown decreases character level by 1
+  rpc LevelDown(CharacterID) returns (ExpResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{character_id}/level/down"
+    };
+  }
+
+  // CanLvlUp checks if character can level up
+  rpc CanLvlUp(CharacterID) returns (CanLvlResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{character_id}/can-level-up"
+    };
+  }
+
+  // CanLvlDown checks if character can level down
+  rpc CanLvlDown(CharacterID) returns (CanLvlResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{character_id}/can-level-down"
+    };
+  }
+
+  // CurrentLvl returns character's current level
+  rpc CurrentLvl(CharacterID) returns (CurrentLvlResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{character_id}/level"
+    };
+  }
+
+  // ExpToNextLvl returns experience needed for next level
+  rpc ExpToNextLvl(CharacterID) returns (ExpToNextLvlResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{character_id}/exp-to-next-level"
+    };
+  }
+
+  // SetLevel directly sets character level
+  rpc SetLevel(SetLevelRequest) returns (ExpResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{character_id}/level/set"
+      body: "level"
+    };
+  }
+}
+
+message CharacterID {
+  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ModifyExpRequest {
+  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  int32 amount = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ExpResponse {
+  int32 current_lvl = 1;
+  int32 current_exp = 2;
+  int32 exp_to_next_lvl = 3;
+}
+
+message CanLvlResponse {
+  bool can = 1;
+  int32 current_lvl = 2;
+  int32 current_exp = 3;
+  int32 exp_to_next_lvl = 4;
+}
+
+message CurrentLvlResponse {
+  int32 current_lvl = 1;
+}
+
+message ExpToNextLvlResponse {
+  int32 exp_to_next_lvl = 1;
+}
+
+message SetLevelRequest {
+  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  int32 level = 2 [(google.api.field_behavior) = REQUIRED];
+}

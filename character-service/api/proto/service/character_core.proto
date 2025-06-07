@@ -1,0 +1,95 @@
+syntax = "proto3";
+package character_core.v1;
+
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/service/character-core";
+
+import "character.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+service CharacterCoreService {
+  // CreateCharacter creates a new character with the given details
+  rpc CreateCharacter(CreateCharRequest) returns (CharacterID) {
+    option (google.api.http) = {
+      post: "/v1/characters"
+      body: "*"
+    };
+  }
+  
+  // GetCharacter retrieves full character details by ID
+  rpc GetCharacter(CharacterID) returns (GetCharResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}"
+    };
+  }
+  
+  // UpdateCharacter partially updates character information
+  rpc UpdateCharacter(UpdateCharRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      patch: "/v1/characters/{id}"
+      body: "*"
+    };
+  }
+  
+  // DeleteCharacter removes a character by ID
+  rpc DeleteCharacter(CharacterID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/characters/{id}"
+    };
+  }
+  
+  // ListCharacters returns all characters for a given owner
+  rpc ListCharacters(ListCharRequest) returns (ListCharResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters"
+    };
+  }
+  
+  // GetInfoAboutCharacter returns basic character information
+  rpc GetInfoAboutCharacter(CharacterID) returns (GetInfoResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/info"
+    };
+  }
+}
+
+message CharacterID {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateCharRequest {
+  int64 owner_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string name = 2 [(google.api.field_behavior) = REQUIRED];
+  string class_name = 3 [(google.api.field_behavior) = REQUIRED];
+  string subclass = 4 [(google.api.field_behavior) = REQUIRED];
+  string race = 5 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetCharResponse {
+  character.Character character = 1;
+}
+
+message UpdateCharRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  optional string name = 2;
+  optional string class = 3;
+  optional string subclass = 4;
+  optional string race = 5;
+}
+
+message ListCharRequest {
+  int64 owner_id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ListCharResponse {
+  repeated character.Character characters = 1;
+}
+
+message GetInfoResponse {
+  int64 owner_id = 1;
+  string name = 2;
+  string class = 3;
+  string subclass = 4;
+  string race = 5;
+}
