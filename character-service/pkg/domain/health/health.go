@@ -113,7 +113,7 @@ func (h *Health) ResetHitDice(dicesReset map[dice.Dice]int) error {
 }
 
 func (h *Health) SetTempHP(tempHP int) {
-	h.TempHP = max(tempHP, h.TempHP)
+	h.TempHP = tempHP
 }
 
 func (h *Health) TakeDamage(damage int) {
