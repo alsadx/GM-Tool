@@ -17,13 +17,13 @@ import (
 
 type Handler struct {
 	character_core.UnimplementedCharacterCoreServiceServer
-	ctrl *core_controller.Controller
+	ctrl   *core_controller.Controller
 	logger *zap.Logger
 }
 
 func New(ctrl *core_controller.Controller) *Handler {
 	return &Handler{
-		ctrl: ctrl,
+		ctrl:   ctrl,
 		logger: zap.L().Named("core_handler"),
 	}
 }
@@ -116,10 +116,10 @@ func (h *Handler) GetInfoAboutCharacter(ctx context.Context, req *character_core
 		h.logger.Error("error when processing a request to get character info", zap.Error(err))
 	}
 	return &character_core.GetInfoResponse{
-		OwnerId: int64(charInfo.OwnerID),
-		Name: charInfo.Name,
-		Class: charInfo.Class,
+		OwnerId:  int64(charInfo.OwnerID),
+		Name:     charInfo.Name,
+		Class:    charInfo.Class,
 		Subclass: charInfo.Subclass,
-		Race: charInfo.Race,
+		Race:     charInfo.Race,
 	}, nil
 }

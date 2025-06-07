@@ -56,7 +56,6 @@ func (ctrl *Controller) Get(ctx context.Context, id string) (*dto.CharacterDTO, 
 	return dto.CharacterDTOFromDomain(char), nil
 }
 
-
 func (ctrl *Controller) Update(ctx context.Context, char *dto.UpdateCharDTO) error {
 	ctrl.logger.Debug("updating character", zap.String("id", char.ID))
 
@@ -80,7 +79,7 @@ func (ctrl *Controller) Update(ctx context.Context, char *dto.UpdateCharDTO) err
 	if char.Subclass != "" {
 		existChar.Subclass = char.Subclass
 	}
-	
+
 	if err := ctrl.repo.Update(ctx, existChar); err != nil {
 		ctrl.logger.Error("failed to update character", zap.Error(err))
 		return fmt.Errorf("failed to update character: %w", err)
@@ -120,10 +119,10 @@ func (ctrl *Controller) GetInfoAboutCharacter(ctx context.Context, id string) (*
 		return nil, err
 	}
 	return &dto.CharacterInfoDTO{
-		OwnerID: char.Owner,
-		Name: char.Name,
-		Class: char.Class,
+		OwnerID:  char.Owner,
+		Name:     char.Name,
+		Class:    char.Class,
 		Subclass: char.Subclass,
-		Race: char.Race,
+		Race:     char.Race,
 	}, nil
 }

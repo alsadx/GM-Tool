@@ -51,9 +51,9 @@ func (s *ScoreDTO) toDomain() *ability.Score {
 
 func (s *ScoreDTO) toProto() *gen.Score {
 	return &gen.Score{
-		Base: int32(s.Base),
+		Base:  int32(s.Base),
 		Bonus: int32(s.Bonus),
-		Mod:  int32(s.Mod),
+		Mod:   int32(s.Mod),
 	}
 }
 
@@ -356,7 +356,7 @@ type UpdateCharDTO struct {
 }
 
 type CharacterInfoDTO struct {
-	OwnerID int
+	OwnerID  int
 	Name     string
 	Class    string
 	Subclass string
@@ -364,8 +364,8 @@ type CharacterInfoDTO struct {
 }
 
 type CharacterHPState struct {
-	MaxHP int
+	MaxHP     int
 	CurrentHP int
-	TempHP int
+	TempHP    int
 	IsKnocked bool
 }

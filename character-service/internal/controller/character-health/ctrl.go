@@ -25,17 +25,17 @@ func (ctrl *Controller) SetMaxHP(ctx context.Context, id string, max_hp int) (*d
 	if max_hp <= 0 {
 		return nil, fmt.Errorf("invalid max_hp value: %d", max_hp)
 	}
-	
+
 	char, err := ctrl.repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	char.SetMaxHP(max_hp)
-	
+
 	if err := ctrl.repo.Update(ctx, char); err != nil {
 		ctrl.logger.Error("failed to update character after setting max HP",
-			zap.String("id", id), 
+			zap.String("id", id),
 			zap.Int("max_hp", max_hp),
 			zap.Error(err))
 		return nil, err
@@ -53,8 +53,8 @@ func (ctrl *Controller) SetCurrentHP(ctx context.Context, id string, current_hp 
 
 	if err := ctrl.repo.Update(ctx, char); err != nil {
 		ctrl.logger.Error("failed to update character after setting current HP",
-		zap.String("id", id),
-		zap.Int("current_hp", current_hp))
+			zap.String("id", id),
+			zap.Int("current_hp", current_hp))
 		return nil, err
 	}
 	return dto.CharacterDTOFromDomain(char), nil
@@ -74,7 +74,7 @@ func (ctrl *Controller) SetTempHP(ctx context.Context, id string, temp_hp int) (
 
 	if err := ctrl.repo.Update(ctx, char); err != nil {
 		ctrl.logger.Error("failed to update character after setting temp HP",
-			zap.String("id", id), 
+			zap.String("id", id),
 			zap.Int("temp_hp", temp_hp),
 			zap.Error(err))
 		return nil, err
@@ -130,9 +130,9 @@ func (ctrl *Controller) GetHPState(ctx context.Context, id string) (*dto.Charact
 	}
 
 	return &dto.CharacterHPState{
-		MaxHP: char.GetMaxHP(),
+		MaxHP:     char.GetMaxHP(),
 		CurrentHP: char.GetCurrentHP(),
-		TempHP: char.GetTempHP(),
+		TempHP:    char.GetTempHP(),
 		IsKnocked: char.IsKnocked(),
-		}, nil
+	}, nil
 }

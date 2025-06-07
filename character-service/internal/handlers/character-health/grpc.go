@@ -12,13 +12,13 @@ import (
 
 type Handler struct {
 	character_health.UnimplementedCharacterHealthServiceServer
-	ctrl *health_controller.Controller
+	ctrl   *health_controller.Controller
 	logger *zap.Logger
 }
 
 func New(ctrl *health_controller.Controller) *Handler {
 	return &Handler{
-		ctrl: ctrl,
+		ctrl:   ctrl,
 		logger: zap.L().Named("health_handler"),
 	}
 }
@@ -35,9 +35,9 @@ func (h *Handler) SetMaxHP(ctx context.Context, req *character_health.SetHpReque
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.Health.MaxHP),
+		MaxHp:     int32(c.Health.MaxHP),
 		CurrentHp: int32(c.Health.CurrentHP),
-		TempHp: int32(c.Health.TempHP),
+		TempHp:    int32(c.Health.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }
@@ -54,9 +54,9 @@ func (h *Handler) SetCurrentHP(ctx context.Context, req *character_health.SetHpR
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.Health.MaxHP),
+		MaxHp:     int32(c.Health.MaxHP),
 		CurrentHp: int32(c.Health.CurrentHP),
-		TempHp: int32(c.Health.TempHP),
+		TempHp:    int32(c.Health.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }
@@ -73,9 +73,9 @@ func (h *Handler) SetTempHP(ctx context.Context, req *character_health.SetHpRequ
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.Health.MaxHP),
+		MaxHp:     int32(c.Health.MaxHP),
 		CurrentHp: int32(c.Health.CurrentHP),
-		TempHp: int32(c.Health.TempHP),
+		TempHp:    int32(c.Health.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }
@@ -92,9 +92,9 @@ func (h *Handler) Heal(ctx context.Context, req *character_health.ModifyHpReques
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.Health.MaxHP),
+		MaxHp:     int32(c.Health.MaxHP),
 		CurrentHp: int32(c.Health.CurrentHP),
-		TempHp: int32(c.Health.TempHP),
+		TempHp:    int32(c.Health.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }
@@ -111,9 +111,9 @@ func (h *Handler) TakeDamage(ctx context.Context, req *character_health.ModifyHp
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.Health.MaxHP),
+		MaxHp:     int32(c.Health.MaxHP),
 		CurrentHp: int32(c.Health.CurrentHP),
-		TempHp: int32(c.Health.TempHP),
+		TempHp:    int32(c.Health.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }
@@ -144,9 +144,9 @@ func (h *Handler) GetHPState(ctx context.Context, req *character_health.Characte
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_health.HpState{
-		MaxHp: int32(c.MaxHP),
+		MaxHp:     int32(c.MaxHP),
 		CurrentHp: int32(c.CurrentHP),
-		TempHp: int32(c.TempHP),
+		TempHp:    int32(c.TempHP),
 		IsKnocked: c.IsKnocked,
 	}, nil
 }

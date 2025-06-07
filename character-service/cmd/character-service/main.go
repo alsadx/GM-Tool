@@ -29,7 +29,7 @@ func main() {
 		panic(err)
 	}
 	zap.ReplaceGlobals(logger)
-	
+
 	defer logger.Sync()
 
 	urlMongo := "mongodb://localhost:27017"
@@ -38,7 +38,7 @@ func main() {
 		logger.Fatal("error when connecting to MongoDB", zap.Error(err))
 		panic(err)
 	}
-	defer func () {
+	defer func() {
 		if err := client.Disconnect(context.Background()); err != nil {
 			panic(err)
 		}
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-	
+
 	character_core.RegisterCharacterCoreServiceServer(srv, handler_core)
 	character_health.RegisterCharacterHealthServiceServer(srv, handler_health)
 

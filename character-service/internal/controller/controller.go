@@ -38,7 +38,7 @@ func (ctrl *Controller) GainExp(ctx context.Context, id string, amount int) (*dt
 	}
 
 	char.GainExp(amount)
-	
+
 	if err := ctrl.repo.Update(ctx, char); err != nil {
 		ctrl.logger.Error("failed to update character after exp gain",
 			zap.String("id", id), zap.Error(err))
