@@ -43,11 +43,16 @@ func New(maxHp int, hitDice dice.Dice) *Health {
 	}
 }
 
-func (h *Health) SetMaxHP(maxHP int) {
-	h.MaxHP = maxHP
-	if h.CurrentHP > maxHP {
-		h.CurrentHP = maxHP
+func (h *Health) SetMaxHP(max_hp int) {
+	h.MaxHP = max_hp
+	if h.CurrentHP > max_hp {
+		h.CurrentHP = max_hp
 	}
+}
+
+func (h *Health) SetCurrentHP(current_hp int) {
+	h.CurrentHP = current_hp
+	h.TakeDamage(0)
 }
 
 func (h *Health) AddHitDice(hitDiceType dice.Dice) {
