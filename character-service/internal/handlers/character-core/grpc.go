@@ -1,33 +1,34 @@
-package grpc
+package handler_core
 
 import (
 	"context"
 	"errors"
 
-	"github.com/alsadx/GM-Tool/character-service/gen/service"
 	gen "github.com/alsadx/GM-Tool/character-service/gen/character"
-	"github.com/alsadx/GM-Tool/character-service/internal/controller/character"
+	character_core "github.com/alsadx/GM-Tool/character-service/gen/service/character-core"
+	core_controller "github.com/alsadx/GM-Tool/character-service/internal/controller/character-core"
 	"github.com/alsadx/GM-Tool/character-service/internal/dto"
 	"github.com/alsadx/GM-Tool/character-service/internal/repository"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Handler struct {
-	service.UnimplementedCharacterServiceServer
-	ctrl *character.Controller
+	character_core.UnimplementedCharacterCoreServiceServer
+	ctrl *core_controller.Controller
 	logger *zap.Logger
 }
 
-func New(ctrl *character.Controller) *Handler {
+func New(ctrl *core_controller.Controller) *Handler {
 	return &Handler{
 		ctrl: ctrl,
-		logger: zap.L().Named("handler"),
+		logger: zap.L().Named("core_handler"),
 	}
 }
 
-func (h *Handler) CreateCharacter(ctx context.Context, req *service.CreateCharRequest) (*service.CreateCharResponse, error) {
+func (h *Handler) CreateCharacter(ctx context.Context, req *character_core.CreateCharRequest) (*character_core.CharacterID, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -38,10 +39,10 @@ func (h *Handler) CreateCharacter(ctx context.Context, req *service.CreateCharRe
 		h.logger.Error("failed to create character", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &service.CreateCharResponse{Id: c.ID}, nil
+	return &character_core.CharacterID{Id: c.ID}, nil
 }
 
-func (h *Handler) GetCharacter(ctx context.Context, req *service.GetCharRequest) (*service.GetCharResponse, error) {
+func (h *Handler) GetCharacter(ctx context.Context, req *character_core.CharacterID) (*character_core.GetCharResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -53,26 +54,26 @@ func (h *Handler) GetCharacter(ctx context.Context, req *service.GetCharRequest)
 	} else if err != nil {
 		h.logger.Error("failed to get character", zap.Error(err))
 	}
-	return &service.GetCharResponse{Character: c.ToProto()}, nil
+	return &character_core.GetCharResponse{Character: c.ToProto()}, nil
 }
 
-func (h *Handler) UpdateCharacter(ctx context.Context, req *service.UpdateCharRequest) (*service.UpdateCharResponse, error) {
+func (h *Handler) UpdateCharacter(ctx context.Context, req *character_core.UpdateCharRequest) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
-	charUpdate := dto.UpdateCharDTO{ID: req.Id, Name: req.Name, Class: req.Class, Subclass: req.Subclass, Race: req.Race}
+	charUpdate := dto.UpdateCharDTO{ID: req.Id, Name: *req.Name, Class: *req.Class, Subclass: *req.Subclass, Race: *req.Race}
 	err := h.ctrl.Update(ctx, &charUpdate)
 	if errors.Is(err, repository.ErrCharacterNotFound) {
 		return nil, status.Error(codes.NotFound, err.Error())
 	} else if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &service.UpdateCharResponse{Success: true}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) DeleteCharacter(ctx context.Context, req *service.DeleteCharRequest) (*service.DeleteCharResponse, error) {
+func (h *Handler) DeleteCharacter(ctx context.Context, req *character_core.CharacterID) (*emptypb.Empty, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -86,10 +87,10 @@ func (h *Handler) DeleteCharacter(ctx context.Context, req *service.DeleteCharRe
 		h.logger.Error("error when processing a deletion request", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &service.DeleteCharResponse{Success: true}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) GetCharactersByUserID(ctx context.Context, req *service.ListCharRequest) (*service.ListCharResponse, error) {
+func (h *Handler) GetCharactersByUserID(ctx context.Context, req *character_core.ListCharRequest) (*character_core.ListCharResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -102,5 +103,23 @@ func (h *Handler) GetCharactersByUserID(ctx context.Context, req *service.ListCh
 	for i, char := range charList {
 		protoCharList[i] = char.ToProto()
 	}
-	return &service.ListCharResponse{Characters: protoCharList}, nil
+	return &character_core.ListCharResponse{Characters: protoCharList}, nil
+}
+
+func (h *Handler) GetInfoAboutCharacter(ctx context.Context, req *character_core.CharacterID) (*character_core.GetInfoResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "nil req")
+	}
+	h.logger.Info("got request", zap.Any("request", req))
+	charInfo, err := h.ctrl.GetInfoAboutCharacter(ctx, req.Id)
+	if err != nil {
+		h.logger.Error("error when processing a request to get character info", zap.Error(err))
+	}
+	return &character_core.GetInfoResponse{
+		OwnerId: int64(charInfo.OwnerID),
+		Name: charInfo.Name,
+		Class: charInfo.Class,
+		Subclass: charInfo.Subclass,
+		Race: charInfo.Race,
+	}, nil
 }
