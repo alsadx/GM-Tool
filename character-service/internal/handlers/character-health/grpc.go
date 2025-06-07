@@ -94,7 +94,7 @@ func (h *Handler) Heal(ctx context.Context, req *character_health.ModifyHpReques
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
-	if req.Value < 0 {
+	if req.Value <= 0 {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
@@ -116,12 +116,12 @@ func (h *Handler) TakeDamage(ctx context.Context, req *character_health.ModifyHp
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
-	if req.Value < 0 {
+	if req.Value <= 0 {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
-	c, err := h.ctrl.Heal(ctx, req.Id, int(req.Value))
+	c, err := h.ctrl.TakeDamage(ctx, req.Id, int(req.Value))
 	if err != nil {
 		h.logger.Error("failed to take damage", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
