@@ -90,7 +90,7 @@ func (h *Handler) DeleteCharacter(ctx context.Context, req *character_core.Chara
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) GetCharactersByUserID(ctx context.Context, req *character_core.ListCharRequest) (*character_core.ListCharResponse, error) {
+func (h *Handler) ListCharacters(ctx context.Context, req *character_core.ListCharRequest) (*character_core.ListCharResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
