@@ -153,7 +153,14 @@ func (c *Character) IsKnocked() bool { return c.isKnocked }
 
 func (c *Character) SetMaxHP(max_hp int) { c.health.SetMaxHP(max_hp) }
 
-func (c *Character) SetCurrentHP(current_hp int) { c.health.SetCurrentHP(current_hp) }
+func (c *Character) SetCurrentHP(current_hp int) {
+	c.health.SetCurrentHP(current_hp)
+	if current_hp <= 0 {
+		c.isKnocked = true
+	} else {
+		c.isKnocked = false
+	}
+}
 
 func (c *Character) AddHitDice(hidDiceType dice.Dice) error {
 	if (c.health.GetHitDiceCount() + 1) > c.lvl.CurrentLevel() {

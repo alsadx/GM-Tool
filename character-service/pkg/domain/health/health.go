@@ -51,8 +51,13 @@ func (h *Health) SetMaxHP(max_hp int) {
 }
 
 func (h *Health) SetCurrentHP(current_hp int) {
+	if current_hp > h.MaxHP {
+		current_hp = h.MaxHP
+	} else if current_hp < 0 {
+		current_hp = 0
+	}
+
 	h.CurrentHP = current_hp
-	h.TakeDamage(0)
 }
 
 func (h *Health) AddHitDice(hitDiceType dice.Dice) {
