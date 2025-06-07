@@ -78,6 +78,9 @@ func (c *Character) WithStats(stats map[types.AbilityType]*ability.Ability) *Cha
 
 func (c *Character) WithHealth(health health.Health) *Character {
 	c.health = &health
+	if c.health.CurrentHP == 0 {
+		c.isKnocked = true
+	}
 	return c
 }
 
