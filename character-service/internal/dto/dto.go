@@ -280,6 +280,7 @@ func (c *CharacterDTO) ToProto() *gen.Character {
 		ClassName: c.Class,
 		Subclass:  c.Subclass,
 		Race:      c.Race,
+		IsKnocked: c.IsKnocked,
 		Lvl:       c.Lvl.ToProto(),
 		Stats:     statsProto,
 		Health:    c.Health.ToProto(),
