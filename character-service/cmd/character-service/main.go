@@ -13,6 +13,7 @@ import (
 	handler_core "github.com/alsadx/GM-Tool/character-service/internal/handlers/character-core"
 	handler_health "github.com/alsadx/GM-Tool/character-service/internal/handlers/character-health"
 	mongoRepo "github.com/alsadx/GM-Tool/character-service/internal/repository/mongo"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -23,9 +24,18 @@ func main() {
 	port := flag.Int("p", 0, "API handler port")
 	flag.Parse()
 
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
+	zap.ReplaceGlobals(logger)
+	
+	defer logger.Sync()
+
 	urlMongo := "mongodb://localhost:27017"
 	client, err := mongo.Connect(options.Client().ApplyURI(urlMongo))
 	if err != nil {
+		logger.Fatal("error when connecting to MongoDB", zap.Error(err))
 		panic(err)
 	}
 	defer func () {
