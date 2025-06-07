@@ -61,10 +61,6 @@ func (ctrl *Controller) SetCurrentHP(ctx context.Context, id string, current_hp 
 }
 
 func (ctrl *Controller) SetTempHP(ctx context.Context, id string, temp_hp int) (*dto.CharacterDTO, error) {
-	if temp_hp <= 0 {
-		return nil, fmt.Errorf("invalid temp_hp value: %d", temp_hp)
-	}
-
 	char, err := ctrl.repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
