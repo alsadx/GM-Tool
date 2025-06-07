@@ -2,6 +2,7 @@ package handler_health
 
 import (
 	"context"
+	"fmt"
 
 	character_health "github.com/alsadx/GM-Tool/character-service/gen/service/character-health"
 	health_controller "github.com/alsadx/GM-Tool/character-service/internal/controller/character-health"
@@ -27,6 +28,9 @@ func (h *Handler) SetMaxHP(ctx context.Context, req *character_health.SetHpReque
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
+	if req.Value <= 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than or equal 0", req.Value))
+	}
 	h.logger.Info("got request", zap.Any("request", req))
 
 	c, err := h.ctrl.SetMaxHP(ctx, req.Id, int(req.Value))
@@ -45,6 +49,9 @@ func (h *Handler) SetMaxHP(ctx context.Context, req *character_health.SetHpReque
 func (h *Handler) SetCurrentHP(ctx context.Context, req *character_health.SetHpRequest) (*character_health.HpState, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
+	}
+	if req.Value <= 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than or equal 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
@@ -65,9 +72,12 @@ func (h *Handler) SetTempHP(ctx context.Context, req *character_health.SetHpRequ
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
+	if req.Value < 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than or equal 0", req.Value))
+	}
 	h.logger.Info("got request", zap.Any("request", req))
 
-	c, err := h.ctrl.SetCurrentHP(ctx, req.Id, int(req.Value))
+	c, err := h.ctrl.SetTempHP(ctx, req.Id, int(req.Value))
 	if err != nil {
 		h.logger.Error("failed to set temp_hp", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
@@ -83,6 +93,9 @@ func (h *Handler) SetTempHP(ctx context.Context, req *character_health.SetHpRequ
 func (h *Handler) Heal(ctx context.Context, req *character_health.ModifyHpRequest) (*character_health.HpState, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
+	}
+	if req.Value < 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
@@ -102,6 +115,9 @@ func (h *Handler) Heal(ctx context.Context, req *character_health.ModifyHpReques
 func (h *Handler) TakeDamage(ctx context.Context, req *character_health.ModifyHpRequest) (*character_health.HpState, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
+	}
+	if req.Value < 0 {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
