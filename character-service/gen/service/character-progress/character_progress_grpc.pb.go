@@ -21,13 +21,14 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CharacterProgressService_GainExp_FullMethodName      = "/character_progress.v1.CharacterProgressService/GainExp"
 	CharacterProgressService_RemoveExp_FullMethodName    = "/character_progress.v1.CharacterProgressService/RemoveExp"
-	CharacterProgressService_LevelUp_FullMethodName      = "/character_progress.v1.CharacterProgressService/LevelUp"
-	CharacterProgressService_LevelDown_FullMethodName    = "/character_progress.v1.CharacterProgressService/LevelDown"
+	CharacterProgressService_LvlUp_FullMethodName        = "/character_progress.v1.CharacterProgressService/LvlUp"
+	CharacterProgressService_LvlDown_FullMethodName      = "/character_progress.v1.CharacterProgressService/LvlDown"
 	CharacterProgressService_CanLvlUp_FullMethodName     = "/character_progress.v1.CharacterProgressService/CanLvlUp"
 	CharacterProgressService_CanLvlDown_FullMethodName   = "/character_progress.v1.CharacterProgressService/CanLvlDown"
 	CharacterProgressService_CurrentLvl_FullMethodName   = "/character_progress.v1.CharacterProgressService/CurrentLvl"
 	CharacterProgressService_ExpToNextLvl_FullMethodName = "/character_progress.v1.CharacterProgressService/ExpToNextLvl"
-	CharacterProgressService_SetLevel_FullMethodName     = "/character_progress.v1.CharacterProgressService/SetLevel"
+	CharacterProgressService_SetLvl_FullMethodName       = "/character_progress.v1.CharacterProgressService/SetLvl"
+	CharacterProgressService_GetLvlState_FullMethodName  = "/character_progress.v1.CharacterProgressService/GetLvlState"
 )
 
 // CharacterProgressServiceClient is the client API for CharacterProgressService service.
@@ -39,9 +40,9 @@ type CharacterProgressServiceClient interface {
 	// RemoveExp subtracts experience points from character
 	RemoveExp(ctx context.Context, in *ModifyExpRequest, opts ...grpc.CallOption) (*ExpResponse, error)
 	// LevelUp increases character level by 1
-	LevelUp(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error)
+	LvlUp(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error)
 	// LevelDown decreases character level by 1
-	LevelDown(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error)
+	LvlDown(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error)
 	// CanLvlUp checks if character can level up
 	CanLvlUp(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*CanLvlResponse, error)
 	// CanLvlDown checks if character can level down
@@ -51,7 +52,9 @@ type CharacterProgressServiceClient interface {
 	// ExpToNextLvl returns experience needed for next level
 	ExpToNextLvl(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpToNextLvlResponse, error)
 	// SetLevel directly sets character level
-	SetLevel(ctx context.Context, in *SetLevelRequest, opts ...grpc.CallOption) (*ExpResponse, error)
+	SetLvl(ctx context.Context, in *SetLevelRequest, opts ...grpc.CallOption) (*ExpResponse, error)
+	// Obtain the current lvl state
+	GetLvlState(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error)
 }
 
 type characterProgressServiceClient struct {
@@ -82,20 +85,20 @@ func (c *characterProgressServiceClient) RemoveExp(ctx context.Context, in *Modi
 	return out, nil
 }
 
-func (c *characterProgressServiceClient) LevelUp(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error) {
+func (c *characterProgressServiceClient) LvlUp(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ExpResponse)
-	err := c.cc.Invoke(ctx, CharacterProgressService_LevelUp_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CharacterProgressService_LvlUp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *characterProgressServiceClient) LevelDown(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error) {
+func (c *characterProgressServiceClient) LvlDown(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ExpResponse)
-	err := c.cc.Invoke(ctx, CharacterProgressService_LevelDown_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CharacterProgressService_LvlDown_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,10 +145,20 @@ func (c *characterProgressServiceClient) ExpToNextLvl(ctx context.Context, in *C
 	return out, nil
 }
 
-func (c *characterProgressServiceClient) SetLevel(ctx context.Context, in *SetLevelRequest, opts ...grpc.CallOption) (*ExpResponse, error) {
+func (c *characterProgressServiceClient) SetLvl(ctx context.Context, in *SetLevelRequest, opts ...grpc.CallOption) (*ExpResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ExpResponse)
-	err := c.cc.Invoke(ctx, CharacterProgressService_SetLevel_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CharacterProgressService_SetLvl_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *characterProgressServiceClient) GetLvlState(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*ExpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExpResponse)
+	err := c.cc.Invoke(ctx, CharacterProgressService_GetLvlState_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,9 +174,9 @@ type CharacterProgressServiceServer interface {
 	// RemoveExp subtracts experience points from character
 	RemoveExp(context.Context, *ModifyExpRequest) (*ExpResponse, error)
 	// LevelUp increases character level by 1
-	LevelUp(context.Context, *CharacterID) (*ExpResponse, error)
+	LvlUp(context.Context, *CharacterID) (*ExpResponse, error)
 	// LevelDown decreases character level by 1
-	LevelDown(context.Context, *CharacterID) (*ExpResponse, error)
+	LvlDown(context.Context, *CharacterID) (*ExpResponse, error)
 	// CanLvlUp checks if character can level up
 	CanLvlUp(context.Context, *CharacterID) (*CanLvlResponse, error)
 	// CanLvlDown checks if character can level down
@@ -173,7 +186,9 @@ type CharacterProgressServiceServer interface {
 	// ExpToNextLvl returns experience needed for next level
 	ExpToNextLvl(context.Context, *CharacterID) (*ExpToNextLvlResponse, error)
 	// SetLevel directly sets character level
-	SetLevel(context.Context, *SetLevelRequest) (*ExpResponse, error)
+	SetLvl(context.Context, *SetLevelRequest) (*ExpResponse, error)
+	// Obtain the current lvl state
+	GetLvlState(context.Context, *CharacterID) (*ExpResponse, error)
 	mustEmbedUnimplementedCharacterProgressServiceServer()
 }
 
@@ -190,11 +205,11 @@ func (UnimplementedCharacterProgressServiceServer) GainExp(context.Context, *Mod
 func (UnimplementedCharacterProgressServiceServer) RemoveExp(context.Context, *ModifyExpRequest) (*ExpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveExp not implemented")
 }
-func (UnimplementedCharacterProgressServiceServer) LevelUp(context.Context, *CharacterID) (*ExpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LevelUp not implemented")
+func (UnimplementedCharacterProgressServiceServer) LvlUp(context.Context, *CharacterID) (*ExpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LvlUp not implemented")
 }
-func (UnimplementedCharacterProgressServiceServer) LevelDown(context.Context, *CharacterID) (*ExpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LevelDown not implemented")
+func (UnimplementedCharacterProgressServiceServer) LvlDown(context.Context, *CharacterID) (*ExpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LvlDown not implemented")
 }
 func (UnimplementedCharacterProgressServiceServer) CanLvlUp(context.Context, *CharacterID) (*CanLvlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CanLvlUp not implemented")
@@ -208,8 +223,11 @@ func (UnimplementedCharacterProgressServiceServer) CurrentLvl(context.Context, *
 func (UnimplementedCharacterProgressServiceServer) ExpToNextLvl(context.Context, *CharacterID) (*ExpToNextLvlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExpToNextLvl not implemented")
 }
-func (UnimplementedCharacterProgressServiceServer) SetLevel(context.Context, *SetLevelRequest) (*ExpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetLevel not implemented")
+func (UnimplementedCharacterProgressServiceServer) SetLvl(context.Context, *SetLevelRequest) (*ExpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLvl not implemented")
+}
+func (UnimplementedCharacterProgressServiceServer) GetLvlState(context.Context, *CharacterID) (*ExpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLvlState not implemented")
 }
 func (UnimplementedCharacterProgressServiceServer) mustEmbedUnimplementedCharacterProgressServiceServer() {
 }
@@ -269,38 +287,38 @@ func _CharacterProgressService_RemoveExp_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CharacterProgressService_LevelUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CharacterProgressService_LvlUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CharacterID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CharacterProgressServiceServer).LevelUp(ctx, in)
+		return srv.(CharacterProgressServiceServer).LvlUp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CharacterProgressService_LevelUp_FullMethodName,
+		FullMethod: CharacterProgressService_LvlUp_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterProgressServiceServer).LevelUp(ctx, req.(*CharacterID))
+		return srv.(CharacterProgressServiceServer).LvlUp(ctx, req.(*CharacterID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CharacterProgressService_LevelDown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CharacterProgressService_LvlDown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CharacterID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CharacterProgressServiceServer).LevelDown(ctx, in)
+		return srv.(CharacterProgressServiceServer).LvlDown(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CharacterProgressService_LevelDown_FullMethodName,
+		FullMethod: CharacterProgressService_LvlDown_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterProgressServiceServer).LevelDown(ctx, req.(*CharacterID))
+		return srv.(CharacterProgressServiceServer).LvlDown(ctx, req.(*CharacterID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -377,20 +395,38 @@ func _CharacterProgressService_ExpToNextLvl_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CharacterProgressService_SetLevel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _CharacterProgressService_SetLvl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetLevelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CharacterProgressServiceServer).SetLevel(ctx, in)
+		return srv.(CharacterProgressServiceServer).SetLvl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CharacterProgressService_SetLevel_FullMethodName,
+		FullMethod: CharacterProgressService_SetLvl_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterProgressServiceServer).SetLevel(ctx, req.(*SetLevelRequest))
+		return srv.(CharacterProgressServiceServer).SetLvl(ctx, req.(*SetLevelRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CharacterProgressService_GetLvlState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CharacterID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CharacterProgressServiceServer).GetLvlState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CharacterProgressService_GetLvlState_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CharacterProgressServiceServer).GetLvlState(ctx, req.(*CharacterID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -411,12 +447,12 @@ var CharacterProgressService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CharacterProgressService_RemoveExp_Handler,
 		},
 		{
-			MethodName: "LevelUp",
-			Handler:    _CharacterProgressService_LevelUp_Handler,
+			MethodName: "LvlUp",
+			Handler:    _CharacterProgressService_LvlUp_Handler,
 		},
 		{
-			MethodName: "LevelDown",
-			Handler:    _CharacterProgressService_LevelDown_Handler,
+			MethodName: "LvlDown",
+			Handler:    _CharacterProgressService_LvlDown_Handler,
 		},
 		{
 			MethodName: "CanLvlUp",
@@ -435,8 +471,12 @@ var CharacterProgressService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CharacterProgressService_ExpToNextLvl_Handler,
 		},
 		{
-			MethodName: "SetLevel",
-			Handler:    _CharacterProgressService_SetLevel_Handler,
+			MethodName: "SetLvl",
+			Handler:    _CharacterProgressService_SetLvl_Handler,
+		},
+		{
+			MethodName: "GetLvlState",
+			Handler:    _CharacterProgressService_GetLvlState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

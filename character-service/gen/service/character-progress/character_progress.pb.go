@@ -24,7 +24,7 @@ const (
 
 type CharacterID struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,16 +59,16 @@ func (*CharacterID) Descriptor() ([]byte, []int) {
 	return file_service_character_progress_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CharacterID) GetCharacterId() string {
+func (x *CharacterID) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
 
 type ModifyExpRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Amount        int32                  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -104,9 +104,9 @@ func (*ModifyExpRequest) Descriptor() ([]byte, []int) {
 	return file_service_character_progress_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ModifyExpRequest) GetCharacterId() string {
+func (x *ModifyExpRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -181,9 +181,7 @@ func (x *ExpResponse) GetExpToNextLvl() int32 {
 type CanLvlResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Can           bool                   `protobuf:"varint,1,opt,name=can,proto3" json:"can,omitempty"`
-	CurrentLvl    int32                  `protobuf:"varint,2,opt,name=current_lvl,json=currentLvl,proto3" json:"current_lvl,omitempty"`
-	CurrentExp    int32                  `protobuf:"varint,3,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
-	ExpToNextLvl  int32                  `protobuf:"varint,4,opt,name=exp_to_next_lvl,json=expToNextLvl,proto3" json:"exp_to_next_lvl,omitempty"`
+	ExpInfo       *ExpResponse           `protobuf:"bytes,2,opt,name=exp_info,json=expInfo,proto3" json:"exp_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -225,25 +223,11 @@ func (x *CanLvlResponse) GetCan() bool {
 	return false
 }
 
-func (x *CanLvlResponse) GetCurrentLvl() int32 {
+func (x *CanLvlResponse) GetExpInfo() *ExpResponse {
 	if x != nil {
-		return x.CurrentLvl
+		return x.ExpInfo
 	}
-	return 0
-}
-
-func (x *CanLvlResponse) GetCurrentExp() int32 {
-	if x != nil {
-		return x.CurrentExp
-	}
-	return 0
-}
-
-func (x *CanLvlResponse) GetExpToNextLvl() int32 {
-	if x != nil {
-		return x.ExpToNextLvl
-	}
-	return 0
+	return nil
 }
 
 type CurrentLvlResponse struct {
@@ -336,7 +320,7 @@ func (x *ExpToNextLvlResponse) GetExpToNextLvl() int32 {
 
 type SetLevelRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Level         int32                  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -372,9 +356,9 @@ func (*SetLevelRequest) Descriptor() ([]byte, []int) {
 	return file_service_character_progress_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *SetLevelRequest) GetCharacterId() string {
+func (x *SetLevelRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -390,46 +374,43 @@ var File_service_character_progress_proto protoreflect.FileDescriptor
 
 const file_service_character_progress_proto_rawDesc = "" +
 	"\n" +
-	" service/character_progress.proto\x12\x15character_progress.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"5\n" +
-	"\vCharacterID\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\"W\n" +
-	"\x10ModifyExpRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12\x1b\n" +
+	" service/character_progress.proto\x12\x15character_progress.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"\"\n" +
+	"\vCharacterID\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\"D\n" +
+	"\x10ModifyExpRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x1b\n" +
 	"\x06amount\x18\x02 \x01(\x05B\x03\xe0A\x02R\x06amount\"v\n" +
 	"\vExpResponse\x12\x1f\n" +
 	"\vcurrent_lvl\x18\x01 \x01(\x05R\n" +
 	"currentLvl\x12\x1f\n" +
 	"\vcurrent_exp\x18\x02 \x01(\x05R\n" +
 	"currentExp\x12%\n" +
-	"\x0fexp_to_next_lvl\x18\x03 \x01(\x05R\fexpToNextLvl\"\x8b\x01\n" +
+	"\x0fexp_to_next_lvl\x18\x03 \x01(\x05R\fexpToNextLvl\"a\n" +
 	"\x0eCanLvlResponse\x12\x10\n" +
-	"\x03can\x18\x01 \x01(\bR\x03can\x12\x1f\n" +
-	"\vcurrent_lvl\x18\x02 \x01(\x05R\n" +
-	"currentLvl\x12\x1f\n" +
-	"\vcurrent_exp\x18\x03 \x01(\x05R\n" +
-	"currentExp\x12%\n" +
-	"\x0fexp_to_next_lvl\x18\x04 \x01(\x05R\fexpToNextLvl\"5\n" +
+	"\x03can\x18\x01 \x01(\bR\x03can\x12=\n" +
+	"\bexp_info\x18\x02 \x01(\v2\".character_progress.v1.ExpResponseR\aexpInfo\"5\n" +
 	"\x12CurrentLvlResponse\x12\x1f\n" +
 	"\vcurrent_lvl\x18\x01 \x01(\x05R\n" +
 	"currentLvl\"=\n" +
 	"\x14ExpToNextLvlResponse\x12%\n" +
-	"\x0fexp_to_next_lvl\x18\x01 \x01(\x05R\fexpToNextLvl\"T\n" +
-	"\x0fSetLevelRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12\x19\n" +
-	"\x05level\x18\x02 \x01(\x05B\x03\xe0A\x02R\x05level2\x9f\n" +
+	"\x0fexp_to_next_lvl\x18\x01 \x01(\x05R\fexpToNextLvl\"A\n" +
+	"\x0fSetLevelRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x19\n" +
+	"\x05level\x18\x02 \x01(\x05B\x03\xe0A\x02R\x05level2\xb5\n" +
 	"\n" +
-	"\x18CharacterProgressService\x12\x8e\x01\n" +
-	"\aGainExp\x12'.character_progress.v1.ModifyExpRequest\x1a\".character_progress.v1.ExpResponse\"6\x82\xd3\xe4\x93\x020:\x06amount\"&/v1/characters/{character_id}/exp/gain\x12\x92\x01\n" +
-	"\tRemoveExp\x12'.character_progress.v1.ModifyExpRequest\x1a\".character_progress.v1.ExpResponse\"8\x82\xd3\xe4\x93\x022:\x06amount\"(/v1/characters/{character_id}/exp/remove\x12\x81\x01\n" +
-	"\aLevelUp\x12\".character_progress.v1.CharacterID\x1a\".character_progress.v1.ExpResponse\".\x82\xd3\xe4\x93\x02(\"&/v1/characters/{character_id}/level/up\x12\x85\x01\n" +
-	"\tLevelDown\x12\".character_progress.v1.CharacterID\x1a\".character_progress.v1.ExpResponse\"0\x82\xd3\xe4\x93\x02*\"(/v1/characters/{character_id}/level/down\x12\x89\x01\n" +
-	"\bCanLvlUp\x12\".character_progress.v1.CharacterID\x1a%.character_progress.v1.CanLvlResponse\"2\x82\xd3\xe4\x93\x02,\x12*/v1/characters/{character_id}/can-level-up\x12\x8d\x01\n" +
+	"\x18CharacterProgressService\x12\x84\x01\n" +
+	"\aGainExp\x12'.character_progress.v1.ModifyExpRequest\x1a\".character_progress.v1.ExpResponse\",\x82\xd3\xe4\x93\x02&:\x06amount\"\x1c/v1/characters/{id}/exp/gain\x12\x88\x01\n" +
+	"\tRemoveExp\x12'.character_progress.v1.ModifyExpRequest\x1a\".character_progress.v1.ExpResponse\".\x82\xd3\xe4\x93\x02(:\x06amount\"\x1e/v1/characters/{id}/exp/remove\x12u\n" +
+	"\x05LvlUp\x12\".character_progress.v1.CharacterID\x1a\".character_progress.v1.ExpResponse\"$\x82\xd3\xe4\x93\x02\x1e\"\x1c/v1/characters/{id}/level/up\x12y\n" +
+	"\aLvlDown\x12\".character_progress.v1.CharacterID\x1a\".character_progress.v1.ExpResponse\"&\x82\xd3\xe4\x93\x02 \"\x1e/v1/characters/{id}/level/down\x12\x7f\n" +
+	"\bCanLvlUp\x12\".character_progress.v1.CharacterID\x1a%.character_progress.v1.CanLvlResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /v1/characters/{id}/can-level-up\x12\x83\x01\n" +
 	"\n" +
-	"CanLvlDown\x12\".character_progress.v1.CharacterID\x1a%.character_progress.v1.CanLvlResponse\"4\x82\xd3\xe4\x93\x02.\x12,/v1/characters/{character_id}/can-level-down\x12\x88\x01\n" +
+	"CanLvlDown\x12\".character_progress.v1.CharacterID\x1a%.character_progress.v1.CanLvlResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/v1/characters/{id}/can-level-down\x12~\n" +
 	"\n" +
-	"CurrentLvl\x12\".character_progress.v1.CharacterID\x1a).character_progress.v1.CurrentLvlResponse\"+\x82\xd3\xe4\x93\x02%\x12#/v1/characters/{character_id}/level\x12\x98\x01\n" +
-	"\fExpToNextLvl\x12\".character_progress.v1.CharacterID\x1a+.character_progress.v1.ExpToNextLvlResponse\"7\x82\xd3\xe4\x93\x021\x12//v1/characters/{character_id}/exp-to-next-level\x12\x8e\x01\n" +
-	"\bSetLevel\x12&.character_progress.v1.SetLevelRequest\x1a\".character_progress.v1.ExpResponse\"6\x82\xd3\xe4\x93\x020:\x05level\"'/v1/characters/{character_id}/level/setBLZJgithub.com/alsadx/GM-Tool/character-service/gen/service/character-progressb\x06proto3"
+	"CurrentLvl\x12\".character_progress.v1.CharacterID\x1a).character_progress.v1.CurrentLvlResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/characters/{id}/level\x12\x8e\x01\n" +
+	"\fExpToNextLvl\x12\".character_progress.v1.CharacterID\x1a+.character_progress.v1.ExpToNextLvlResponse\"-\x82\xd3\xe4\x93\x02'\x12%/v1/characters/{id}/exp-to-next-level\x12\x82\x01\n" +
+	"\x06SetLvl\x12&.character_progress.v1.SetLevelRequest\x1a\".character_progress.v1.ExpResponse\",\x82\xd3\xe4\x93\x02&:\x05level\"\x1d/v1/characters/{id}/level/set\x12x\n" +
+	"\vGetLvlState\x12\".character_progress.v1.CharacterID\x1a\".character_progress.v1.ExpResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/characters/{id}/levelBLZJgithub.com/alsadx/GM-Tool/character-service/gen/service/character-progressb\x06proto3"
 
 var (
 	file_service_character_progress_proto_rawDescOnce sync.Once
@@ -454,29 +435,32 @@ var file_service_character_progress_proto_goTypes = []any{
 	(*SetLevelRequest)(nil),      // 6: character_progress.v1.SetLevelRequest
 }
 var file_service_character_progress_proto_depIdxs = []int32{
-	1, // 0: character_progress.v1.CharacterProgressService.GainExp:input_type -> character_progress.v1.ModifyExpRequest
-	1, // 1: character_progress.v1.CharacterProgressService.RemoveExp:input_type -> character_progress.v1.ModifyExpRequest
-	0, // 2: character_progress.v1.CharacterProgressService.LevelUp:input_type -> character_progress.v1.CharacterID
-	0, // 3: character_progress.v1.CharacterProgressService.LevelDown:input_type -> character_progress.v1.CharacterID
-	0, // 4: character_progress.v1.CharacterProgressService.CanLvlUp:input_type -> character_progress.v1.CharacterID
-	0, // 5: character_progress.v1.CharacterProgressService.CanLvlDown:input_type -> character_progress.v1.CharacterID
-	0, // 6: character_progress.v1.CharacterProgressService.CurrentLvl:input_type -> character_progress.v1.CharacterID
-	0, // 7: character_progress.v1.CharacterProgressService.ExpToNextLvl:input_type -> character_progress.v1.CharacterID
-	6, // 8: character_progress.v1.CharacterProgressService.SetLevel:input_type -> character_progress.v1.SetLevelRequest
-	2, // 9: character_progress.v1.CharacterProgressService.GainExp:output_type -> character_progress.v1.ExpResponse
-	2, // 10: character_progress.v1.CharacterProgressService.RemoveExp:output_type -> character_progress.v1.ExpResponse
-	2, // 11: character_progress.v1.CharacterProgressService.LevelUp:output_type -> character_progress.v1.ExpResponse
-	2, // 12: character_progress.v1.CharacterProgressService.LevelDown:output_type -> character_progress.v1.ExpResponse
-	3, // 13: character_progress.v1.CharacterProgressService.CanLvlUp:output_type -> character_progress.v1.CanLvlResponse
-	3, // 14: character_progress.v1.CharacterProgressService.CanLvlDown:output_type -> character_progress.v1.CanLvlResponse
-	4, // 15: character_progress.v1.CharacterProgressService.CurrentLvl:output_type -> character_progress.v1.CurrentLvlResponse
-	5, // 16: character_progress.v1.CharacterProgressService.ExpToNextLvl:output_type -> character_progress.v1.ExpToNextLvlResponse
-	2, // 17: character_progress.v1.CharacterProgressService.SetLevel:output_type -> character_progress.v1.ExpResponse
-	9, // [9:18] is the sub-list for method output_type
-	0, // [0:9] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2,  // 0: character_progress.v1.CanLvlResponse.exp_info:type_name -> character_progress.v1.ExpResponse
+	1,  // 1: character_progress.v1.CharacterProgressService.GainExp:input_type -> character_progress.v1.ModifyExpRequest
+	1,  // 2: character_progress.v1.CharacterProgressService.RemoveExp:input_type -> character_progress.v1.ModifyExpRequest
+	0,  // 3: character_progress.v1.CharacterProgressService.LvlUp:input_type -> character_progress.v1.CharacterID
+	0,  // 4: character_progress.v1.CharacterProgressService.LvlDown:input_type -> character_progress.v1.CharacterID
+	0,  // 5: character_progress.v1.CharacterProgressService.CanLvlUp:input_type -> character_progress.v1.CharacterID
+	0,  // 6: character_progress.v1.CharacterProgressService.CanLvlDown:input_type -> character_progress.v1.CharacterID
+	0,  // 7: character_progress.v1.CharacterProgressService.CurrentLvl:input_type -> character_progress.v1.CharacterID
+	0,  // 8: character_progress.v1.CharacterProgressService.ExpToNextLvl:input_type -> character_progress.v1.CharacterID
+	6,  // 9: character_progress.v1.CharacterProgressService.SetLvl:input_type -> character_progress.v1.SetLevelRequest
+	0,  // 10: character_progress.v1.CharacterProgressService.GetLvlState:input_type -> character_progress.v1.CharacterID
+	2,  // 11: character_progress.v1.CharacterProgressService.GainExp:output_type -> character_progress.v1.ExpResponse
+	2,  // 12: character_progress.v1.CharacterProgressService.RemoveExp:output_type -> character_progress.v1.ExpResponse
+	2,  // 13: character_progress.v1.CharacterProgressService.LvlUp:output_type -> character_progress.v1.ExpResponse
+	2,  // 14: character_progress.v1.CharacterProgressService.LvlDown:output_type -> character_progress.v1.ExpResponse
+	3,  // 15: character_progress.v1.CharacterProgressService.CanLvlUp:output_type -> character_progress.v1.CanLvlResponse
+	3,  // 16: character_progress.v1.CharacterProgressService.CanLvlDown:output_type -> character_progress.v1.CanLvlResponse
+	4,  // 17: character_progress.v1.CharacterProgressService.CurrentLvl:output_type -> character_progress.v1.CurrentLvlResponse
+	5,  // 18: character_progress.v1.CharacterProgressService.ExpToNextLvl:output_type -> character_progress.v1.ExpToNextLvlResponse
+	2,  // 19: character_progress.v1.CharacterProgressService.SetLvl:output_type -> character_progress.v1.ExpResponse
+	2,  // 20: character_progress.v1.CharacterProgressService.GetLvlState:output_type -> character_progress.v1.ExpResponse
+	11, // [11:21] is the sub-list for method output_type
+	1,  // [1:11] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_service_character_progress_proto_init() }
