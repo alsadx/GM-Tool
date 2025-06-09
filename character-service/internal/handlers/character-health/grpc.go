@@ -29,7 +29,7 @@ func (h *Handler) SetMaxHP(ctx context.Context, req *character_health.SetHpReque
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
 	if req.Value <= 0 {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than or equal 0", req.Value))
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
 
@@ -50,7 +50,7 @@ func (h *Handler) SetCurrentHP(ctx context.Context, req *character_health.SetHpR
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
-	if req.Value <= 0 {
+	if req.Value < 0 {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("value = %d must be greater than or equal 0", req.Value))
 	}
 	h.logger.Info("got request", zap.Any("request", req))
