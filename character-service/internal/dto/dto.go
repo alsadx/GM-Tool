@@ -221,8 +221,8 @@ func HealthDTOFromDomain(healthDomain *health.Health) *HealthDTO {
 type LevelDTO struct {
 	CurrentExp    int `json:"current_exp" bson:"current_exp"`
 	EarnedLevel   int `json:"eanred_lvl" bson:"-"`
-	CurrentLevel  int `json:"current_lvl" bson:"-"`
-	NextThreshold int `json:"next_threshold" bson:"-"`
+	CurrentLevel  int `json:"current_lvl" bson:"current_level"`
+	NextThreshold int `json:"next_threshold" bson:"next_threshold"`
 }
 
 func (l *LevelDTO) ToProto() *gen.LevelSystem {
@@ -235,20 +235,28 @@ func (l *LevelDTO) ToProto() *gen.LevelSystem {
 }
 
 func (l *LevelDTO) ToDomain() *level.LevelSystem {
-	lvl := level.NewLevelSystem()
-	lvl.AddExp(l.CurrentExp)
+	lvl := level.NewLevelSystem().
+		WithCurrentExp(l.CurrentExp).
+		WithCurrentLvl(l.CurrentLevel).
+		WithNextThreshold(l.NextThreshold)
 	return lvl
 }
 
 func LevelDTOFromProto(genLevel *gen.LevelSystem) *LevelDTO {
 	return &LevelDTO{
-		CurrentExp: int(genLevel.CurrentExp),
+		CurrentExp:    int(genLevel.CurrentExp),
+		EarnedLevel:   int(genLevel.EarnedLvl),
+		CurrentLevel:  int(genLevel.CurrentLvl),
+		NextThreshold: int(genLevel.NextThreshold),
 	}
 }
 
 func LevelDTOFromDomain(domainLevel *level.LevelSystem) *LevelDTO {
 	return &LevelDTO{
-		CurrentExp: domainLevel.CurrentExp(),
+		CurrentExp:    domainLevel.CurrentExp(),
+		EarnedLevel:   domainLevel.EarnedLevel(),
+		CurrentLevel:  domainLevel.CurrentLevel(),
+		NextThreshold: (domainLevel.ExpToNextLevel() + domainLevel.CurrentExp()),
 	}
 }
 
@@ -318,16 +326,16 @@ func CharacterDTOFromProto(protoChar *gen.Character) *CharacterDTO {
 		stats[ablType] = AbilityDTOFromProto(abil)
 	}
 	return &CharacterDTO{
-		ID:       protoChar.Id,
-		Owner:    int(protoChar.Owner),
-		Name:     protoChar.Name,
-		Class:    protoChar.ClassName,
-		Subclass: protoChar.Subclass,
-		Race:     protoChar.Race,
+		ID:        protoChar.Id,
+		Owner:     int(protoChar.Owner),
+		Name:      protoChar.Name,
+		Class:     protoChar.ClassName,
+		Subclass:  protoChar.Subclass,
+		Race:      protoChar.Race,
 		IsKnocked: protoChar.IsKnocked,
-		Lvl:      LevelDTOFromProto(protoChar.Lvl),
-		Stats:    stats,
-		Health:   HealthDTOFromProto(protoChar.Health),
+		Lvl:       LevelDTOFromProto(protoChar.Lvl),
+		Stats:     stats,
+		Health:    HealthDTOFromProto(protoChar.Health),
 	}
 }
 
@@ -337,16 +345,16 @@ func CharacterDTOFromDomain(domainChar *character.Character) *CharacterDTO {
 		stats[ablType.String()] = AbilityDTOFromDomain(abil)
 	}
 	return &CharacterDTO{
-		ID:       domainChar.ID,
-		Owner:    domainChar.Owner,
-		Name:     domainChar.Name,
-		Class:    domainChar.Class,
-		Subclass: domainChar.Subclass,
-		Race:     domainChar.Race,
+		ID:        domainChar.ID,
+		Owner:     domainChar.Owner,
+		Name:      domainChar.Name,
+		Class:     domainChar.Class,
+		Subclass:  domainChar.Subclass,
+		Race:      domainChar.Race,
 		IsKnocked: domainChar.IsKnocked(),
-		Lvl:      LevelDTOFromDomain(domainChar.GetLvlSystem()),
-		Stats:    stats,
-		Health:   HealthDTOFromDomain(domainChar.GetHealth()),
+		Lvl:       LevelDTOFromDomain(domainChar.GetLvlSystem()),
+		Stats:     stats,
+		Health:    HealthDTOFromDomain(domainChar.GetHealth()),
 	}
 }
 
@@ -366,9 +374,15 @@ type CharacterInfoDTO struct {
 	Race     string
 }
 
-type CharacterHPState struct {
+type HPStateDTO struct {
 	MaxHP     int
 	CurrentHP int
 	TempHP    int
 	IsKnocked bool
+}
+
+type LvlStateDTO struct {
+	CurrentLvl   int
+	CurrentExp   int
+	ExpToNextLvl int
 }
