@@ -119,13 +119,13 @@ func (ctrl *Controller) IsKnocked(ctx context.Context, id string) (bool, error) 
 	return char.IsKnocked(), nil
 }
 
-func (ctrl *Controller) GetHPState(ctx context.Context, id string) (*dto.CharacterHPState, error) {
+func (ctrl *Controller) GetHPState(ctx context.Context, id string) (*dto.HPStateDTO, error) {
 	char, err := ctrl.repo.Get(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.CharacterHPState{
+	return &dto.HPStateDTO{
 		MaxHP:     char.GetMaxHP(),
 		CurrentHP: char.GetCurrentHP(),
 		TempHP:    char.GetTempHP(),
