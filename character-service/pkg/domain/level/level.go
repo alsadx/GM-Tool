@@ -23,8 +23,25 @@ func NewLevelSystem() *LevelSystem {
 	}
 }
 
+func (ls *LevelSystem) WithCurrentExp(current_exp int) *LevelSystem {
+	ls.currentExp = current_exp
+	ls.updateEarnedLevel()
+	return ls
+}
+
+func (ls *LevelSystem) WithCurrentLvl(current_lvl int) *LevelSystem {
+    current_lvl = min(max(current_lvl, 1), len(Thresholds))
+    ls.currentLevel = current_lvl
+    return ls
+}
+
+func (ls *LevelSystem) WithNextThreshold(next_threshols int) *LevelSystem {
+	ls.nextThreshold = next_threshols
+	return ls
+}
+
 func (ls *LevelSystem) AddExp(amount int) {
-	if amount <= 0 || ls.earnedLevel >= len(Thresholds) {
+	if ls.earnedLevel >= len(Thresholds) {
 		return
 	}
 
@@ -36,8 +53,10 @@ func (ls *LevelSystem) AddExp(amount int) {
 }
 
 func (ls *LevelSystem) SetLevel(lvl int) {
+	lvl = min(max(lvl, 1), len(Thresholds))
 	ls.currentExp = Thresholds[lvl-1]
 	ls.currentLevel = lvl
+	ls.updateEarnedLevelDown()
 	ls.updateEarnedLevel()
 }
 
@@ -56,12 +75,13 @@ func (ls *LevelSystem) RemoveExp(amount int) {
 func (ls *LevelSystem) updateEarnedLevelDown() {
 	newEarnedLevel := 1
 
-	for i := len(Thresholds) - 1; i >= 0; i-- {
-		if ls.currentExp >= Thresholds[i] {
-			newEarnedLevel = i + 1
-			break
-		}
-	}
+    for i := range len(Thresholds) - 1 {
+        if ls.currentExp < Thresholds[i+1] {
+            break
+        }
+        newEarnedLevel = i + 1
+    }
+
 
 	if newEarnedLevel != ls.earnedLevel {
 		ls.earnedLevel = newEarnedLevel
@@ -119,7 +139,7 @@ func (ls *LevelSystem) CurrentLevel() int  { return ls.currentLevel }
 func (ls *LevelSystem) EarnedLevel() int   { return ls.earnedLevel }
 func (ls *LevelSystem) CurrentExp() int    { return ls.currentExp }
 func (ls *LevelSystem) ExpToNextLevel() int {
-	if ls.currentExp >= Thresholds[19] {
+	if ls.earnedLevel >= len(Thresholds) {
 		return 0
 	}
 	return ls.nextThreshold - ls.currentExp
