@@ -5,6 +5,7 @@ import (
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/dice"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/health"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/level"
+	"github.com/alsadx/GM-Tool/character-service/pkg/domain/skill"
 	"github.com/alsadx/GM-Tool/character-service/pkg/domain/types"
 
 	"github.com/google/uuid"
@@ -194,6 +195,11 @@ func (c *Character) CheckSkill(skillType types.SkillType) (diceRes, bonus, resul
 
 func (c *Character) Ability(abilityType types.AbilityType) *ability.Ability {
 	return c.stats[abilityType]
+}
+
+func (c *Character) Skill(skillType types.SkillType) *skill.Skill {
+	abil := types.SkillToAbility[skillType]
+	return c.stats[abil].Skills[skillType]
 }
 
 func (c *Character) GetStats() map[types.AbilityType]*ability.Ability {
