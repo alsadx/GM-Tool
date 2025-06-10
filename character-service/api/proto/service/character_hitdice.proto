@@ -11,14 +11,14 @@ service CharacterHitDiceService {
   // GetHitDice retrieves current hit dice state for a character
   rpc GetHitDice(CharacterID) returns (HitDiceResponse) {
     option (google.api.http) = {
-      get: "/v1/characters/{character_id}/hitdice"
+      get: "/v1/characters/{id}/hitdice"
     };
   }
 
   // AddHitDice adds hit dice of specified type to a character
   rpc AddHitDice(HitDiceRequest) returns (HitDiceResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/hitdice/add"
+      post: "/v1/characters/{id}/hitdice/add"
       body: "dice_type"
     };
   }
@@ -26,7 +26,7 @@ service CharacterHitDiceService {
   // RemoveHitDice removes hit dice of specified type from a character
   rpc RemoveHitDice(HitDiceRequest) returns (HitDiceResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/hitdice/remove"
+      post: "/v1/characters/{id}/hitdice/remove"
       body: "dice_type"
     };
   }
@@ -34,7 +34,7 @@ service CharacterHitDiceService {
   // RollHitDice rolls specified hit dice and returns the result
   rpc RollHitDice(HitDiceMapRequest) returns (HitDiceResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/hitdice/roll"
+      post: "/v1/characters/{id}/hitdice/roll"
       body: "amount_dice"
     };
   }
@@ -42,23 +42,23 @@ service CharacterHitDiceService {
   // ResetHitDice resets all hit dice to maximum for the character
   rpc ResetHitDice(HitDiceMapRequest) returns (HitDiceResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/hitdice/reset"
+      post: "/v1/characters/{id}/hitdice/reset"
       body: "*"
     };
   }
 }
 
 message CharacterID {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message HitDiceRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   int32 dice_type = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
 message HitDiceMapRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   map<int32, int32> amount_dice = 2;
 }
 
