@@ -25,7 +25,7 @@ const (
 
 type CharacterID struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -60,35 +60,35 @@ func (*CharacterID) Descriptor() ([]byte, []int) {
 	return file_service_character_stats_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CharacterID) GetCharacterId() string {
+func (x *CharacterID) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
 
-type CheckAbilityRequest struct {
+type AbilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Ability       string                 `protobuf:"bytes,2,opt,name=ability,proto3" json:"ability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CheckAbilityRequest) Reset() {
-	*x = CheckAbilityRequest{}
+func (x *AbilityRequest) Reset() {
+	*x = AbilityRequest{}
 	mi := &file_service_character_stats_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CheckAbilityRequest) String() string {
+func (x *AbilityRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CheckAbilityRequest) ProtoMessage() {}
+func (*AbilityRequest) ProtoMessage() {}
 
-func (x *CheckAbilityRequest) ProtoReflect() protoreflect.Message {
+func (x *AbilityRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_service_character_stats_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,47 +100,45 @@ func (x *CheckAbilityRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckAbilityRequest.ProtoReflect.Descriptor instead.
-func (*CheckAbilityRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use AbilityRequest.ProtoReflect.Descriptor instead.
+func (*AbilityRequest) Descriptor() ([]byte, []int) {
 	return file_service_character_stats_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CheckAbilityRequest) GetCharacterId() string {
+func (x *AbilityRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
 
-func (x *CheckAbilityRequest) GetAbility() string {
+func (x *AbilityRequest) GetAbility() string {
 	if x != nil {
 		return x.Ability
 	}
 	return ""
 }
 
-type CheckSkillRequest struct {
+type AbilityResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
-	Skill         string                 `protobuf:"bytes,2,opt,name=skill,proto3" json:"skill,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CheckSkillRequest) Reset() {
-	*x = CheckSkillRequest{}
+func (x *AbilityResponse) Reset() {
+	*x = AbilityResponse{}
 	mi := &file_service_character_stats_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CheckSkillRequest) String() string {
+func (x *AbilityResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CheckSkillRequest) ProtoMessage() {}
+func (*AbilityResponse) ProtoMessage() {}
 
-func (x *CheckSkillRequest) ProtoReflect() protoreflect.Message {
+func (x *AbilityResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_service_character_stats_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -152,19 +150,57 @@ func (x *CheckSkillRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CheckSkillRequest.ProtoReflect.Descriptor instead.
-func (*CheckSkillRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use AbilityResponse.ProtoReflect.Descriptor instead.
+func (*AbilityResponse) Descriptor() ([]byte, []int) {
 	return file_service_character_stats_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *CheckSkillRequest) GetCharacterId() string {
+type SkillRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Skill         string                 `protobuf:"bytes,2,opt,name=skill,proto3" json:"skill,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SkillRequest) Reset() {
+	*x = SkillRequest{}
+	mi := &file_service_character_stats_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SkillRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SkillRequest) ProtoMessage() {}
+
+func (x *SkillRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_service_character_stats_proto_msgTypes[3]
 	if x != nil {
-		return x.CharacterId
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SkillRequest.ProtoReflect.Descriptor instead.
+func (*SkillRequest) Descriptor() ([]byte, []int) {
+	return file_service_character_stats_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SkillRequest) GetId() string {
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
 
-func (x *CheckSkillRequest) GetSkill() string {
+func (x *SkillRequest) GetSkill() string {
 	if x != nil {
 		return x.Skill
 	}
@@ -182,7 +218,7 @@ type CheckResponse struct {
 
 func (x *CheckResponse) Reset() {
 	*x = CheckResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[3]
+	mi := &file_service_character_stats_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -194,7 +230,7 @@ func (x *CheckResponse) String() string {
 func (*CheckResponse) ProtoMessage() {}
 
 func (x *CheckResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[3]
+	mi := &file_service_character_stats_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -207,7 +243,7 @@ func (x *CheckResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckResponse.ProtoReflect.Descriptor instead.
 func (*CheckResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{3}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CheckResponse) GetDiceResult() int32 {
@@ -233,7 +269,7 @@ func (x *CheckResponse) GetTotal() int32 {
 
 type SetAbilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AbilityName   string                 `protobuf:"bytes,2,opt,name=ability_name,json=abilityName,proto3" json:"ability_name,omitempty"`
 	Amount        int32                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -242,7 +278,7 @@ type SetAbilityRequest struct {
 
 func (x *SetAbilityRequest) Reset() {
 	*x = SetAbilityRequest{}
-	mi := &file_service_character_stats_proto_msgTypes[4]
+	mi := &file_service_character_stats_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -254,7 +290,7 @@ func (x *SetAbilityRequest) String() string {
 func (*SetAbilityRequest) ProtoMessage() {}
 
 func (x *SetAbilityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[4]
+	mi := &file_service_character_stats_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -267,12 +303,12 @@ func (x *SetAbilityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetAbilityRequest.ProtoReflect.Descriptor instead.
 func (*SetAbilityRequest) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{4}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *SetAbilityRequest) GetCharacterId() string {
+func (x *SetAbilityRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -300,7 +336,7 @@ type SetAbilityResponse struct {
 
 func (x *SetAbilityResponse) Reset() {
 	*x = SetAbilityResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[5]
+	mi := &file_service_character_stats_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +348,7 @@ func (x *SetAbilityResponse) String() string {
 func (*SetAbilityResponse) ProtoMessage() {}
 
 func (x *SetAbilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[5]
+	mi := &file_service_character_stats_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +361,7 @@ func (x *SetAbilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetAbilityResponse.ProtoReflect.Descriptor instead.
 func (*SetAbilityResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{5}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SetAbilityResponse) GetScore() *character.Score {
@@ -337,7 +373,7 @@ func (x *SetAbilityResponse) GetScore() *character.Score {
 
 type SetSkillBonusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	SkillName     string                 `protobuf:"bytes,2,opt,name=skill_name,json=skillName,proto3" json:"skill_name,omitempty"`
 	Amount        int32                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -346,7 +382,7 @@ type SetSkillBonusRequest struct {
 
 func (x *SetSkillBonusRequest) Reset() {
 	*x = SetSkillBonusRequest{}
-	mi := &file_service_character_stats_proto_msgTypes[6]
+	mi := &file_service_character_stats_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -358,7 +394,7 @@ func (x *SetSkillBonusRequest) String() string {
 func (*SetSkillBonusRequest) ProtoMessage() {}
 
 func (x *SetSkillBonusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[6]
+	mi := &file_service_character_stats_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -371,12 +407,12 @@ func (x *SetSkillBonusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSkillBonusRequest.ProtoReflect.Descriptor instead.
 func (*SetSkillBonusRequest) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{6}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *SetSkillBonusRequest) GetCharacterId() string {
+func (x *SetSkillBonusRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -405,7 +441,7 @@ type SetSkillBonusResponse struct {
 
 func (x *SetSkillBonusResponse) Reset() {
 	*x = SetSkillBonusResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[7]
+	mi := &file_service_character_stats_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -417,7 +453,7 @@ func (x *SetSkillBonusResponse) String() string {
 func (*SetSkillBonusResponse) ProtoMessage() {}
 
 func (x *SetSkillBonusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[7]
+	mi := &file_service_character_stats_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -430,7 +466,7 @@ func (x *SetSkillBonusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetSkillBonusResponse.ProtoReflect.Descriptor instead.
 func (*SetSkillBonusResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{7}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SetSkillBonusResponse) GetSkillName() string {
@@ -456,7 +492,7 @@ type GetStatsResponse struct {
 
 func (x *GetStatsResponse) Reset() {
 	*x = GetStatsResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[8]
+	mi := &file_service_character_stats_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +504,7 @@ func (x *GetStatsResponse) String() string {
 func (*GetStatsResponse) ProtoMessage() {}
 
 func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[8]
+	mi := &file_service_character_stats_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,7 +517,7 @@ func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetStatsResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{8}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetStatsResponse) GetStats() map[string]*character.Ability {
@@ -493,7 +529,7 @@ func (x *GetStatsResponse) GetStats() map[string]*character.Ability {
 
 type GetModifierRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AbilityName   string                 `protobuf:"bytes,2,opt,name=ability_name,json=abilityName,proto3" json:"ability_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -501,7 +537,7 @@ type GetModifierRequest struct {
 
 func (x *GetModifierRequest) Reset() {
 	*x = GetModifierRequest{}
-	mi := &file_service_character_stats_proto_msgTypes[9]
+	mi := &file_service_character_stats_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -513,7 +549,7 @@ func (x *GetModifierRequest) String() string {
 func (*GetModifierRequest) ProtoMessage() {}
 
 func (x *GetModifierRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[9]
+	mi := &file_service_character_stats_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -526,12 +562,12 @@ func (x *GetModifierRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetModifierRequest.ProtoReflect.Descriptor instead.
 func (*GetModifierRequest) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{9}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *GetModifierRequest) GetCharacterId() string {
+func (x *GetModifierRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -553,7 +589,7 @@ type GetModifierResponse struct {
 
 func (x *GetModifierResponse) Reset() {
 	*x = GetModifierResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[10]
+	mi := &file_service_character_stats_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -565,7 +601,7 @@ func (x *GetModifierResponse) String() string {
 func (*GetModifierResponse) ProtoMessage() {}
 
 func (x *GetModifierResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[10]
+	mi := &file_service_character_stats_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -578,7 +614,7 @@ func (x *GetModifierResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetModifierResponse.ProtoReflect.Descriptor instead.
 func (*GetModifierResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{10}
+	return file_service_character_stats_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetModifierResponse) GetAbilityName() string {
@@ -595,92 +631,33 @@ func (x *GetModifierResponse) GetModifier() int32 {
 	return 0
 }
 
-type StatusResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Level         int32                  `protobuf:"varint,1,opt,name=level,proto3" json:"level,omitempty"`
-	CurrentExp    int32                  `protobuf:"varint,2,opt,name=current_exp,json=currentExp,proto3" json:"current_exp,omitempty"`
-	ExpToNext     int32                  `protobuf:"varint,3,opt,name=exp_to_next,json=expToNext,proto3" json:"exp_to_next,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StatusResponse) Reset() {
-	*x = StatusResponse{}
-	mi := &file_service_character_stats_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StatusResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusResponse) ProtoMessage() {}
-
-func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_service_character_stats_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
-func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_service_character_stats_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *StatusResponse) GetLevel() int32 {
-	if x != nil {
-		return x.Level
-	}
-	return 0
-}
-
-func (x *StatusResponse) GetCurrentExp() int32 {
-	if x != nil {
-		return x.CurrentExp
-	}
-	return 0
-}
-
-func (x *StatusResponse) GetExpToNext() int32 {
-	if x != nil {
-		return x.ExpToNext
-	}
-	return 0
-}
-
 var File_service_character_stats_proto protoreflect.FileDescriptor
 
 const file_service_character_stats_proto_rawDesc = "" +
 	"\n" +
-	"\x1dservice/character_stats.proto\x12\x12character_stats.v1\x1a\x0fcharacter.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"5\n" +
-	"\vCharacterID\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\"\\\n" +
-	"\x13CheckAbilityRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12\x1d\n" +
-	"\aability\x18\x02 \x01(\tB\x03\xe0A\x02R\aability\"V\n" +
-	"\x11CheckSkillRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12\x19\n" +
+	"\x1dservice/character_stats.proto\x12\x12character_stats.v1\x1a\x0fcharacter.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"\"\n" +
+	"\vCharacterID\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\"D\n" +
+	"\x0eAbilityRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x1d\n" +
+	"\aability\x18\x02 \x01(\tB\x03\xe0A\x02R\aability\"\x11\n" +
+	"\x0fAbilityResponse\">\n" +
+	"\fSkillRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x19\n" +
 	"\x05skill\x18\x02 \x01(\tB\x03\xe0A\x02R\x05skill\"\\\n" +
 	"\rCheckResponse\x12\x1f\n" +
 	"\vdice_result\x18\x01 \x01(\x05R\n" +
 	"diceResult\x12\x14\n" +
 	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\x12\x14\n" +
-	"\x05total\x18\x03 \x01(\x05R\x05total\"\x80\x01\n" +
-	"\x11SetAbilityRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12&\n" +
+	"\x05total\x18\x03 \x01(\x05R\x05total\"m\n" +
+	"\x11SetAbilityRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12&\n" +
 	"\fability_name\x18\x02 \x01(\tB\x03\xe0A\x02R\vabilityName\x12\x1b\n" +
 	"\x06amount\x18\x03 \x01(\x05B\x03\xe0A\x02R\x06amount\"<\n" +
 	"\x12SetAbilityResponse\x12&\n" +
-	"\x05score\x18\x01 \x01(\v2\x10.character.ScoreR\x05score\"\x7f\n" +
-	"\x14SetSkillBonusRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12\"\n" +
+	"\x05score\x18\x01 \x01(\v2\x10.character.ScoreR\x05score\"l\n" +
+	"\x14SetSkillBonusRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\"\n" +
 	"\n" +
 	"skill_name\x18\x02 \x01(\tB\x03\xe0A\x02R\tskillName\x12\x1b\n" +
 	"\x06amount\x18\x03 \x01(\x05B\x03\xe0A\x02R\x06amount\"L\n" +
@@ -693,29 +670,24 @@ const file_service_character_stats_proto_rawDesc = "" +
 	"\n" +
 	"StatsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12(\n" +
-	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01\"d\n" +
-	"\x12GetModifierRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12&\n" +
+	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01\"Q\n" +
+	"\x12GetModifierRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12&\n" +
 	"\fability_name\x18\x02 \x01(\tB\x03\xe0A\x02R\vabilityName\"T\n" +
 	"\x13GetModifierResponse\x12!\n" +
 	"\fability_name\x18\x01 \x01(\tR\vabilityName\x12\x1a\n" +
-	"\bmodifier\x18\x02 \x01(\x05R\bmodifier\"g\n" +
-	"\x0eStatusResponse\x12\x14\n" +
-	"\x05level\x18\x01 \x01(\x05R\x05level\x12\x1f\n" +
-	"\vcurrent_exp\x18\x02 \x01(\x05R\n" +
-	"currentExp\x12\x1e\n" +
-	"\vexp_to_next\x18\x03 \x01(\x05R\texpToNext2\x86\n" +
+	"\bmodifier\x18\x02 \x01(\x05R\bmodifier2\xb2\t\n" +
+	"\x15CharacterStatsService\x12\x8c\x01\n" +
+	"\fCheckAbility\x12\".character_stats.v1.AbilityRequest\x1a!.character_stats.v1.CheckResponse\"5\x82\xd3\xe4\x93\x02/\"-/v1/characters/{id}/abilities/{ability}/check\x12\x83\x01\n" +
 	"\n" +
-	"\x15CharacterStatsService\x12\x9b\x01\n" +
-	"\fCheckAbility\x12'.character_stats.v1.CheckAbilityRequest\x1a!.character_stats.v1.CheckResponse\"?\x82\xd3\xe4\x93\x029\"7/v1/characters/{character_id}/abilities/{ability}/check\x12\x92\x01\n" +
+	"CheckSkill\x12 .character_stats.v1.SkillRequest\x1a!.character_stats.v1.CheckResponse\"0\x82\xd3\xe4\x93\x02*\"(/v1/characters/{id}/skills/{skill}/check\x12\xa4\x01\n" +
+	"\x0fSetAbilityScore\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"B\x82\xd3\xe4\x93\x02<:\x06amount\x1a2/v1/characters/{id}/abilities/{ability_name}/score\x12\xa4\x01\n" +
+	"\x0fSetAbilityBonus\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"B\x82\xd3\xe4\x93\x02<:\x06amount\x1a2/v1/characters/{id}/abilities/{ability_name}/bonus\x12\xa3\x01\n" +
+	"\rSetSkillBonus\x12(.character_stats.v1.SetSkillBonusRequest\x1a).character_stats.v1.SetSkillBonusResponse\"=\x82\xd3\xe4\x93\x027:\x06amount\x1a-/v1/characters/{id}/skills/{skill_name}/bonus\x12t\n" +
+	"\bGetStats\x12\x1f.character_stats.v1.CharacterID\x1a$.character_stats.v1.GetStatsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/characters/{id}/stats\x12\x9d\x01\n" +
+	"\vGetModifier\x12&.character_stats.v1.GetModifierRequest\x1a'.character_stats.v1.GetModifierResponse\"=\x82\xd3\xe4\x93\x027\x125/v1/characters/{id}/abilities/{ability_name}/modifier\x12z\n" +
 	"\n" +
-	"CheckSkill\x12%.character_stats.v1.CheckSkillRequest\x1a!.character_stats.v1.CheckResponse\":\x82\xd3\xe4\x93\x024\"2/v1/characters/{character_id}/skills/{skill}/check\x12\xae\x01\n" +
-	"\x0fSetAbilityScore\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"L\x82\xd3\xe4\x93\x02F:\x06amount\x1a</v1/characters/{character_id}/abilities/{ability_name}/score\x12\xae\x01\n" +
-	"\x0fSetAbilityBonus\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"L\x82\xd3\xe4\x93\x02F:\x06amount\x1a</v1/characters/{character_id}/abilities/{ability_name}/bonus\x12\xad\x01\n" +
-	"\rSetSkillBonus\x12(.character_stats.v1.SetSkillBonusRequest\x1a).character_stats.v1.SetSkillBonusResponse\"G\x82\xd3\xe4\x93\x02A:\x06amount\x1a7/v1/characters/{character_id}/skills/{skill_name}/bonus\x12~\n" +
-	"\bGetStats\x12\x1f.character_stats.v1.CharacterID\x1a$.character_stats.v1.GetStatsResponse\"+\x82\xd3\xe4\x93\x02%\x12#/v1/characters/{character_id}/stats\x12\xa7\x01\n" +
-	"\vGetModifier\x12&.character_stats.v1.GetModifierRequest\x1a'.character_stats.v1.GetModifierResponse\"G\x82\xd3\xe4\x93\x02A\x12?/v1/characters/{character_id}/abilities/{ability_name}/modifier\x12~\n" +
-	"\tGetStatus\x12\x1f.character_stats.v1.CharacterID\x1a\".character_stats.v1.StatusResponse\",\x82\xd3\xe4\x93\x02&\x12$/v1/characters/{character_id}/statusBIZGgithub.com/alsadx/GM-Tool/character-service/gen/service/character-statsb\x06proto3"
+	"GetAbility\x12\".character_stats.v1.AbilityRequest\x1a\x12.character.Ability\"4\x82\xd3\xe4\x93\x02.\x12,/v1/characters/{id}/abilities/{ability_name}BIZGgithub.com/alsadx/GM-Tool/character-service/gen/service/character-statsb\x06proto3"
 
 var (
 	file_service_character_stats_proto_rawDescOnce sync.Once
@@ -732,17 +704,17 @@ func file_service_character_stats_proto_rawDescGZIP() []byte {
 var file_service_character_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_service_character_stats_proto_goTypes = []any{
 	(*CharacterID)(nil),           // 0: character_stats.v1.CharacterID
-	(*CheckAbilityRequest)(nil),   // 1: character_stats.v1.CheckAbilityRequest
-	(*CheckSkillRequest)(nil),     // 2: character_stats.v1.CheckSkillRequest
-	(*CheckResponse)(nil),         // 3: character_stats.v1.CheckResponse
-	(*SetAbilityRequest)(nil),     // 4: character_stats.v1.SetAbilityRequest
-	(*SetAbilityResponse)(nil),    // 5: character_stats.v1.SetAbilityResponse
-	(*SetSkillBonusRequest)(nil),  // 6: character_stats.v1.SetSkillBonusRequest
-	(*SetSkillBonusResponse)(nil), // 7: character_stats.v1.SetSkillBonusResponse
-	(*GetStatsResponse)(nil),      // 8: character_stats.v1.GetStatsResponse
-	(*GetModifierRequest)(nil),    // 9: character_stats.v1.GetModifierRequest
-	(*GetModifierResponse)(nil),   // 10: character_stats.v1.GetModifierResponse
-	(*StatusResponse)(nil),        // 11: character_stats.v1.StatusResponse
+	(*AbilityRequest)(nil),        // 1: character_stats.v1.AbilityRequest
+	(*AbilityResponse)(nil),       // 2: character_stats.v1.AbilityResponse
+	(*SkillRequest)(nil),          // 3: character_stats.v1.SkillRequest
+	(*CheckResponse)(nil),         // 4: character_stats.v1.CheckResponse
+	(*SetAbilityRequest)(nil),     // 5: character_stats.v1.SetAbilityRequest
+	(*SetAbilityResponse)(nil),    // 6: character_stats.v1.SetAbilityResponse
+	(*SetSkillBonusRequest)(nil),  // 7: character_stats.v1.SetSkillBonusRequest
+	(*SetSkillBonusResponse)(nil), // 8: character_stats.v1.SetSkillBonusResponse
+	(*GetStatsResponse)(nil),      // 9: character_stats.v1.GetStatsResponse
+	(*GetModifierRequest)(nil),    // 10: character_stats.v1.GetModifierRequest
+	(*GetModifierResponse)(nil),   // 11: character_stats.v1.GetModifierResponse
 	nil,                           // 12: character_stats.v1.GetStatsResponse.StatsEntry
 	(*character.Score)(nil),       // 13: character.Score
 	(*character.Ability)(nil),     // 14: character.Ability
@@ -751,22 +723,22 @@ var file_service_character_stats_proto_depIdxs = []int32{
 	13, // 0: character_stats.v1.SetAbilityResponse.score:type_name -> character.Score
 	12, // 1: character_stats.v1.GetStatsResponse.stats:type_name -> character_stats.v1.GetStatsResponse.StatsEntry
 	14, // 2: character_stats.v1.GetStatsResponse.StatsEntry.value:type_name -> character.Ability
-	1,  // 3: character_stats.v1.CharacterStatsService.CheckAbility:input_type -> character_stats.v1.CheckAbilityRequest
-	2,  // 4: character_stats.v1.CharacterStatsService.CheckSkill:input_type -> character_stats.v1.CheckSkillRequest
-	4,  // 5: character_stats.v1.CharacterStatsService.SetAbilityScore:input_type -> character_stats.v1.SetAbilityRequest
-	4,  // 6: character_stats.v1.CharacterStatsService.SetAbilityBonus:input_type -> character_stats.v1.SetAbilityRequest
-	6,  // 7: character_stats.v1.CharacterStatsService.SetSkillBonus:input_type -> character_stats.v1.SetSkillBonusRequest
+	1,  // 3: character_stats.v1.CharacterStatsService.CheckAbility:input_type -> character_stats.v1.AbilityRequest
+	3,  // 4: character_stats.v1.CharacterStatsService.CheckSkill:input_type -> character_stats.v1.SkillRequest
+	5,  // 5: character_stats.v1.CharacterStatsService.SetAbilityScore:input_type -> character_stats.v1.SetAbilityRequest
+	5,  // 6: character_stats.v1.CharacterStatsService.SetAbilityBonus:input_type -> character_stats.v1.SetAbilityRequest
+	7,  // 7: character_stats.v1.CharacterStatsService.SetSkillBonus:input_type -> character_stats.v1.SetSkillBonusRequest
 	0,  // 8: character_stats.v1.CharacterStatsService.GetStats:input_type -> character_stats.v1.CharacterID
-	9,  // 9: character_stats.v1.CharacterStatsService.GetModifier:input_type -> character_stats.v1.GetModifierRequest
-	0,  // 10: character_stats.v1.CharacterStatsService.GetStatus:input_type -> character_stats.v1.CharacterID
-	3,  // 11: character_stats.v1.CharacterStatsService.CheckAbility:output_type -> character_stats.v1.CheckResponse
-	3,  // 12: character_stats.v1.CharacterStatsService.CheckSkill:output_type -> character_stats.v1.CheckResponse
-	5,  // 13: character_stats.v1.CharacterStatsService.SetAbilityScore:output_type -> character_stats.v1.SetAbilityResponse
-	5,  // 14: character_stats.v1.CharacterStatsService.SetAbilityBonus:output_type -> character_stats.v1.SetAbilityResponse
-	7,  // 15: character_stats.v1.CharacterStatsService.SetSkillBonus:output_type -> character_stats.v1.SetSkillBonusResponse
-	8,  // 16: character_stats.v1.CharacterStatsService.GetStats:output_type -> character_stats.v1.GetStatsResponse
-	10, // 17: character_stats.v1.CharacterStatsService.GetModifier:output_type -> character_stats.v1.GetModifierResponse
-	11, // 18: character_stats.v1.CharacterStatsService.GetStatus:output_type -> character_stats.v1.StatusResponse
+	10, // 9: character_stats.v1.CharacterStatsService.GetModifier:input_type -> character_stats.v1.GetModifierRequest
+	1,  // 10: character_stats.v1.CharacterStatsService.GetAbility:input_type -> character_stats.v1.AbilityRequest
+	4,  // 11: character_stats.v1.CharacterStatsService.CheckAbility:output_type -> character_stats.v1.CheckResponse
+	4,  // 12: character_stats.v1.CharacterStatsService.CheckSkill:output_type -> character_stats.v1.CheckResponse
+	6,  // 13: character_stats.v1.CharacterStatsService.SetAbilityScore:output_type -> character_stats.v1.SetAbilityResponse
+	6,  // 14: character_stats.v1.CharacterStatsService.SetAbilityBonus:output_type -> character_stats.v1.SetAbilityResponse
+	8,  // 15: character_stats.v1.CharacterStatsService.SetSkillBonus:output_type -> character_stats.v1.SetSkillBonusResponse
+	9,  // 16: character_stats.v1.CharacterStatsService.GetStats:output_type -> character_stats.v1.GetStatsResponse
+	11, // 17: character_stats.v1.CharacterStatsService.GetModifier:output_type -> character_stats.v1.GetModifierResponse
+	14, // 18: character_stats.v1.CharacterStatsService.GetAbility:output_type -> character.Ability
 	11, // [11:19] is the sub-list for method output_type
 	3,  // [3:11] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name

@@ -8,6 +8,7 @@ package character_stats
 
 import (
 	context "context"
+	character "github.com/alsadx/GM-Tool/character-service/gen/character"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -26,7 +27,7 @@ const (
 	CharacterStatsService_SetSkillBonus_FullMethodName   = "/character_stats.v1.CharacterStatsService/SetSkillBonus"
 	CharacterStatsService_GetStats_FullMethodName        = "/character_stats.v1.CharacterStatsService/GetStats"
 	CharacterStatsService_GetModifier_FullMethodName     = "/character_stats.v1.CharacterStatsService/GetModifier"
-	CharacterStatsService_GetStatus_FullMethodName       = "/character_stats.v1.CharacterStatsService/GetStatus"
+	CharacterStatsService_GetAbility_FullMethodName      = "/character_stats.v1.CharacterStatsService/GetAbility"
 )
 
 // CharacterStatsServiceClient is the client API for CharacterStatsService service.
@@ -34,9 +35,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CharacterStatsServiceClient interface {
 	// CheckAbility performs an ability check for a character
-	CheckAbility(ctx context.Context, in *CheckAbilityRequest, opts ...grpc.CallOption) (*CheckResponse, error)
+	CheckAbility(ctx context.Context, in *AbilityRequest, opts ...grpc.CallOption) (*CheckResponse, error)
 	// CheckSkill performs a skill check for a character
-	CheckSkill(ctx context.Context, in *CheckSkillRequest, opts ...grpc.CallOption) (*CheckResponse, error)
+	CheckSkill(ctx context.Context, in *SkillRequest, opts ...grpc.CallOption) (*CheckResponse, error)
 	// SetAbilityScore sets the base ability score
 	SetAbilityScore(ctx context.Context, in *SetAbilityRequest, opts ...grpc.CallOption) (*SetAbilityResponse, error)
 	// SetAbilityBonus sets the ability bonus
@@ -47,8 +48,7 @@ type CharacterStatsServiceClient interface {
 	GetStats(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*GetStatsResponse, error)
 	// GetModifier retrieves ability modifier
 	GetModifier(ctx context.Context, in *GetModifierRequest, opts ...grpc.CallOption) (*GetModifierResponse, error)
-	// GetStatus retrieves character status information
-	GetStatus(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*StatusResponse, error)
+	GetAbility(ctx context.Context, in *AbilityRequest, opts ...grpc.CallOption) (*character.Ability, error)
 }
 
 type characterStatsServiceClient struct {
@@ -59,7 +59,7 @@ func NewCharacterStatsServiceClient(cc grpc.ClientConnInterface) CharacterStatsS
 	return &characterStatsServiceClient{cc}
 }
 
-func (c *characterStatsServiceClient) CheckAbility(ctx context.Context, in *CheckAbilityRequest, opts ...grpc.CallOption) (*CheckResponse, error) {
+func (c *characterStatsServiceClient) CheckAbility(ctx context.Context, in *AbilityRequest, opts ...grpc.CallOption) (*CheckResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckResponse)
 	err := c.cc.Invoke(ctx, CharacterStatsService_CheckAbility_FullMethodName, in, out, cOpts...)
@@ -69,7 +69,7 @@ func (c *characterStatsServiceClient) CheckAbility(ctx context.Context, in *Chec
 	return out, nil
 }
 
-func (c *characterStatsServiceClient) CheckSkill(ctx context.Context, in *CheckSkillRequest, opts ...grpc.CallOption) (*CheckResponse, error) {
+func (c *characterStatsServiceClient) CheckSkill(ctx context.Context, in *SkillRequest, opts ...grpc.CallOption) (*CheckResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckResponse)
 	err := c.cc.Invoke(ctx, CharacterStatsService_CheckSkill_FullMethodName, in, out, cOpts...)
@@ -129,10 +129,10 @@ func (c *characterStatsServiceClient) GetModifier(ctx context.Context, in *GetMo
 	return out, nil
 }
 
-func (c *characterStatsServiceClient) GetStatus(ctx context.Context, in *CharacterID, opts ...grpc.CallOption) (*StatusResponse, error) {
+func (c *characterStatsServiceClient) GetAbility(ctx context.Context, in *AbilityRequest, opts ...grpc.CallOption) (*character.Ability, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StatusResponse)
-	err := c.cc.Invoke(ctx, CharacterStatsService_GetStatus_FullMethodName, in, out, cOpts...)
+	out := new(character.Ability)
+	err := c.cc.Invoke(ctx, CharacterStatsService_GetAbility_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +144,9 @@ func (c *characterStatsServiceClient) GetStatus(ctx context.Context, in *Charact
 // for forward compatibility.
 type CharacterStatsServiceServer interface {
 	// CheckAbility performs an ability check for a character
-	CheckAbility(context.Context, *CheckAbilityRequest) (*CheckResponse, error)
+	CheckAbility(context.Context, *AbilityRequest) (*CheckResponse, error)
 	// CheckSkill performs a skill check for a character
-	CheckSkill(context.Context, *CheckSkillRequest) (*CheckResponse, error)
+	CheckSkill(context.Context, *SkillRequest) (*CheckResponse, error)
 	// SetAbilityScore sets the base ability score
 	SetAbilityScore(context.Context, *SetAbilityRequest) (*SetAbilityResponse, error)
 	// SetAbilityBonus sets the ability bonus
@@ -157,8 +157,7 @@ type CharacterStatsServiceServer interface {
 	GetStats(context.Context, *CharacterID) (*GetStatsResponse, error)
 	// GetModifier retrieves ability modifier
 	GetModifier(context.Context, *GetModifierRequest) (*GetModifierResponse, error)
-	// GetStatus retrieves character status information
-	GetStatus(context.Context, *CharacterID) (*StatusResponse, error)
+	GetAbility(context.Context, *AbilityRequest) (*character.Ability, error)
 	mustEmbedUnimplementedCharacterStatsServiceServer()
 }
 
@@ -169,10 +168,10 @@ type CharacterStatsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCharacterStatsServiceServer struct{}
 
-func (UnimplementedCharacterStatsServiceServer) CheckAbility(context.Context, *CheckAbilityRequest) (*CheckResponse, error) {
+func (UnimplementedCharacterStatsServiceServer) CheckAbility(context.Context, *AbilityRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAbility not implemented")
 }
-func (UnimplementedCharacterStatsServiceServer) CheckSkill(context.Context, *CheckSkillRequest) (*CheckResponse, error) {
+func (UnimplementedCharacterStatsServiceServer) CheckSkill(context.Context, *SkillRequest) (*CheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckSkill not implemented")
 }
 func (UnimplementedCharacterStatsServiceServer) SetAbilityScore(context.Context, *SetAbilityRequest) (*SetAbilityResponse, error) {
@@ -190,8 +189,8 @@ func (UnimplementedCharacterStatsServiceServer) GetStats(context.Context, *Chara
 func (UnimplementedCharacterStatsServiceServer) GetModifier(context.Context, *GetModifierRequest) (*GetModifierResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetModifier not implemented")
 }
-func (UnimplementedCharacterStatsServiceServer) GetStatus(context.Context, *CharacterID) (*StatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
+func (UnimplementedCharacterStatsServiceServer) GetAbility(context.Context, *AbilityRequest) (*character.Ability, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAbility not implemented")
 }
 func (UnimplementedCharacterStatsServiceServer) mustEmbedUnimplementedCharacterStatsServiceServer() {}
 func (UnimplementedCharacterStatsServiceServer) testEmbeddedByValue()                               {}
@@ -215,7 +214,7 @@ func RegisterCharacterStatsServiceServer(s grpc.ServiceRegistrar, srv CharacterS
 }
 
 func _CharacterStatsService_CheckAbility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckAbilityRequest)
+	in := new(AbilityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -227,13 +226,13 @@ func _CharacterStatsService_CheckAbility_Handler(srv interface{}, ctx context.Co
 		FullMethod: CharacterStatsService_CheckAbility_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterStatsServiceServer).CheckAbility(ctx, req.(*CheckAbilityRequest))
+		return srv.(CharacterStatsServiceServer).CheckAbility(ctx, req.(*AbilityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _CharacterStatsService_CheckSkill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckSkillRequest)
+	in := new(SkillRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -245,7 +244,7 @@ func _CharacterStatsService_CheckSkill_Handler(srv interface{}, ctx context.Cont
 		FullMethod: CharacterStatsService_CheckSkill_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterStatsServiceServer).CheckSkill(ctx, req.(*CheckSkillRequest))
+		return srv.(CharacterStatsServiceServer).CheckSkill(ctx, req.(*SkillRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -340,20 +339,20 @@ func _CharacterStatsService_GetModifier_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CharacterStatsService_GetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CharacterID)
+func _CharacterStatsService_GetAbility_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbilityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CharacterStatsServiceServer).GetStatus(ctx, in)
+		return srv.(CharacterStatsServiceServer).GetAbility(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CharacterStatsService_GetStatus_FullMethodName,
+		FullMethod: CharacterStatsService_GetAbility_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CharacterStatsServiceServer).GetStatus(ctx, req.(*CharacterID))
+		return srv.(CharacterStatsServiceServer).GetAbility(ctx, req.(*AbilityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -394,8 +393,8 @@ var CharacterStatsService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CharacterStatsService_GetModifier_Handler,
 		},
 		{
-			MethodName: "GetStatus",
-			Handler:    _CharacterStatsService_GetStatus_Handler,
+			MethodName: "GetAbility",
+			Handler:    _CharacterStatsService_GetAbility_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
