@@ -30,9 +30,9 @@ func (ls *LevelSystem) WithCurrentExp(current_exp int) *LevelSystem {
 }
 
 func (ls *LevelSystem) WithCurrentLvl(current_lvl int) *LevelSystem {
-    current_lvl = min(max(current_lvl, 1), len(Thresholds))
-    ls.currentLevel = current_lvl
-    return ls
+	current_lvl = min(max(current_lvl, 1), len(Thresholds))
+	ls.currentLevel = current_lvl
+	return ls
 }
 
 func (ls *LevelSystem) WithNextThreshold(next_threshols int) *LevelSystem {
@@ -75,13 +75,12 @@ func (ls *LevelSystem) RemoveExp(amount int) {
 func (ls *LevelSystem) updateEarnedLevelDown() {
 	newEarnedLevel := 1
 
-    for i := range len(Thresholds) - 1 {
-        if ls.currentExp < Thresholds[i+1] {
-            break
-        }
-        newEarnedLevel = i + 1
-    }
-
+	for i := range len(Thresholds) - 1 {
+		if ls.currentExp < Thresholds[i+1] {
+			break
+		}
+		newEarnedLevel = i + 1
+	}
 
 	if newEarnedLevel != ls.earnedLevel {
 		ls.earnedLevel = newEarnedLevel
