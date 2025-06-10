@@ -11,21 +11,21 @@ service CharacterStatsService {
   // CheckAbility performs an ability check for a character
   rpc CheckAbility(AbilityRequest) returns (CheckResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/abilities/{ability}/check"
+      post: "/v1/characters/{id}/abilities/{ability}/check"
     };
   }
   
   // CheckSkill performs a skill check for a character
   rpc CheckSkill(SkillRequest) returns (CheckResponse) {
     option (google.api.http) = {
-      post: "/v1/characters/{character_id}/skills/{skill}/check"
+      post: "/v1/characters/{id}/skills/{skill}/check"
     };
   }
   
   // SetAbilityScore sets the base ability score
   rpc SetAbilityScore(SetAbilityRequest) returns (SetAbilityResponse) {
     option (google.api.http) = {
-      put: "/v1/characters/{character_id}/abilities/{ability_name}/score"
+      put: "/v1/characters/{id}/abilities/{ability_name}/score"
       body: "amount"
     };
   }
@@ -33,7 +33,7 @@ service CharacterStatsService {
   // SetAbilityBonus sets the ability bonus
   rpc SetAbilityBonus(SetAbilityRequest) returns (SetAbilityResponse) {
     option (google.api.http) = {
-      put: "/v1/characters/{character_id}/abilities/{ability_name}/bonus"
+      put: "/v1/characters/{id}/abilities/{ability_name}/bonus"
       body: "amount"
     };
   }
@@ -41,7 +41,7 @@ service CharacterStatsService {
   // SetSkillBonus sets the skill bonus
   rpc SetSkillBonus(SetSkillBonusRequest) returns (SetSkillBonusResponse) {
     option (google.api.http) = {
-      put: "/v1/characters/{character_id}/skills/{skill_name}/bonus"
+      put: "/v1/characters/{id}/skills/{skill_name}/bonus"
       body: "amount"
     };
   }
@@ -49,30 +49,30 @@ service CharacterStatsService {
   // GetStats retrieves all character stats
   rpc GetStats(CharacterID) returns (GetStatsResponse) {
     option (google.api.http) = {
-      get: "/v1/characters/{character_id}/stats"
+      get: "/v1/characters/{id}/stats"
     };
   }
   
   // GetModifier retrieves ability modifier
   rpc GetModifier(GetModifierRequest) returns (GetModifierResponse) {
     option (google.api.http) = {
-      get: "/v1/characters/{character_id}/abilities/{ability_name}/modifier"
+      get: "/v1/characters/{id}/abilities/{ability_name}/modifier"
     };
   }
 
   rpc GetAbility(AbilityRequest) returns (character.Ability) {
     option (google.api.http) = {
-      get: "/v1/characters/{character_id}/abilities/{ability_name}"
+      get: "/v1/characters/{id}/abilities/{ability_name}"
     };
   }
 }
 
 message CharacterID {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message AbilityRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   string ability = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -81,7 +81,7 @@ message AbilityResponse {
 }
 
 message SkillRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   string skill = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
@@ -92,7 +92,7 @@ message CheckResponse {
 }
 
 message SetAbilityRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   string ability_name = 2 [(google.api.field_behavior) = REQUIRED];
   int32 amount = 3 [(google.api.field_behavior) = REQUIRED];
 }
@@ -102,7 +102,7 @@ message SetAbilityResponse {
 }
 
 message SetSkillBonusRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   string skill_name = 2 [(google.api.field_behavior) = REQUIRED];
   int32 amount = 3 [(google.api.field_behavior) = REQUIRED];
 }
@@ -117,7 +117,7 @@ message GetStatsResponse {
 }
 
 message GetModifierRequest {
-  string character_id = 1 [(google.api.field_behavior) = REQUIRED];
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
   string ability_name = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
