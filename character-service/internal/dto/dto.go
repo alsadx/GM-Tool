@@ -386,3 +386,9 @@ type LvlStateDTO struct {
 	CurrentExp   int
 	ExpToNextLvl int
 }
+
+type DiceResultDTO struct {
+	DiceRes int
+	Bonus   int
+	result  int
+}
