@@ -270,7 +270,7 @@ func (x *CheckResponse) GetTotal() int32 {
 type SetAbilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AbilityName   string                 `protobuf:"bytes,2,opt,name=ability_name,json=abilityName,proto3" json:"ability_name,omitempty"`
+	Ability       string                 `protobuf:"bytes,2,opt,name=ability,proto3" json:"ability,omitempty"`
 	Amount        int32                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -313,9 +313,9 @@ func (x *SetAbilityRequest) GetId() string {
 	return ""
 }
 
-func (x *SetAbilityRequest) GetAbilityName() string {
+func (x *SetAbilityRequest) GetAbility() string {
 	if x != nil {
-		return x.AbilityName
+		return x.Ability
 	}
 	return ""
 }
@@ -374,7 +374,7 @@ func (x *SetAbilityResponse) GetScore() *character.Score {
 type SetSkillBonusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	SkillName     string                 `protobuf:"bytes,2,opt,name=skill_name,json=skillName,proto3" json:"skill_name,omitempty"`
+	Skill         string                 `protobuf:"bytes,2,opt,name=skill,proto3" json:"skill,omitempty"`
 	Amount        int32                  `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -417,9 +417,9 @@ func (x *SetSkillBonusRequest) GetId() string {
 	return ""
 }
 
-func (x *SetSkillBonusRequest) GetSkillName() string {
+func (x *SetSkillBonusRequest) GetSkill() string {
 	if x != nil {
-		return x.SkillName
+		return x.Skill
 	}
 	return ""
 }
@@ -433,7 +433,7 @@ func (x *SetSkillBonusRequest) GetAmount() int32 {
 
 type SetSkillBonusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SkillName     string                 `protobuf:"bytes,1,opt,name=skill_name,json=skillName,proto3" json:"skill_name,omitempty"`
+	Skill         string                 `protobuf:"bytes,1,opt,name=skill,proto3" json:"skill,omitempty"`
 	Bonus         int32                  `protobuf:"varint,2,opt,name=bonus,proto3" json:"bonus,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -469,9 +469,9 @@ func (*SetSkillBonusResponse) Descriptor() ([]byte, []int) {
 	return file_service_character_stats_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *SetSkillBonusResponse) GetSkillName() string {
+func (x *SetSkillBonusResponse) GetSkill() string {
 	if x != nil {
-		return x.SkillName
+		return x.Skill
 	}
 	return ""
 }
@@ -530,7 +530,7 @@ func (x *GetStatsResponse) GetStats() map[string]*character.Ability {
 type GetModifierRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	AbilityName   string                 `protobuf:"bytes,2,opt,name=ability_name,json=abilityName,proto3" json:"ability_name,omitempty"`
+	Ability       string                 `protobuf:"bytes,2,opt,name=ability,proto3" json:"ability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -572,16 +572,16 @@ func (x *GetModifierRequest) GetId() string {
 	return ""
 }
 
-func (x *GetModifierRequest) GetAbilityName() string {
+func (x *GetModifierRequest) GetAbility() string {
 	if x != nil {
-		return x.AbilityName
+		return x.Ability
 	}
 	return ""
 }
 
 type GetModifierResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AbilityName   string                 `protobuf:"bytes,1,opt,name=ability_name,json=abilityName,proto3" json:"ability_name,omitempty"`
+	Ability       string                 `protobuf:"bytes,1,opt,name=ability,proto3" json:"ability,omitempty"`
 	Modifier      int32                  `protobuf:"varint,2,opt,name=modifier,proto3" json:"modifier,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -617,9 +617,9 @@ func (*GetModifierResponse) Descriptor() ([]byte, []int) {
 	return file_service_character_stats_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *GetModifierResponse) GetAbilityName() string {
+func (x *GetModifierResponse) GetAbility() string {
 	if x != nil {
-		return x.AbilityName
+		return x.Ability
 	}
 	return ""
 }
@@ -649,45 +649,43 @@ const file_service_character_stats_proto_rawDesc = "" +
 	"\vdice_result\x18\x01 \x01(\x05R\n" +
 	"diceResult\x12\x14\n" +
 	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\x12\x14\n" +
-	"\x05total\x18\x03 \x01(\x05R\x05total\"m\n" +
+	"\x05total\x18\x03 \x01(\x05R\x05total\"d\n" +
 	"\x11SetAbilityRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12&\n" +
-	"\fability_name\x18\x02 \x01(\tB\x03\xe0A\x02R\vabilityName\x12\x1b\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x1d\n" +
+	"\aability\x18\x02 \x01(\tB\x03\xe0A\x02R\aability\x12\x1b\n" +
 	"\x06amount\x18\x03 \x01(\x05B\x03\xe0A\x02R\x06amount\"<\n" +
 	"\x12SetAbilityResponse\x12&\n" +
-	"\x05score\x18\x01 \x01(\v2\x10.character.ScoreR\x05score\"l\n" +
+	"\x05score\x18\x01 \x01(\v2\x10.character.ScoreR\x05score\"c\n" +
 	"\x14SetSkillBonusRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\"\n" +
-	"\n" +
-	"skill_name\x18\x02 \x01(\tB\x03\xe0A\x02R\tskillName\x12\x1b\n" +
-	"\x06amount\x18\x03 \x01(\x05B\x03\xe0A\x02R\x06amount\"L\n" +
-	"\x15SetSkillBonusResponse\x12\x1d\n" +
-	"\n" +
-	"skill_name\x18\x01 \x01(\tR\tskillName\x12\x14\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x19\n" +
+	"\x05skill\x18\x02 \x01(\tB\x03\xe0A\x02R\x05skill\x12\x1b\n" +
+	"\x06amount\x18\x03 \x01(\x05B\x03\xe0A\x02R\x06amount\"C\n" +
+	"\x15SetSkillBonusResponse\x12\x14\n" +
+	"\x05skill\x18\x01 \x01(\tR\x05skill\x12\x14\n" +
 	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\"\xa7\x01\n" +
 	"\x10GetStatsResponse\x12E\n" +
 	"\x05stats\x18\x01 \x03(\v2/.character_stats.v1.GetStatsResponse.StatsEntryR\x05stats\x1aL\n" +
 	"\n" +
 	"StatsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12(\n" +
-	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01\"Q\n" +
+	"\x05value\x18\x02 \x01(\v2\x12.character.AbilityR\x05value:\x028\x01\"H\n" +
 	"\x12GetModifierRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12&\n" +
-	"\fability_name\x18\x02 \x01(\tB\x03\xe0A\x02R\vabilityName\"T\n" +
-	"\x13GetModifierResponse\x12!\n" +
-	"\fability_name\x18\x01 \x01(\tR\vabilityName\x12\x1a\n" +
-	"\bmodifier\x18\x02 \x01(\x05R\bmodifier2\xb2\t\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12\x1d\n" +
+	"\aability\x18\x02 \x01(\tB\x03\xe0A\x02R\aability\"K\n" +
+	"\x13GetModifierResponse\x12\x18\n" +
+	"\aability\x18\x01 \x01(\tR\aability\x12\x1a\n" +
+	"\bmodifier\x18\x02 \x01(\x05R\bmodifier2\x99\t\n" +
 	"\x15CharacterStatsService\x12\x8c\x01\n" +
 	"\fCheckAbility\x12\".character_stats.v1.AbilityRequest\x1a!.character_stats.v1.CheckResponse\"5\x82\xd3\xe4\x93\x02/\"-/v1/characters/{id}/abilities/{ability}/check\x12\x83\x01\n" +
 	"\n" +
-	"CheckSkill\x12 .character_stats.v1.SkillRequest\x1a!.character_stats.v1.CheckResponse\"0\x82\xd3\xe4\x93\x02*\"(/v1/characters/{id}/skills/{skill}/check\x12\xa4\x01\n" +
-	"\x0fSetAbilityScore\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"B\x82\xd3\xe4\x93\x02<:\x06amount\x1a2/v1/characters/{id}/abilities/{ability_name}/score\x12\xa4\x01\n" +
-	"\x0fSetAbilityBonus\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"B\x82\xd3\xe4\x93\x02<:\x06amount\x1a2/v1/characters/{id}/abilities/{ability_name}/bonus\x12\xa3\x01\n" +
-	"\rSetSkillBonus\x12(.character_stats.v1.SetSkillBonusRequest\x1a).character_stats.v1.SetSkillBonusResponse\"=\x82\xd3\xe4\x93\x027:\x06amount\x1a-/v1/characters/{id}/skills/{skill_name}/bonus\x12t\n" +
-	"\bGetStats\x12\x1f.character_stats.v1.CharacterID\x1a$.character_stats.v1.GetStatsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/characters/{id}/stats\x12\x9d\x01\n" +
-	"\vGetModifier\x12&.character_stats.v1.GetModifierRequest\x1a'.character_stats.v1.GetModifierResponse\"=\x82\xd3\xe4\x93\x027\x125/v1/characters/{id}/abilities/{ability_name}/modifier\x12z\n" +
+	"CheckSkill\x12 .character_stats.v1.SkillRequest\x1a!.character_stats.v1.CheckResponse\"0\x82\xd3\xe4\x93\x02*\"(/v1/characters/{id}/skills/{skill}/check\x12\x9f\x01\n" +
+	"\x0fSetAbilityScore\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"=\x82\xd3\xe4\x93\x027:\x06amount\x1a-/v1/characters/{id}/abilities/{ability}/score\x12\x9f\x01\n" +
+	"\x0fSetAbilityBonus\x12%.character_stats.v1.SetAbilityRequest\x1a&.character_stats.v1.SetAbilityResponse\"=\x82\xd3\xe4\x93\x027:\x06amount\x1a-/v1/characters/{id}/abilities/{ability}/bonus\x12\x9e\x01\n" +
+	"\rSetSkillBonus\x12(.character_stats.v1.SetSkillBonusRequest\x1a).character_stats.v1.SetSkillBonusResponse\"8\x82\xd3\xe4\x93\x022:\x06amount\x1a(/v1/characters/{id}/skills/{skill}/bonus\x12t\n" +
+	"\bGetStats\x12\x1f.character_stats.v1.CharacterID\x1a$.character_stats.v1.GetStatsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/characters/{id}/stats\x12\x98\x01\n" +
+	"\vGetModifier\x12&.character_stats.v1.GetModifierRequest\x1a'.character_stats.v1.GetModifierResponse\"8\x82\xd3\xe4\x93\x022\x120/v1/characters/{id}/abilities/{ability}/modifier\x12u\n" +
 	"\n" +
-	"GetAbility\x12\".character_stats.v1.AbilityRequest\x1a\x12.character.Ability\"4\x82\xd3\xe4\x93\x02.\x12,/v1/characters/{id}/abilities/{ability_name}BIZGgithub.com/alsadx/GM-Tool/character-service/gen/service/character-statsb\x06proto3"
+	"GetAbility\x12\".character_stats.v1.AbilityRequest\x1a\x12.character.Ability\"/\x82\xd3\xe4\x93\x02)\x12'/v1/characters/{id}/abilities/{ability}BIZGgithub.com/alsadx/GM-Tool/character-service/gen/service/character-statsb\x06proto3"
 
 var (
 	file_service_character_stats_proto_rawDescOnce sync.Once
