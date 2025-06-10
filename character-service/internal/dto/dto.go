@@ -390,5 +390,5 @@ type LvlStateDTO struct {
 type DiceResultDTO struct {
 	DiceRes int
 	Bonus   int
-	result  int
+	Result  int
 }
