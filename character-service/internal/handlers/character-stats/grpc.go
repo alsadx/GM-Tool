@@ -24,7 +24,7 @@ type Handler struct {
 func New(ctrl *stats_controller.Controller) *Handler {
 	return &Handler{
 		ctrl:   ctrl,
-		logger: zap.L().Named("progress_handler"),
+		logger: zap.L().Named("stats_handler"),
 	}
 }
 
@@ -88,7 +88,7 @@ func (h *Handler) SetAbilityScore(ctx context.Context, req *character_stats.SetA
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("amount = %d must be greater than or equal 0", req.Amount))
 	}
 
-	abilityType, err := types.ParseAbilityType(req.AbilityName)
+	abilityType, err := types.ParseAbilityType(req.Ability)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "Incorrect name for the ability")
 	}
@@ -115,7 +115,7 @@ func (h *Handler) SetAbilityBonus(ctx context.Context, req *character_stats.SetA
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("amount = %d must be greater than or equal 0", req.Amount))
 	}
 
-	abilityType, err := types.ParseAbilityType(req.AbilityName)
+	abilityType, err := types.ParseAbilityType(req.Ability)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "Incorrect name for the ability")
 	}
@@ -142,7 +142,7 @@ func (h *Handler) SetSkillBonus(ctx context.Context, req *character_stats.SetSki
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("amount = %d must be greater than or equal 0", req.Amount))
 	}
 
-	skillType, err := types.ParseSkillType(req.SkillName)
+	skillType, err := types.ParseSkillType(req.Skill)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "Incorrect name for the skill")
 	}
@@ -157,7 +157,7 @@ func (h *Handler) SetSkillBonus(ctx context.Context, req *character_stats.SetSki
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &character_stats.SetSkillBonusResponse{
-		SkillName: req.SkillName,
+		Skill: req.Skill,
 		Bonus: int32(skillDto.Bonus),
 	}, nil
 }
@@ -181,7 +181,7 @@ func (h *Handler) GetStats(ctx context.Context, req *character_stats.CharacterID
 	}, nil
 }
 
-func (h *Handler) GetModifier(ctx context.Context, req *character_stats.AbilityRequest) (*character_stats.GetModifierResponse, error) {
+func (h *Handler) GetModifier(ctx context.Context, req *character_stats.GetModifierRequest) (*character_stats.GetModifierResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -201,7 +201,7 @@ func (h *Handler) GetModifier(ctx context.Context, req *character_stats.AbilityR
 	
 
 	return &character_stats.GetModifierResponse{
-		AbilityName: req.Ability,
+		Ability: req.Ability,
 		Modifier: int32(mod),
 	}, nil
 }
