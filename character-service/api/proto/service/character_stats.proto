@@ -9,14 +9,14 @@ import "google/api/field_behavior.proto";
 
 service CharacterStatsService {
   // CheckAbility performs an ability check for a character
-  rpc CheckAbility(CheckAbilityRequest) returns (CheckResponse) {
+  rpc CheckAbility(AbilityRequest) returns (CheckResponse) {
     option (google.api.http) = {
       post: "/v1/characters/{character_id}/abilities/{ability}/check"
     };
   }
   
   // CheckSkill performs a skill check for a character
-  rpc CheckSkill(CheckSkillRequest) returns (CheckResponse) {
+  rpc CheckSkill(SkillRequest) returns (CheckResponse) {
     option (google.api.http) = {
       post: "/v1/characters/{character_id}/skills/{skill}/check"
     };
@@ -59,18 +59,28 @@ service CharacterStatsService {
       get: "/v1/characters/{character_id}/abilities/{ability_name}/modifier"
     };
   }
+
+  rpc GetAbility(AbilityRequest) returns (character.Ability) {
+    option (google.api.http) = {
+      get: "/v1/characters/{character_id}/abilities/{ability_name}"
+    };
+  }
 }
 
 message CharacterID {
   string character_id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
-message CheckAbilityRequest {
+message AbilityRequest {
   string character_id = 1 [(google.api.field_behavior) = REQUIRED];
   string ability = 2 [(google.api.field_behavior) = REQUIRED];
 }
 
-message CheckSkillRequest {
+message AbilityResponse {
+  
+}
+
+message SkillRequest {
   string character_id = 1 [(google.api.field_behavior) = REQUIRED];
   string skill = 2 [(google.api.field_behavior) = REQUIRED];
 }
