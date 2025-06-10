@@ -392,3 +392,7 @@ type DiceResultDTO struct {
 	Bonus   int
 	Result  int
 }
+
+type StatsDTO struct {
+	Stats map[types.AbilityType]*AbilityDTO
+}
