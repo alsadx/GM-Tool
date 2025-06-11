@@ -37,7 +37,7 @@ type CharacterHitDiceServiceClient interface {
 	// RemoveHitDice removes hit dice of specified type from a character
 	RemoveHitDice(ctx context.Context, in *HitDiceRequest, opts ...grpc.CallOption) (*HitDiceResponse, error)
 	// RollHitDice rolls specified hit dice and returns the result
-	RollHitDice(ctx context.Context, in *HitDiceMapRequest, opts ...grpc.CallOption) (*HitDiceResponse, error)
+	RollHitDice(ctx context.Context, in *HitDiceMapRequest, opts ...grpc.CallOption) (*RollHitDiceResponse, error)
 	// ResetHitDice resets all hit dice to maximum for the character
 	ResetHitDice(ctx context.Context, in *HitDiceMapRequest, opts ...grpc.CallOption) (*HitDiceResponse, error)
 }
@@ -80,9 +80,9 @@ func (c *characterHitDiceServiceClient) RemoveHitDice(ctx context.Context, in *H
 	return out, nil
 }
 
-func (c *characterHitDiceServiceClient) RollHitDice(ctx context.Context, in *HitDiceMapRequest, opts ...grpc.CallOption) (*HitDiceResponse, error) {
+func (c *characterHitDiceServiceClient) RollHitDice(ctx context.Context, in *HitDiceMapRequest, opts ...grpc.CallOption) (*RollHitDiceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HitDiceResponse)
+	out := new(RollHitDiceResponse)
 	err := c.cc.Invoke(ctx, CharacterHitDiceService_RollHitDice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ type CharacterHitDiceServiceServer interface {
 	// RemoveHitDice removes hit dice of specified type from a character
 	RemoveHitDice(context.Context, *HitDiceRequest) (*HitDiceResponse, error)
 	// RollHitDice rolls specified hit dice and returns the result
-	RollHitDice(context.Context, *HitDiceMapRequest) (*HitDiceResponse, error)
+	RollHitDice(context.Context, *HitDiceMapRequest) (*RollHitDiceResponse, error)
 	// ResetHitDice resets all hit dice to maximum for the character
 	ResetHitDice(context.Context, *HitDiceMapRequest) (*HitDiceResponse, error)
 	mustEmbedUnimplementedCharacterHitDiceServiceServer()
@@ -133,7 +133,7 @@ func (UnimplementedCharacterHitDiceServiceServer) AddHitDice(context.Context, *H
 func (UnimplementedCharacterHitDiceServiceServer) RemoveHitDice(context.Context, *HitDiceRequest) (*HitDiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveHitDice not implemented")
 }
-func (UnimplementedCharacterHitDiceServiceServer) RollHitDice(context.Context, *HitDiceMapRequest) (*HitDiceResponse, error) {
+func (UnimplementedCharacterHitDiceServiceServer) RollHitDice(context.Context, *HitDiceMapRequest) (*RollHitDiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollHitDice not implemented")
 }
 func (UnimplementedCharacterHitDiceServiceServer) ResetHitDice(context.Context, *HitDiceMapRequest) (*HitDiceResponse, error) {

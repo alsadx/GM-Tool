@@ -32,7 +32,7 @@ service CharacterHitDiceService {
   }
 
   // RollHitDice rolls specified hit dice and returns the result
-  rpc RollHitDice(HitDiceMapRequest) returns (HitDiceResponse) {
+  rpc RollHitDice(HitDiceMapRequest) returns (RollHitDiceResponse) {
     option (google.api.http) = {
       post: "/v1/characters/{id}/hitdice/roll"
       body: "amount_dice"
@@ -64,4 +64,10 @@ message HitDiceMapRequest {
 
 message HitDiceResponse {
   map<int32, character.Amount> hit_dice = 1;
+}
+
+message RollHitDiceResponse {
+  repeated int32 results = 1;
+  int32 bonus = 2;
+  map<int32, character.Amount> hit_dice = 3;
 }

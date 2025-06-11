@@ -25,7 +25,7 @@ const (
 
 type CharacterID struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -60,16 +60,16 @@ func (*CharacterID) Descriptor() ([]byte, []int) {
 	return file_service_character_hitdice_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CharacterID) GetCharacterId() string {
+func (x *CharacterID) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
 
 type HitDiceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	DiceType      int32                  `protobuf:"varint,2,opt,name=dice_type,json=diceType,proto3" json:"dice_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -105,9 +105,9 @@ func (*HitDiceRequest) Descriptor() ([]byte, []int) {
 	return file_service_character_hitdice_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *HitDiceRequest) GetCharacterId() string {
+func (x *HitDiceRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -121,7 +121,7 @@ func (x *HitDiceRequest) GetDiceType() int32 {
 
 type HitDiceMapRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CharacterId   string                 `protobuf:"bytes,1,opt,name=character_id,json=characterId,proto3" json:"character_id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	AmountDice    map[int32]int32        `protobuf:"bytes,2,rep,name=amount_dice,json=amountDice,proto3" json:"amount_dice,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -157,9 +157,9 @@ func (*HitDiceMapRequest) Descriptor() ([]byte, []int) {
 	return file_service_character_hitdice_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *HitDiceMapRequest) GetCharacterId() string {
+func (x *HitDiceMapRequest) GetId() string {
 	if x != nil {
-		return x.CharacterId
+		return x.Id
 	}
 	return ""
 }
@@ -215,18 +215,78 @@ func (x *HitDiceResponse) GetHitDice() map[int32]*character.Amount {
 	return nil
 }
 
+type RollHitDiceResponse struct {
+	state         protoimpl.MessageState      `protogen:"open.v1"`
+	Results       []int32                     `protobuf:"varint,1,rep,packed,name=results,proto3" json:"results,omitempty"`
+	Bonus         int32                       `protobuf:"varint,2,opt,name=bonus,proto3" json:"bonus,omitempty"`
+	HitDice       map[int32]*character.Amount `protobuf:"bytes,3,rep,name=hit_dice,json=hitDice,proto3" json:"hit_dice,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RollHitDiceResponse) Reset() {
+	*x = RollHitDiceResponse{}
+	mi := &file_service_character_hitdice_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RollHitDiceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RollHitDiceResponse) ProtoMessage() {}
+
+func (x *RollHitDiceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_service_character_hitdice_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RollHitDiceResponse.ProtoReflect.Descriptor instead.
+func (*RollHitDiceResponse) Descriptor() ([]byte, []int) {
+	return file_service_character_hitdice_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *RollHitDiceResponse) GetResults() []int32 {
+	if x != nil {
+		return x.Results
+	}
+	return nil
+}
+
+func (x *RollHitDiceResponse) GetBonus() int32 {
+	if x != nil {
+		return x.Bonus
+	}
+	return 0
+}
+
+func (x *RollHitDiceResponse) GetHitDice() map[int32]*character.Amount {
+	if x != nil {
+		return x.HitDice
+	}
+	return nil
+}
+
 var File_service_character_hitdice_proto protoreflect.FileDescriptor
 
 const file_service_character_hitdice_proto_rawDesc = "" +
 	"\n" +
-	"\x1fservice/character_hitdice.proto\x12\x14character_hitdice.v1\x1a\x0fcharacter.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"5\n" +
-	"\vCharacterID\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\"Z\n" +
-	"\x0eHitDiceRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12 \n" +
-	"\tdice_type\x18\x02 \x01(\x05B\x03\xe0A\x02R\bdiceType\"\xd4\x01\n" +
-	"\x11HitDiceMapRequest\x12&\n" +
-	"\fcharacter_id\x18\x01 \x01(\tB\x03\xe0A\x02R\vcharacterId\x12X\n" +
+	"\x1fservice/character_hitdice.proto\x12\x14character_hitdice.v1\x1a\x0fcharacter.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\"\"\n" +
+	"\vCharacterID\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\"G\n" +
+	"\x0eHitDiceRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12 \n" +
+	"\tdice_type\x18\x02 \x01(\x05B\x03\xe0A\x02R\bdiceType\"\xc1\x01\n" +
+	"\x11HitDiceMapRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tB\x03\xe0A\x02R\x02id\x12X\n" +
 	"\vamount_dice\x18\x02 \x03(\v27.character_hitdice.v1.HitDiceMapRequest.AmountDiceEntryR\n" +
 	"amountDice\x1a=\n" +
 	"\x0fAmountDiceEntry\x12\x10\n" +
@@ -236,15 +296,22 @@ const file_service_character_hitdice_proto_rawDesc = "" +
 	"\bhit_dice\x18\x01 \x03(\v22.character_hitdice.v1.HitDiceResponse.HitDiceEntryR\ahitDice\x1aM\n" +
 	"\fHitDiceEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12'\n" +
-	"\x05value\x18\x02 \x01(\v2\x11.character.AmountR\x05value:\x028\x012\x95\x06\n" +
-	"\x17CharacterHitDiceService\x12\x85\x01\n" +
+	"\x05value\x18\x02 \x01(\v2\x11.character.AmountR\x05value:\x028\x01\"\xe7\x01\n" +
+	"\x13RollHitDiceResponse\x12\x18\n" +
+	"\aresults\x18\x01 \x03(\x05R\aresults\x12\x14\n" +
+	"\x05bonus\x18\x02 \x01(\x05R\x05bonus\x12Q\n" +
+	"\bhit_dice\x18\x03 \x03(\v26.character_hitdice.v1.RollHitDiceResponse.HitDiceEntryR\ahitDice\x1aM\n" +
+	"\fHitDiceEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\x05R\x03key\x12'\n" +
+	"\x05value\x18\x02 \x01(\v2\x11.character.AmountR\x05value:\x028\x012\xe6\x05\n" +
+	"\x17CharacterHitDiceService\x12{\n" +
 	"\n" +
-	"GetHitDice\x12!.character_hitdice.v1.CharacterID\x1a%.character_hitdice.v1.HitDiceResponse\"-\x82\xd3\xe4\x93\x02'\x12%/v1/characters/{character_id}/hitdice\x12\x97\x01\n" +
+	"GetHitDice\x12!.character_hitdice.v1.CharacterID\x1a%.character_hitdice.v1.HitDiceResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/characters/{id}/hitdice\x12\x8d\x01\n" +
 	"\n" +
-	"AddHitDice\x12$.character_hitdice.v1.HitDiceRequest\x1a%.character_hitdice.v1.HitDiceResponse\"<\x82\xd3\xe4\x93\x026:\tdice_type\")/v1/characters/{character_id}/hitdice/add\x12\x9d\x01\n" +
-	"\rRemoveHitDice\x12$.character_hitdice.v1.HitDiceRequest\x1a%.character_hitdice.v1.HitDiceResponse\"?\x82\xd3\xe4\x93\x029:\tdice_type\",/v1/characters/{character_id}/hitdice/remove\x12\x9e\x01\n" +
-	"\vRollHitDice\x12'.character_hitdice.v1.HitDiceMapRequest\x1a%.character_hitdice.v1.HitDiceResponse\"?\x82\xd3\xe4\x93\x029:\vamount_dice\"*/v1/characters/{character_id}/hitdice/roll\x12\x96\x01\n" +
-	"\fResetHitDice\x12'.character_hitdice.v1.HitDiceMapRequest\x1a%.character_hitdice.v1.HitDiceResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/v1/characters/{character_id}/hitdice/resetBKZIgithub.com/alsadx/GM-Tool/character-service/gen/service/character-hitdiceb\x06proto3"
+	"AddHitDice\x12$.character_hitdice.v1.HitDiceRequest\x1a%.character_hitdice.v1.HitDiceResponse\"2\x82\xd3\xe4\x93\x02,:\tdice_type\"\x1f/v1/characters/{id}/hitdice/add\x12\x93\x01\n" +
+	"\rRemoveHitDice\x12$.character_hitdice.v1.HitDiceRequest\x1a%.character_hitdice.v1.HitDiceResponse\"5\x82\xd3\xe4\x93\x02/:\tdice_type\"\"/v1/characters/{id}/hitdice/remove\x12\x98\x01\n" +
+	"\vRollHitDice\x12'.character_hitdice.v1.HitDiceMapRequest\x1a).character_hitdice.v1.RollHitDiceResponse\"5\x82\xd3\xe4\x93\x02/:\vamount_dice\" /v1/characters/{id}/hitdice/roll\x12\x8c\x01\n" +
+	"\fResetHitDice\x12'.character_hitdice.v1.HitDiceMapRequest\x1a%.character_hitdice.v1.HitDiceResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/v1/characters/{id}/hitdice/resetBKZIgithub.com/alsadx/GM-Tool/character-service/gen/service/character-hitdiceb\x06proto3"
 
 var (
 	file_service_character_hitdice_proto_rawDescOnce sync.Once
@@ -258,35 +325,39 @@ func file_service_character_hitdice_proto_rawDescGZIP() []byte {
 	return file_service_character_hitdice_proto_rawDescData
 }
 
-var file_service_character_hitdice_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_service_character_hitdice_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_service_character_hitdice_proto_goTypes = []any{
-	(*CharacterID)(nil),       // 0: character_hitdice.v1.CharacterID
-	(*HitDiceRequest)(nil),    // 1: character_hitdice.v1.HitDiceRequest
-	(*HitDiceMapRequest)(nil), // 2: character_hitdice.v1.HitDiceMapRequest
-	(*HitDiceResponse)(nil),   // 3: character_hitdice.v1.HitDiceResponse
-	nil,                       // 4: character_hitdice.v1.HitDiceMapRequest.AmountDiceEntry
-	nil,                       // 5: character_hitdice.v1.HitDiceResponse.HitDiceEntry
-	(*character.Amount)(nil),  // 6: character.Amount
+	(*CharacterID)(nil),         // 0: character_hitdice.v1.CharacterID
+	(*HitDiceRequest)(nil),      // 1: character_hitdice.v1.HitDiceRequest
+	(*HitDiceMapRequest)(nil),   // 2: character_hitdice.v1.HitDiceMapRequest
+	(*HitDiceResponse)(nil),     // 3: character_hitdice.v1.HitDiceResponse
+	(*RollHitDiceResponse)(nil), // 4: character_hitdice.v1.RollHitDiceResponse
+	nil,                         // 5: character_hitdice.v1.HitDiceMapRequest.AmountDiceEntry
+	nil,                         // 6: character_hitdice.v1.HitDiceResponse.HitDiceEntry
+	nil,                         // 7: character_hitdice.v1.RollHitDiceResponse.HitDiceEntry
+	(*character.Amount)(nil),    // 8: character.Amount
 }
 var file_service_character_hitdice_proto_depIdxs = []int32{
-	4, // 0: character_hitdice.v1.HitDiceMapRequest.amount_dice:type_name -> character_hitdice.v1.HitDiceMapRequest.AmountDiceEntry
-	5, // 1: character_hitdice.v1.HitDiceResponse.hit_dice:type_name -> character_hitdice.v1.HitDiceResponse.HitDiceEntry
-	6, // 2: character_hitdice.v1.HitDiceResponse.HitDiceEntry.value:type_name -> character.Amount
-	0, // 3: character_hitdice.v1.CharacterHitDiceService.GetHitDice:input_type -> character_hitdice.v1.CharacterID
-	1, // 4: character_hitdice.v1.CharacterHitDiceService.AddHitDice:input_type -> character_hitdice.v1.HitDiceRequest
-	1, // 5: character_hitdice.v1.CharacterHitDiceService.RemoveHitDice:input_type -> character_hitdice.v1.HitDiceRequest
-	2, // 6: character_hitdice.v1.CharacterHitDiceService.RollHitDice:input_type -> character_hitdice.v1.HitDiceMapRequest
-	2, // 7: character_hitdice.v1.CharacterHitDiceService.ResetHitDice:input_type -> character_hitdice.v1.HitDiceMapRequest
-	3, // 8: character_hitdice.v1.CharacterHitDiceService.GetHitDice:output_type -> character_hitdice.v1.HitDiceResponse
-	3, // 9: character_hitdice.v1.CharacterHitDiceService.AddHitDice:output_type -> character_hitdice.v1.HitDiceResponse
-	3, // 10: character_hitdice.v1.CharacterHitDiceService.RemoveHitDice:output_type -> character_hitdice.v1.HitDiceResponse
-	3, // 11: character_hitdice.v1.CharacterHitDiceService.RollHitDice:output_type -> character_hitdice.v1.HitDiceResponse
-	3, // 12: character_hitdice.v1.CharacterHitDiceService.ResetHitDice:output_type -> character_hitdice.v1.HitDiceResponse
-	8, // [8:13] is the sub-list for method output_type
-	3, // [3:8] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	5,  // 0: character_hitdice.v1.HitDiceMapRequest.amount_dice:type_name -> character_hitdice.v1.HitDiceMapRequest.AmountDiceEntry
+	6,  // 1: character_hitdice.v1.HitDiceResponse.hit_dice:type_name -> character_hitdice.v1.HitDiceResponse.HitDiceEntry
+	7,  // 2: character_hitdice.v1.RollHitDiceResponse.hit_dice:type_name -> character_hitdice.v1.RollHitDiceResponse.HitDiceEntry
+	8,  // 3: character_hitdice.v1.HitDiceResponse.HitDiceEntry.value:type_name -> character.Amount
+	8,  // 4: character_hitdice.v1.RollHitDiceResponse.HitDiceEntry.value:type_name -> character.Amount
+	0,  // 5: character_hitdice.v1.CharacterHitDiceService.GetHitDice:input_type -> character_hitdice.v1.CharacterID
+	1,  // 6: character_hitdice.v1.CharacterHitDiceService.AddHitDice:input_type -> character_hitdice.v1.HitDiceRequest
+	1,  // 7: character_hitdice.v1.CharacterHitDiceService.RemoveHitDice:input_type -> character_hitdice.v1.HitDiceRequest
+	2,  // 8: character_hitdice.v1.CharacterHitDiceService.RollHitDice:input_type -> character_hitdice.v1.HitDiceMapRequest
+	2,  // 9: character_hitdice.v1.CharacterHitDiceService.ResetHitDice:input_type -> character_hitdice.v1.HitDiceMapRequest
+	3,  // 10: character_hitdice.v1.CharacterHitDiceService.GetHitDice:output_type -> character_hitdice.v1.HitDiceResponse
+	3,  // 11: character_hitdice.v1.CharacterHitDiceService.AddHitDice:output_type -> character_hitdice.v1.HitDiceResponse
+	3,  // 12: character_hitdice.v1.CharacterHitDiceService.RemoveHitDice:output_type -> character_hitdice.v1.HitDiceResponse
+	4,  // 13: character_hitdice.v1.CharacterHitDiceService.RollHitDice:output_type -> character_hitdice.v1.RollHitDiceResponse
+	3,  // 14: character_hitdice.v1.CharacterHitDiceService.ResetHitDice:output_type -> character_hitdice.v1.HitDiceResponse
+	10, // [10:15] is the sub-list for method output_type
+	5,  // [5:10] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_service_character_hitdice_proto_init() }
@@ -300,7 +371,7 @@ func file_service_character_hitdice_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_service_character_hitdice_proto_rawDesc), len(file_service_character_hitdice_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
