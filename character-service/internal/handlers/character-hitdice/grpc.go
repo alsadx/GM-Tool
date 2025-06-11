@@ -27,7 +27,7 @@ func New(ctrl *hitdice_controller.Controller) *Handler {
 	}
 }
 
-func (h *Handler) GetHidDice(ctx context.Context, req *character_hitdice.CharacterID) (*character_hitdice.HitDiceResponse, error) {
+func (h *Handler) GetHitDice(ctx context.Context, req *character_hitdice.CharacterID) (*character_hitdice.HitDiceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "nil req")
 	}
@@ -100,7 +100,7 @@ func (h *Handler) RollHitDice(ctx context.Context, req *character_hitdice.HitDic
 	rollHitDiceDto, err := h.ctrl.RollHitDice(ctx, req.Id, rollingDice)
 	if errors.Is(err, repository.ErrCharacterNotFound) {
 		return nil, status.Error(codes.NotFound, err.Error())
-	} else if errors.Is(err, health.ErrWrongTypeHitDice) {
+	} else if errors.Is(err, health.ErrWrongTypeHitDice) || errors.Is(err, health.ErrNoHitDiceAvailable) {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	} else if err != nil {
 		h.logger.Error("failed to remove hit dice")
@@ -127,7 +127,7 @@ func (h *Handler) ResetHitDice(ctx context.Context, req *character_hitdice.HitDi
 	healthDto, err := h.ctrl.ResetHitDice(ctx, req.Id, rollingDice)
 	if errors.Is(err, repository.ErrCharacterNotFound) {
 		return nil, status.Error(codes.NotFound, err.Error())
-	} else if errors.Is(err, health.ErrWrongTypeHitDice) {
+	} else if errors.Is(err, health.ErrWrongTypeHitDice) || errors.Is(err, health.ErrCantResetHitDice) {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	} else if err != nil {
 		h.logger.Error("failed to remove hit dice")
