@@ -392,3 +392,9 @@ type DiceResultDTO struct {
 	Bonus   int
 	Result  int
 }
+
+type RollHitDiceResultDTO struct {
+	Result []int32
+	Bonus  int32
+	Health *HealthDTO
+}
