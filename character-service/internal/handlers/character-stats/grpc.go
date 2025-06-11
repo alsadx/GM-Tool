@@ -49,8 +49,8 @@ func (h *Handler) CheckAbility(ctx context.Context, req *character_stats.Ability
 
 	return &character_stats.CheckResponse{
 		DiceResult: int32(diceResult.DiceRes),
-		Bonus: int32(diceResult.Bonus),
-		Total: int32(diceResult.Result),
+		Bonus:      int32(diceResult.Bonus),
+		Total:      int32(diceResult.Result),
 	}, nil
 }
 
@@ -75,8 +75,8 @@ func (h *Handler) CheckSkill(ctx context.Context, req *character_stats.SkillRequ
 
 	return &character_stats.CheckResponse{
 		DiceResult: int32(diceResult.DiceRes),
-		Bonus: int32(diceResult.Bonus),
-		Total: int32(diceResult.Result),
+		Bonus:      int32(diceResult.Bonus),
+		Total:      int32(diceResult.Result),
 	}, nil
 }
 
@@ -174,7 +174,6 @@ func (h *Handler) GetStats(ctx context.Context, req *character_stats.CharacterID
 		h.logger.Error("failed to set ability bonus", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
 
 	return &character_stats.GetStatsResponse{
 		Stats: c.ToProto().Stats,
@@ -198,10 +197,9 @@ func (h *Handler) GetModifier(ctx context.Context, req *character_stats.GetModif
 		h.logger.Error("failed to set ability bonus", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
 
 	return &character_stats.GetModifierResponse{
-		Ability: req.Ability,
+		Ability:  req.Ability,
 		Modifier: int32(mod),
 	}, nil
 }
@@ -223,7 +221,6 @@ func (h *Handler) GetAbility(ctx context.Context, req *character_stats.AbilityRe
 		h.logger.Error("failed to get ability", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
 
 	return abilDto.ToProto(), nil
 }
