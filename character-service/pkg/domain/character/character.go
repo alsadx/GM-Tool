@@ -130,19 +130,6 @@ func (c *Character) Heal(healthAmount int) {
 	}
 }
 
-func (c *Character) RollHitDice(rollingDice map[dice.Dice]int) (result []int, bonus int, err error) {
-	result, err = c.health.RollHitDiceRest(rollingDice)
-	if err != nil {
-		return nil, 0, err
-	}
-	for _, diceRes := range result {
-		c.Heal(diceRes)
-	}
-	bonus = c.Ability(types.Constitution).Modifier()
-	c.Heal(bonus)
-	return result, bonus, nil
-}
-
 func (c *Character) GetCurrentHP() int { return c.health.CurrentHP }
 
 func (c *Character) GetHealth() *health.Health { return c.health }
@@ -166,6 +153,8 @@ func (c *Character) SetCurrentHP(current_hp int) {
 	}
 }
 
+func (c *Character) SetTempHP(tempHp int) { c.health.SetTempHP(tempHp) }
+
 func (c *Character) AddHitDice(hidDiceType dice.Dice) error {
 	if (c.health.GetHitDiceCount() + 1) > c.lvl.CurrentLevel() {
 		return ErrNotEnoughLvlForAddHidDice
@@ -174,10 +163,26 @@ func (c *Character) AddHitDice(hidDiceType dice.Dice) error {
 	return nil
 }
 
-func (c *Character) SetTempHP(tempHp int) { c.health.SetTempHP(tempHp) }
+func (c *Character) RollHitDice(rollingDice map[dice.Dice]int) (result []int, bonus int, err error) {
+	result, err = c.health.RollHitDiceRest(rollingDice)
+	if err != nil {
+		return nil, 0, err
+	}
+	var sumRes int
+	for _, diceRes := range result {
+		sumRes += diceRes
+	}
+	bonus = c.Ability(types.Constitution).Modifier()
+	c.Heal(int(bonus + sumRes))
+	return result, bonus, nil
+}
 
 func (c *Character) RemoveHitDice(hitDiceType dice.Dice) error {
 	return c.health.RemoveHitDice(hitDiceType)
+}
+
+func (c *Character) ResetHitDice(resetDice map[dice.Dice]int) error {
+	return c.health.ResetHitDice(resetDice)
 }
 
 func (c *Character) GetHidDice() map[dice.Dice]*health.Amount {
