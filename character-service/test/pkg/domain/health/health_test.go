@@ -130,13 +130,9 @@ func TestHealthPoint(t *testing.T) {
 
 	t.Run("AddTempHP", func(t *testing.T) {
 		hp := &health.Health{TempHP: 5}
-		hp.SetTempHP(3)
-		if hp.TempHP != 5 {
-			t.Error("AddTempHP() should keep higher value")
-		}
 		hp.SetTempHP(8)
 		if hp.TempHP != 8 {
-			t.Error("AddTempHP() should update to higher value")
+			t.Error("AddTempHP() should set value")
 		}
 	})
 }

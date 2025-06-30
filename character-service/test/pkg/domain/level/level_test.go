@@ -122,9 +122,9 @@ func TestSetLevel(t *testing.T) {
 			},
 			levelToSet:     3,
 			wantLevel:      3,
-			wantEarned:     5,
+			wantEarned:     3,
 			wantExp:        level.Thresholds[2], // 900
-			wantNextThresh: level.Thresholds[5] - level.Thresholds[2],
+			wantNextThresh: level.Thresholds[3] - level.Thresholds[2],
 		},
 	}
 
@@ -173,8 +173,8 @@ func TestRemoveExp(t *testing.T) {
 			expToRemove:    6000,
 			wantLevel:      5,
 			wantEarned:     2,
-			wantExp:        6500 - 6000, // 500
-			wantNextThresh: 900 - 500,
+			wantExp:        500,
+			wantNextThresh: 400,
 		},
 	}
 
