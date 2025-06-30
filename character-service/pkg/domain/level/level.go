@@ -53,65 +53,37 @@ func (ls *LevelSystem) AddExp(amount int) {
 }
 
 func (ls *LevelSystem) SetLevel(lvl int) {
-	lvl = min(max(lvl, 1), len(Thresholds))
-	ls.currentExp = Thresholds[lvl-1]
-	ls.currentLevel = lvl
-	ls.updateEarnedLevelDown()
-	ls.updateEarnedLevel()
+    lvl = min(max(lvl, 1), len(Thresholds))
+    ls.currentExp = Thresholds[lvl-1]
+    ls.currentLevel = lvl
+    ls.updateEarnedLevel()
 }
 
 func (ls *LevelSystem) RemoveExp(amount int) {
-	if amount <= 0 || ls.currentExp == 0 {
-		return
-	}
-
-	ls.currentExp = max(ls.currentExp-amount, 0)
-
-	if ls.currentExp < Thresholds[ls.earnedLevel-1] {
-		ls.updateEarnedLevelDown()
-	}
-}
-
-func (ls *LevelSystem) updateEarnedLevelDown() {
-	newEarnedLevel := 1
-
-	for i := range len(Thresholds) - 1 {
-		if ls.currentExp < Thresholds[i+1] {
-			break
-		}
-		newEarnedLevel = i + 1
-	}
-
-	if newEarnedLevel != ls.earnedLevel {
-		ls.earnedLevel = newEarnedLevel
-		if ls.earnedLevel < len(Thresholds) {
-			ls.nextThreshold = Thresholds[ls.earnedLevel]
-		} else {
-			ls.nextThreshold = 0
-		}
-	}
+    if amount <= 0 || ls.currentExp == 0 {
+        return
+    }
+    ls.currentExp = max(ls.currentExp-amount, 0)
+    ls.updateEarnedLevel()
 }
 
 func (ls *LevelSystem) updateEarnedLevel() {
-	newEarnedLevel := ls.earnedLevel
-
-	for i := ls.earnedLevel; i < len(Thresholds); i++ {
-		if ls.currentExp >= Thresholds[i] {
-			newEarnedLevel = i + 1
-		} else {
-			break
-		}
-	}
-
-	if newEarnedLevel != ls.earnedLevel {
-		ls.earnedLevel = newEarnedLevel
-
-		if ls.earnedLevel < len(Thresholds) {
-			ls.nextThreshold = Thresholds[ls.earnedLevel]
-		} else {
-			ls.nextThreshold = 0
-		}
-	}
+    newEarnedLevel := 1
+    for i := 1; i < len(Thresholds); i++ {
+        if ls.currentExp >= Thresholds[i] {
+            newEarnedLevel = i + 1
+        } else {
+            break
+        }
+    }
+    if newEarnedLevel != ls.earnedLevel {
+        ls.earnedLevel = newEarnedLevel
+        if ls.earnedLevel < len(Thresholds) {
+            ls.nextThreshold = Thresholds[ls.earnedLevel]
+        } else {
+            ls.nextThreshold = 0
+        }
+    }
 }
 
 func (ls *LevelSystem) LevelUp() bool {
