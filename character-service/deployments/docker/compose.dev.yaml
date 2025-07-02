@@ -1,0 +1,54 @@
+services:
+  character-service:
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      MONGO_URL: mongodb://root:example@mongo:27017/character-service-db?authSource=admin
+      MONGO_DATABASE: character-service-db
+    networks:
+      - character-network
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:8.0.10
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - character_mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - character-network
+
+  mongo-express:
+    image: mongo-express:1.0.0-20
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/character-service-db?ssl=false
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+    depends_on:
+      - mongo
+    networks:
+      - character-network
+
+volumes:
+  character_mongodb_data:
+
+networks:
+  character-network:
+    driver: bridge

@@ -1,0 +1,88 @@
+syntax = "proto3";
+package character_health.v1;
+
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/service/character-health";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+service CharacterHealthService {
+  // Set the maximum HP
+  rpc SetMaxHP(SetHpRequest) returns (HpState) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/health/max"
+      body: "value"
+    };
+  }
+  
+  // Set the current HP
+  rpc SetCurrentHP(SetHpRequest) returns (HpState) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/health/current"
+      body: "value"
+    };
+  }
+  
+  // Set temporary HP
+  rpc SetTempHP(SetHpRequest) returns (HpState) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/health/temp"
+      body: "value"
+    };
+  }
+  
+  // Character Treatment
+  rpc Heal(ModifyHpRequest) returns (HpState) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/health/heal"
+      body: "amount"
+    };
+  }
+  
+  // Doing damage
+  rpc TakeDamage(ModifyHpRequest) returns (HpState) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/health/damage"
+      body: "amount"
+    };
+  }
+  
+  // Checking the knockout status
+  rpc IsKnocked(CharacterID) returns (IsKnockedResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/health/knocked"
+    };
+  }
+  
+  // Obtain the current HP state
+  rpc GetHPState(CharacterID) returns (HpState) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/health"
+    };
+  }
+}
+
+message CharacterID {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message SetHpRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  int32 value = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message ModifyHpRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  int32 value = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message HpState {
+  int32 max_hp = 1;
+  int32 current_hp = 2;
+  int32 temp_hp = 3;
+  bool is_knocked = 4;
+}
+
+message IsKnockedResponse {
+  bool is_knocked = 1;
+}

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"sso/internal/domain/models"
 	"time"
 
@@ -34,6 +35,7 @@ func (m *TokenManager) NewJWT(user *models.User, signKey string, ttl time.Durati
 	claims["uid"] = user.Id
 	claims["email"] = user.Email
 	claims["exp"] = time.Now().Add(ttl).Unix()
+	log.Printf("Claims: %v", claims)
 
 	return token.SignedString([]byte(signKey))
 }

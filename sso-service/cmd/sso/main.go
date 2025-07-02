@@ -25,7 +25,7 @@ func main() {
 
 	tokenManager := jwt.NewTokenManager()
 
-	application := app.New(log, cfg.GRPC.Port, &cfg.DB, cfg.Auth.AccessTokenTTL, hasher, tokenManager)
+	application := app.New(log, cfg.GRPC.Port, &cfg.DB, cfg.Auth.AccessTokenTTL, cfg.Auth.RefreshTokenTTL, hasher, tokenManager)
 	defer application.Storage.Close()
 
 	go application.GRPCServer.MustRun()

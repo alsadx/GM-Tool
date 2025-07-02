@@ -17,13 +17,13 @@ type App struct {
 	Storage    *postgres.Storage
 }
 
-func New(log *slog.Logger, grpcPort int, dbConfig *config.DBConfig, tokenTTL time.Duration, hasher *hash.Hasher, tokenManager *jwt.TokenManager) *App {
+func New(log *slog.Logger, grpcPort int, dbConfig *config.DBConfig, tokenTTL time.Duration, refreshTokenTTL time.Duration, hasher *hash.Hasher, tokenManager *jwt.TokenManager) *App {
 	storage, err := postgres.New(dbConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	authService := auth.New(log, storage, storage, tokenTTL, hasher, tokenManager)
+	authService := auth.New(log, storage, storage, tokenTTL, refreshTokenTTL, hasher, tokenManager)
 
 	userInfoService := userinfo.New(log, storage, storage)
 

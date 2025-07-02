@@ -5,7 +5,7 @@ import (
 	"errors"
 	"sso/internal/domain/models"
 
-	"sso/protos/ssov1"
+	ssov1 "github.com/alsadx/gm-protos/gen/go/sso"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -83,7 +83,7 @@ func (s *UserInfoAPI) UpdateUser(ctx context.Context, req *ssov1.UpdateUserReque
 	if err != nil {
 		switch {
 		case errors.Is(err, models.ErrNameIsTaken):
-			return nil, status.Error(codes.AlreadyExists, "name is taken")
+            return nil, status.Error(codes.AlreadyExists, "name is taken")
 		case errors.Is(err, models.ErrInvalidArgument):
 			return nil, status.Error(codes.InvalidArgument, "invalid argument")
 		case errors.Is(err, models.ErrUserNotFound):

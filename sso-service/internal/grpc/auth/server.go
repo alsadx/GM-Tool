@@ -7,7 +7,7 @@ import (
 	"sso/internal/domain/models"
 	"strings"
 
-	"sso/protos/ssov1"
+	ssov1"github.com/alsadx/gm-protos/gen/go/sso"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -32,45 +32,6 @@ type ServerAPI struct {
 func RegisterServerAPI(gRPC *grpc.Server, auth Auth) {
 	ssov1.RegisterAuthServer(gRPC, &ServerAPI{Auth: auth})
 }
-
-// func AuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-// 	md, ok := metadata.FromIncomingContext(ctx)
-// 	if !ok {
-// 		return nil, status.Errorf(codes.Unauthenticated, "missing metadata")
-// 	}
-
-// 	authHeader, ok := md["authorization"]
-// 	if !ok || len(authHeader) == 0 {
-// 		return nil, status.Errorf(codes.Unauthenticated, "missing authorization header")
-// 	}
-
-// 	token, err := jwt.ExtractTokenFromHeader(authHeader[0])
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	// if os.Getenv("TEST_ENV") == "true" {
-// 	// 	if token == "valid-token" {
-// 	// 		ctx = context.WithValue(ctx, "user_id", 1)
-// 	// 		return handler(ctx, req)
-// 	// 	} else {
-// 	// 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
-// 	// 	}
-// 	// }
-
-// 	userId, err := jwt.ValidateToken(token, "secret")
-// 	if err != nil {
-// 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
-// 	}
-
-// 	// if err := jwt.IsTokenExpired(token); err != nil {
-//     //     return nil, status.Errorf(codes.Unauthenticated, "token expired")
-//     // }
-
-// 	ctx = context.WithValue(ctx, "user_id", userId)
-
-// 	return handler(ctx, req)
-// }
 
 func (s *ServerAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.LoginResponse, error) {
 	input := models.LoginInput{

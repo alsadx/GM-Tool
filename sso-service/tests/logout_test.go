@@ -4,7 +4,7 @@ import (
 	"sso/tests/suite"
 	"testing"
 
-	"sso/protos/ssov1"
+	ssov1"github.com/alsadx/gm-protos/gen/go/sso"
 
 	"github.com/brianvoe/gofakeit"
 	"github.com/stretchr/testify/assert"

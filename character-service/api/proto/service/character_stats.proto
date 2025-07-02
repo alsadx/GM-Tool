@@ -1,0 +1,127 @@
+syntax = "proto3";
+package character_stats.v1;
+
+option go_package = "github.com/alsadx/GM-Tool/character-service/gen/service/character-stats";
+
+import "character.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+service CharacterStatsService {
+  // CheckAbility performs an ability check for a character
+  rpc CheckAbility(AbilityRequest) returns (CheckResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/abilities/{ability}/check"
+    };
+  }
+  
+  // CheckSkill performs a skill check for a character
+  rpc CheckSkill(SkillRequest) returns (CheckResponse) {
+    option (google.api.http) = {
+      post: "/v1/characters/{id}/skills/{skill}/check"
+    };
+  }
+  
+  // SetAbilityScore sets the base ability score
+  rpc SetAbilityScore(SetAbilityRequest) returns (SetAbilityResponse) {
+    option (google.api.http) = {
+      put: "/v1/characters/{id}/abilities/{ability}/score"
+      body: "amount"
+    };
+  }
+  
+  // SetAbilityBonus sets the ability bonus
+  rpc SetAbilityBonus(SetAbilityRequest) returns (SetAbilityResponse) {
+    option (google.api.http) = {
+      put: "/v1/characters/{id}/abilities/{ability}/bonus"
+      body: "amount"
+    };
+  }
+  
+  // SetSkillBonus sets the skill bonus
+  rpc SetSkillBonus(SetSkillBonusRequest) returns (SetSkillBonusResponse) {
+    option (google.api.http) = {
+      put: "/v1/characters/{id}/skills/{skill}/bonus"
+      body: "amount"
+    };
+  }
+  
+  // GetStats retrieves all character stats
+  rpc GetStats(CharacterID) returns (GetStatsResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/stats"
+    };
+  }
+  
+  // GetModifier retrieves ability modifier
+  rpc GetModifier(GetModifierRequest) returns (GetModifierResponse) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/abilities/{ability}/modifier"
+    };
+  }
+
+  rpc GetAbility(AbilityRequest) returns (character.Ability) {
+    option (google.api.http) = {
+      get: "/v1/characters/{id}/abilities/{ability}"
+    };
+  }
+}
+
+message CharacterID {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AbilityRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string ability = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message AbilityResponse {
+  
+}
+
+message SkillRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string skill = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CheckResponse {
+  int32 dice_result = 1;  // Result of the dice roll (1-20)
+  int32 bonus = 2;        // Total bonus applied
+  int32 total = 3;        // Final result (dice_result + bonus)
+}
+
+message SetAbilityRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string ability = 2 [(google.api.field_behavior) = REQUIRED];
+  int32 amount = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+message SetAbilityResponse {
+  character.Score score = 1;
+}
+
+message SetSkillBonusRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string skill = 2 [(google.api.field_behavior) = REQUIRED];
+  int32 amount = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+message SetSkillBonusResponse {
+  string skill = 1;
+  int32 bonus = 2;
+}
+
+message GetStatsResponse {
+  map<string, character.Ability> stats = 1;
+}
+
+message GetModifierRequest {
+  string id = 1 [(google.api.field_behavior) = REQUIRED];
+  string ability = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetModifierResponse {
+  string ability = 1;
+  int32 modifier = 2;
+}

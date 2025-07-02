@@ -12,12 +12,14 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v5 v5.7.4
-	github.com/joho/godotenv v1.5.1
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.33.0
 	google.golang.org/grpc v1.72.0
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.6 // indirect
 )
+
+require github.com/alsadx/gm-protos v0.0.1
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect

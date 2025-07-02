@@ -10,13 +10,13 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// if err := godotenv.Load(".env.development"); err != nil {
-	// 	log.Fatalf("Error loading .env file: %v", err)
-	// }
+	if err := godotenv.Load(".env.development"); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")

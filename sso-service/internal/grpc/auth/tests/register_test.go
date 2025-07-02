@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"sso/protos/ssov1"
+	ssov1"github.com/alsadx/gm-protos/gen/go/sso"
 	"github.com/brianvoe/gofakeit"
 
 	"github.com/golang/mock/gomock"

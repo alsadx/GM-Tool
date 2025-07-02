@@ -97,7 +97,7 @@ func (u *UserInfo) UpdateUser(ctx context.Context, userId int64, updates map[str
 	// TODO: validate updates
 
 	for key, value := range updates {
-		if value == "" || len(value) > 255 {
+		if len(value) > 255 {
 			u.Log.Warn("invalid update value", slog.String("key", key), slog.String("value", value))
 
 			return &models.User{}, fmt.Errorf("%s: %w", op, models.ErrInvalidArgument)

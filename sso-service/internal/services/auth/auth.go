@@ -32,16 +32,18 @@ type Auth struct {
 	UserSaver    srv.UserSaver
 	UserProvider srv.UserProvider
 	TokenTTL     time.Duration
+	RefreshTokenTTL time.Duration
 	Hasher       Hasher
 	TokenManager TokenManager
 }
 
-func New(log *slog.Logger, userSaver srv.UserSaver, userProvider srv.UserProvider, tokenTTL time.Duration, hasher Hasher, tokenManager TokenManager) *Auth {
+func New(log *slog.Logger, userSaver srv.UserSaver, userProvider srv.UserProvider, tokenTTL time.Duration, refreshTokenTTL time.Duration, hasher Hasher, tokenManager TokenManager) *Auth {
 	return &Auth{
 		Log:          log,
 		UserSaver:    userSaver,
 		UserProvider: userProvider,
 		TokenTTL:     tokenTTL,
+		RefreshTokenTTL: refreshTokenTTL,
 		Hasher:       hasher,
 		TokenManager: tokenManager,
 	}
@@ -248,7 +250,7 @@ func (a *Auth) CreateSession(ctx context.Context, user *models.User) (models.Tok
 
 	session := models.Session{
 		RefreshToken: res.RefreshToken,
-		ExpiresAt:    time.Now().Add(a.TokenTTL),
+		ExpiresAt:    time.Now().Add(a.RefreshTokenTTL),
 	}
 
 	log.Info("session created", slog.String("refreshToken", session.RefreshToken), slog.Time("expiresAt", session.ExpiresAt))
