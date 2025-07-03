@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"campaigntool/protos/campaignv1"
+	"github.com/alsadx/gm-protos/gen/go/campaignv1"
 
-	"campaigntool/protos/ssov1"
+	"github.com/alsadx/gm-protos/gen/go/ssov1"
 	"github.com/brianvoe/gofakeit"
 
 	"github.com/stretchr/testify/assert"
@@ -391,6 +391,7 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 	playerName := gofakeit.Name()
 	playerEmail := gofakeit.Email()
 	playerPassword := gofakeit.Password(true, true, true, true, false, 6)
+	charId := gofakeit.Uint32()
 
 	regResp, err = authClient.Register(ctx, &ssov1.RegisterRequest{
 		Email:    playerEmail,
@@ -412,6 +413,7 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 	joinResp, err := suite.CampaignClient.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
 		InviteCode: inviteCode,
 		UserId: playerId,
+		CharacterId: int64(charId),
 	})
 	require.NoError(t, err)
 	assert.True(t, joinResp.GetSuccess())
@@ -449,6 +451,7 @@ func TestE2E_JoinWithInviteCode_LeaveCampaign_Success(t *testing.T) {
 	joinResp, err = suite.CampaignClient.JoinCampaign(ctx, &campaignv1.JoinCampaignRequest{
 		InviteCode: inviteCode,
 		UserId: playerId,
+		CharacterId: int64(charId),
 	})
 	require.Error(t, err)
 	st, ok := status.FromError(err)

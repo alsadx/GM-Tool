@@ -2,9 +2,9 @@ env: "local"
 postgres:
   host: "localhost"
   port: 5431
-  user: "alinasad"
+  user: "postgres"
   password: ""
-  database: "sso"
+  database: "campaigntool"
   maxConn: 10
 
 grpc:

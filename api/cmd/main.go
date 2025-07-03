@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gateway/internal/gateway"
+	"github.com/alsadx/GM-Tool/api/internal/gateway"
 	"log"
 
 	"github.com/alsadx/gm-protos/gen/go/campaignv1"

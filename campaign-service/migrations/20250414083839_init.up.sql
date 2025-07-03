@@ -8,10 +8,9 @@ CREATE TABLE IF NOT EXISTS campaigns (
     UNIQUE (name, master_id)
 );
 
-CREATE TABLE IF NOT EXISTS players (
-    campaign_id INT REFERENCES campaigns(id),
-    player_id INT,
-    character_id INT UNIQUE,
-    charachter_joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (campaign_id, player_id)
+CREATE TABLE IF NOT EXISTS campaign_characters (
+    char_id INT NOT NULL UNIQUE,
+    player_id INT NOT NULL,
+    campaign_id INT NOT NULL REFERENCES campaigns(id),
+    PRIMARY KEY (campaign_id, player_id, char_id)
 );

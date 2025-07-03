@@ -35,22 +35,36 @@ func (m *MockGameSaver) EXPECT() *MockGameSaverMockRecorder {
 	return m.recorder
 }
 
-// AddPlayer mocks base method.
-func (m *MockGameSaver) AddPlayer(ctx context.Context, campaignId int64, userId int) error {
+// AddCharacter mocks base method.
+func (m *MockGameSaver) AddCharacter(ctx context.Context, campaignId, userId, charId int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddPlayer", ctx, campaignId, userId)
+	ret := m.ctrl.Call(m, "AddCharacter", ctx, campaignId, userId, charId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddCharacter indicates an expected call of AddCharacter.
+func (mr *MockGameSaverMockRecorder) AddCharacter(ctx, campaignId, userId, charId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCharacter", reflect.TypeOf((*MockGameSaver)(nil).AddCharacter), ctx, campaignId, userId, charId)
+}
+
+// AddPlayer mocks base method.
+func (m *MockGameSaver) AddPlayer(ctx context.Context, campaignId, userId, charId int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddPlayer", ctx, campaignId, userId, charId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddPlayer indicates an expected call of AddPlayer.
-func (mr *MockGameSaverMockRecorder) AddPlayer(ctx, campaignId, userId interface{}) *gomock.Call {
+func (mr *MockGameSaverMockRecorder) AddPlayer(ctx, campaignId, userId, charId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPlayer", reflect.TypeOf((*MockGameSaver)(nil).AddPlayer), ctx, campaignId, userId)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddPlayer", reflect.TypeOf((*MockGameSaver)(nil).AddPlayer), ctx, campaignId, userId, charId)
 }
 
 // DeleteCampaign mocks base method.
-func (m *MockGameSaver) DeleteCampaign(ctx context.Context, campaignId int64, userId int) error {
+func (m *MockGameSaver) DeleteCampaign(ctx context.Context, campaignId, userId int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteCampaign", ctx, campaignId, userId)
 	ret0, _ := ret[0].(error)
@@ -63,8 +77,22 @@ func (mr *MockGameSaverMockRecorder) DeleteCampaign(ctx, campaignId, userId inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCampaign", reflect.TypeOf((*MockGameSaver)(nil).DeleteCampaign), ctx, campaignId, userId)
 }
 
+// RemoveCharacter mocks base method.
+func (m *MockGameSaver) RemoveCharacter(ctx context.Context, campaignId, userId, charId int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveCharacter", ctx, campaignId, userId, charId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveCharacter indicates an expected call of RemoveCharacter.
+func (mr *MockGameSaverMockRecorder) RemoveCharacter(ctx, campaignId, userId, charId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCharacter", reflect.TypeOf((*MockGameSaver)(nil).RemoveCharacter), ctx, campaignId, userId, charId)
+}
+
 // RemovePlayer mocks base method.
-func (m *MockGameSaver) RemovePlayer(ctx context.Context, campaignId int64, userId int) error {
+func (m *MockGameSaver) RemovePlayer(ctx context.Context, campaignId, userId int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemovePlayer", ctx, campaignId, userId)
 	ret0, _ := ret[0].(error)
@@ -78,7 +106,7 @@ func (mr *MockGameSaverMockRecorder) RemovePlayer(ctx, campaignId, userId interf
 }
 
 // SaveCampaign mocks base method.
-func (m *MockGameSaver) SaveCampaign(ctx context.Context, name, desc string, userId int) (int64, error) {
+func (m *MockGameSaver) SaveCampaign(ctx context.Context, name, desc string, userId int64) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveCampaign", ctx, name, desc, userId)
 	ret0, _ := ret[0].(int64)
@@ -93,17 +121,31 @@ func (mr *MockGameSaverMockRecorder) SaveCampaign(ctx, name, desc, userId interf
 }
 
 // SetInviteCode mocks base method.
-func (m *MockGameSaver) SetInviteCode(ctx context.Context, campaignId int64, inviteCode string) error {
+func (m *MockGameSaver) SetInviteCode(ctx context.Context, campaignId, masterId int64, inviteCode string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetInviteCode", ctx, campaignId, inviteCode)
+	ret := m.ctrl.Call(m, "SetInviteCode", ctx, campaignId, masterId, inviteCode)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SetInviteCode indicates an expected call of SetInviteCode.
-func (mr *MockGameSaverMockRecorder) SetInviteCode(ctx, campaignId, inviteCode interface{}) *gomock.Call {
+func (mr *MockGameSaverMockRecorder) SetInviteCode(ctx, campaignId, masterId, inviteCode interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInviteCode", reflect.TypeOf((*MockGameSaver)(nil).SetInviteCode), ctx, campaignId, inviteCode)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInviteCode", reflect.TypeOf((*MockGameSaver)(nil).SetInviteCode), ctx, campaignId, masterId, inviteCode)
+}
+
+// UpdateCampaign mocks base method.
+func (m *MockGameSaver) UpdateCampaign(ctx context.Context, campaign *models.CampaignInfo) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCampaign", ctx, campaign)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateCampaign indicates an expected call of UpdateCampaign.
+func (mr *MockGameSaverMockRecorder) UpdateCampaign(ctx, campaign interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCampaign", reflect.TypeOf((*MockGameSaver)(nil).UpdateCampaign), ctx, campaign)
 }
 
 // MockGameProvider is a mock of GameProvider interface.
@@ -145,7 +187,7 @@ func (mr *MockGameProviderMockRecorder) CheckInviteCode(ctx, inviteCode interfac
 }
 
 // CreatedCampaigns mocks base method.
-func (m *MockGameProvider) CreatedCampaigns(ctx context.Context, userId int) ([]*models.Campaign, error) {
+func (m *MockGameProvider) CreatedCampaigns(ctx context.Context, userId int64) ([]*models.Campaign, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatedCampaigns", ctx, userId)
 	ret0, _ := ret[0].([]*models.Campaign)
@@ -160,7 +202,7 @@ func (mr *MockGameProviderMockRecorder) CreatedCampaigns(ctx, userId interface{}
 }
 
 // CurrentCampaigns mocks base method.
-func (m *MockGameProvider) CurrentCampaigns(ctx context.Context, userId int) ([]*models.CampaignForPlayer, error) {
+func (m *MockGameProvider) CurrentCampaigns(ctx context.Context, userId int64) ([]*models.CampaignForPlayer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CurrentCampaigns", ctx, userId)
 	ret0, _ := ret[0].([]*models.CampaignForPlayer)
@@ -174,11 +216,41 @@ func (mr *MockGameProviderMockRecorder) CurrentCampaigns(ctx, userId interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentCampaigns", reflect.TypeOf((*MockGameProvider)(nil).CurrentCampaigns), ctx, userId)
 }
 
+// GetCampaign mocks base method.
+func (m *MockGameProvider) GetCampaign(ctx context.Context, campaignId int64) (*models.CampaignInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCampaign", ctx, campaignId)
+	ret0, _ := ret[0].(*models.CampaignInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCampaign indicates an expected call of GetCampaign.
+func (mr *MockGameProviderMockRecorder) GetCampaign(ctx, campaignId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCampaign", reflect.TypeOf((*MockGameProvider)(nil).GetCampaign), ctx, campaignId)
+}
+
+// GetCampaignCharacters mocks base method.
+func (m *MockGameProvider) GetCampaignCharacters(ctx context.Context, campaignId int64) ([]*models.CampaignCharacter, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCampaignCharacters", ctx, campaignId)
+	ret0, _ := ret[0].([]*models.CampaignCharacter)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCampaignCharacters indicates an expected call of GetCampaignCharacters.
+func (mr *MockGameProviderMockRecorder) GetCampaignCharacters(ctx, campaignId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCampaignCharacters", reflect.TypeOf((*MockGameProvider)(nil).GetCampaignCharacters), ctx, campaignId)
+}
+
 // GetCampaignPlayers mocks base method.
-func (m *MockGameProvider) GetCampaignPlayers(ctx context.Context, campaignId int) ([]int, error) {
+func (m *MockGameProvider) GetCampaignPlayers(ctx context.Context, campaignId int64) ([]int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCampaignPlayers", ctx, campaignId)
-	ret0, _ := ret[0].([]int)
+	ret0, _ := ret[0].([]int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -187,4 +259,64 @@ func (m *MockGameProvider) GetCampaignPlayers(ctx context.Context, campaignId in
 func (mr *MockGameProviderMockRecorder) GetCampaignPlayers(ctx, campaignId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCampaignPlayers", reflect.TypeOf((*MockGameProvider)(nil).GetCampaignPlayers), ctx, campaignId)
+}
+
+// GetPlayerCharacters mocks base method.
+func (m *MockGameProvider) GetPlayerCharacters(ctx context.Context, campaignId, userId int64) ([]int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlayerCharacters", ctx, campaignId, userId)
+	ret0, _ := ret[0].([]int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlayerCharacters indicates an expected call of GetPlayerCharacters.
+func (mr *MockGameProviderMockRecorder) GetPlayerCharacters(ctx, campaignId, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlayerCharacters", reflect.TypeOf((*MockGameProvider)(nil).GetPlayerCharacters), ctx, campaignId, userId)
+}
+
+// IsCharacterOwner mocks base method.
+func (m *MockGameProvider) IsCharacterOwner(ctx context.Context, campaignId, userId, charId int64) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsCharacterOwner", ctx, campaignId, userId, charId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsCharacterOwner indicates an expected call of IsCharacterOwner.
+func (mr *MockGameProviderMockRecorder) IsCharacterOwner(ctx, campaignId, userId, charId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsCharacterOwner", reflect.TypeOf((*MockGameProvider)(nil).IsCharacterOwner), ctx, campaignId, userId, charId)
+}
+
+// IsMaster mocks base method.
+func (m *MockGameProvider) IsMaster(ctx context.Context, campaignId, userId int64) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsMaster", ctx, campaignId, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsMaster indicates an expected call of IsMaster.
+func (mr *MockGameProviderMockRecorder) IsMaster(ctx, campaignId, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMaster", reflect.TypeOf((*MockGameProvider)(nil).IsMaster), ctx, campaignId, userId)
+}
+
+// IsPlayer mocks base method.
+func (m *MockGameProvider) IsPlayer(ctx context.Context, campaignId, userId int64) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsPlayer", ctx, campaignId, userId)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsPlayer indicates an expected call of IsPlayer.
+func (mr *MockGameProviderMockRecorder) IsPlayer(ctx, campaignId, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsPlayer", reflect.TypeOf((*MockGameProvider)(nil).IsPlayer), ctx, campaignId, userId)
 }

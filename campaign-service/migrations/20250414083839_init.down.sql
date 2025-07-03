@@ -1,2 +1,2 @@
-DROP TABLE IF EXISTS players;
+DROP TABLE IF EXISTS campaign_characters;
 DROP TABLE IF EXISTS campaigns;

@@ -14,14 +14,15 @@ import (
 func TestGenerateInviteCode_Success(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
-	ctx := context.WithValue(context.Background(), "user_id", 1)
+	ctx := context.Background()
 	campaignId := int64(123)
+	userId := int64(123)
 
 	mockGameSaver.EXPECT().
-		SetInviteCode(ctx, campaignId, gomock.Any()).
+		SetInviteCode(ctx, campaignId, userId, gomock.Any()).
 		Return(nil)
 
-	inviteCode, err := service.GenerateInviteCode(ctx, campaignId, 1)
+	inviteCode, err := service.GenerateInviteCode(ctx, campaignId, userId)
 
 	require.NoError(t, err)
 	assert.NotEmpty(t, inviteCode)
@@ -31,14 +32,15 @@ func TestGenerateInviteCode_Success(t *testing.T) {
 func TestGenerateInviteCode_CampaignNotFound(t *testing.T) {
 	service, mockGameSaver, _ := setupTest(t)
 
-	ctx := context.WithValue(context.Background(), "user_id", 1)
+	ctx := context.Background()
 	campaignId := int64(123)
+	userId := int64(123)
 
 	mockGameSaver.EXPECT().
-		SetInviteCode(ctx, campaignId, gomock.Any()).
+		SetInviteCode(ctx, campaignId, userId, gomock.Any()).
 		Return(models.ErrCampaignNotFound)
 
-	inviteCode, err := service.GenerateInviteCode(ctx, campaignId, 1)
+	inviteCode, err := service.GenerateInviteCode(ctx, campaignId, userId)
 
 	require.Error(t, err)
 	assert.Equal(t, models.ErrCampaignNotFound, errors.Unwrap(err))

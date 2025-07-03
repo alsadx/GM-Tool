@@ -1,4 +1,4 @@
-module gateway
+module github.com/alsadx/GM-Tool/api
 
 go 1.24.2
 

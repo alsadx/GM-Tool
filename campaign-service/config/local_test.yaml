@@ -4,7 +4,7 @@ postgres:
   port: 5431
   user: "postgres"
   password: ""
-  database: "sso"
+  database: "campaigntool"
   maxConn: 10
 
 grpc:

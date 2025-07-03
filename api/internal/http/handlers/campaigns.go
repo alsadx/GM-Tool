@@ -10,8 +10,8 @@ import (
 	"github.com/alsadx/gm-protos/gen/go/ssov1"
 	"log"
 
-	models "gateway/internal/domain"
-	"gateway/internal/middleware"
+	models "github.com/alsadx/GM-Tool/api/internal/domain"
+	"github.com/alsadx/GM-Tool/api/internal/middleware"
 )
 
 func GetCreatedCampaignsHandler(campaignClient campaignv1.CampaignToolClient, userClient ssov1.UserInfoClient) http.HandlerFunc {
